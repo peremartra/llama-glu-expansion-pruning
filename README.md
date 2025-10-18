@@ -50,7 +50,7 @@ Evaluation of structured width pruning in GLU-MLP layers using expansion ratio m
 
 ## Key Design Decisions
 
-### Why this benchmark suite for width pruning?
+### Why the selected benchmarks?
 
 1. **Dichotomy measurement:**
    - Knowledge in weights (MMLU, TruthfulQA) → MLP-sensitive
@@ -61,24 +61,17 @@ Evaluation of structured width pruning in GLU-MLP layers using expansion ratio m
    - WinoGrande + PIQA: Missing from original, universal in 2023-2025 papers
    - TruthfulQA: Can show improvement with width pruning
 
-3. **Omitted from original consideration:**
-   - ❌ HumanEval: Less critical for width pruning, time-intensive
-   - ❌ MT-Bench/AlpacaEval: Not standard in pruning research
+### Neuron Selection Method Comparison
 
-### Comparison to original GLU paper
+Before conducting the main pruning experiments, we empirically validated three neuron importance metrics for GLU architectures:
 
-**Added:**
-- WikiText-2 PPL (critical)
-- WinoGrande (universal)
-- PIQA (universal)
-- HellaSwag (very common)
-- ARC-Challenge (standard)
-- GSM8K in standard format
+- **MAW (Maximum Absolute Weight)** - Selected method ✅
+- **VOW (Variance of Weights)** - Rejected due to catastrophic performance
+- **PON (Product of Norms)** - Rejected due to catastrophic performance
 
-**Kept from original:**
-- BoolQ (showed interesting rebound behavior)
-- Lambada
-- IFEval
+**Key Finding:** At just 10% pruning on Llama-3.2-1B, VOW and PON caused perplexity increases of 9,000%+ on Lambada, while MAW showed acceptable 50% degradation. This validates our architectural understanding that GLU's gating mechanism requires magnitude-aware importance metrics.
+
+See [Notebook 00 Neuron Selection Method](notebooks/00_Neuron_Selection_Method_Comparison.ipynb) for full experimental details.
 
 ---
 
