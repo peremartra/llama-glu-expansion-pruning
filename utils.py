@@ -144,3 +144,103 @@ LIBRARY_VERSIONS = {
     "lm-eval": None,
     "torch": None,
 }
+
+# =============================================================================
+# CORE EVALUATION FUNCTIONS
+# =============================================================================
+
+def model_evaluation(model_obj, tokenizer, tasks, limit=None):
+    """
+    Runs lm-eval on a model and tokenizer already in memory.
+    
+    Args:
+        model_obj: PyTorch model object to evaluate
+        tokenizer: Tokenizer object for the model
+        tasks (list): List of task dicts with format:
+                     [{"name": "wikitext", "num_fewshot": 0}, ...]
+                     OR simple list of strings: ["wikitext", "boolq"]
+        limit (int, optional): Number of samples per task for quick testing
+        
+    Returns:
+        dict: Formatted results with metrics per task
+        
+    Raises:
+        ImportError: If lm-eval is not installed
+        Exception: If evaluation fails for all tasks
+        
+    Example:
+        >>> results = model_evaluation(
+        ...     model, tokenizer, 
+        ...     tasks=BENCHMARKS_BASE,
+        ...     limit=100  # Quick test
+        ... )
+    """
+    from lm_eval import evaluator
+    from lm_eval.models.huggingface import HFLM
+    
+    # Extract model name for logging
+    model_name = getattr(model_obj.config, '_name_or_path', 'unknown')
+    limit_str = f"(limit={limit})" if limit else "(full dataset)"
+    
+    # Parse tasks to handle both dict and string formats
+    task_names = []
+    task_fewshot_map = {}
+    
+    for task in tasks:
+        if isinstance(task, dict):
+            task_name = task["name"]
+            task_names.append(task_name)
+            task_fewshot_map[task_name] = task["num_fewshot"]
+        else:
+            # Backward compatibility: simple string list
+            task_names.append(task)
+            task_fewshot_map[task] = 0
+    
+    print(f"\n{'='*70}")
+    print(f"Starting lm-eval on model '{model_name}'")
+    print(f"Tasks: {task_names} {limit_str}")
+    print(f"Few-shot config: {task_fewshot_map}")
+    print(f"{'='*70}\n")
+    
+    # Wrap model for lm-eval
+    model_wrapper = HFLM(
+        pretrained=model_obj,
+        tokenizer=tokenizer,
+        device=str(DEVICE)
+    )
+    
+    # Run evaluation with per-task few-shot configuration
+    # Note: lm-eval handles num_fewshot per task if tasks are configured properly
+    results = evaluator.simple_evaluate(
+        model=model_wrapper,
+        tasks=task_names,
+        num_fewshot=None,  # Let task configs handle this
+        limit=limit,
+        device=str(DEVICE)
+    )
+    
+    # Format results for clean display
+    formatted_results = {}
+    for task_name, res in results["results"].items():
+        # Extract relevant metrics based on task type
+        if 'perplexity,none' in res:
+            # Perplexity tasks (wikitext, lambada)
+            formatted_results[task_name] = {
+                'perplexity': f"{res.get('perplexity,none', 0):.2f}",
+                'word_perplexity': f"{res.get('word_perplexity,none', 0):.2f}",
+                'bits_per_byte': f"{res.get('bits_per_byte,none', 0):.4f}"
+            }
+        elif 'acc,none' in res:
+            # Accuracy tasks (boolq, arc, hellaswag, etc.)
+            formatted_results[task_name] = {
+                'accuracy': f"{res.get('acc,none', 0):.4f}",
+                'acc_norm': f"{res.get('acc_norm,none', 0):.4f}" if 'acc_norm,none' in res else "N/A"
+            }
+        else:
+            # Fallback: store all numeric metrics
+            formatted_results[task_name] = {
+                k: f"{v:.4f}" for k, v in res.items() 
+                if isinstance(v, (int, float))
+            }
+    
+    return formatted_results
