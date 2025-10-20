@@ -36,6 +36,17 @@ Repository: https://github.com/peremartra/glu-pruning
 Paper: "Exploring GLU Expansion Ratios: Structured Pruning in Llama-3.2 Models"
 """
 
+try:
+    import lm_eval
+    import transformers
+    import optipfair
+except ImportError as e:
+    raise ImportError(
+        f"Missing required library: {e.name}\n"
+        "Install all dependencies with:\n"
+        "  pip install optipfair lm-eval transformers torch langdetect"
+    )
+
 # =============================================================================
 # EXPERIMENT CONFIGURATION
 # =============================================================================
@@ -244,3 +255,337 @@ def model_evaluation(model_obj, tokenizer, tasks, limit=None):
             }
     
     return formatted_results
+
+def run_robust_evaluation(model, tokenizer, tasks, checkpoint_path, model_name=None):
+    """
+    Run evaluation with checkpoint/resume support for Colab disconnections.
+    
+    This function saves progress after each benchmark, allowing recovery from
+    interruptions. Checkpoint files are stored as JSON with task completion status.
+    
+    Args:
+        model: PyTorch model object to evaluate
+        tokenizer: Tokenizer object for the model
+        tasks (list): List of task dicts with format:
+                     [{"name": "wikitext", "num_fewshot": 0}, ...]
+        checkpoint_path (str): Path to checkpoint JSON file
+                              (e.g., "/content/drive/MyDrive/glu_pruning/llama_1b_20pct.json")
+        model_name (str, optional): Human-readable model name for logging
+        
+    Returns:
+        dict: Complete results with all benchmark metrics
+        
+    Example:
+        >>> results = run_robust_evaluation(
+        ...     model, tokenizer,
+        ...     tasks=BENCHMARKS_BASE,
+        ...     checkpoint_path="/content/drive/MyDrive/checkpoints/model.json"
+        ... )
+        >>> # If interrupted, re-run the same command - it will resume
+    """
+    import json
+    import os
+    from datetime import datetime
+    from pathlib import Path
+    
+    # Extract model name for metadata
+    if model_name is None:
+        model_name = getattr(model.config, '_name_or_path', 'unknown')
+    
+    # Ensure checkpoint directory exists
+    checkpoint_dir = os.path.dirname(checkpoint_path)
+    if checkpoint_dir:
+        os.makedirs(checkpoint_dir, exist_ok=True)
+    
+    # Parse tasks to get task names
+    task_names = [t["name"] if isinstance(t, dict) else t for t in tasks]
+    
+    # Load or create checkpoint
+    if os.path.exists(checkpoint_path):
+        print(f"📂 Found existing checkpoint: {checkpoint_path}")
+        with open(checkpoint_path, 'r') as f:
+            checkpoint = json.load(f)
+        
+        # Validate checkpoint structure
+        if "results" not in checkpoint or "pending_tasks" not in checkpoint:
+            print("⚠️  Invalid checkpoint structure. Starting fresh.")
+            checkpoint = _create_new_checkpoint(model_name, task_names)
+        else:
+            print(f"✅ Loaded checkpoint. Completed: {len(checkpoint['results'])}/{len(task_names)} tasks")
+            print(f"   Pending: {checkpoint['pending_tasks']}")
+            if checkpoint.get('failed_tasks'):
+                print(f"   ⚠️  Previously failed: {checkpoint['failed_tasks']}")
+    else:
+        print(f"🆕 Creating new checkpoint: {checkpoint_path}")
+        checkpoint = _create_new_checkpoint(model_name, task_names)
+    
+    # Identify tasks to run (pending + failed to retry)
+    completed_tasks = set(checkpoint["results"].keys())
+    tasks_to_run = [t for t in tasks if (t["name"] if isinstance(t, dict) else t) not in completed_tasks]
+    
+    if not tasks_to_run:
+        print("🎉 All tasks already completed!")
+        return checkpoint["results"]
+    
+    print(f"\n{'='*70}")
+    print(f"🚀 Starting evaluation: {len(tasks_to_run)} tasks remaining")
+    print(f"{'='*70}\n")
+    
+    # Run each pending task
+    for i, task in enumerate(tasks_to_run, 1):
+        task_name = task["name"] if isinstance(task, dict) else task
+        
+        print(f"\n[{i}/{len(tasks_to_run)}] Evaluating: {task_name}")
+        print(f"{'─'*70}")
+        
+        try:
+            # Run evaluation for single task
+            result = model_evaluation(
+                model, tokenizer, 
+                tasks=[task],
+                limit=None
+            )
+            
+            # Store result in checkpoint
+            checkpoint["results"][task_name] = result[task_name]
+            checkpoint["pending_tasks"].remove(task_name)
+            checkpoint["metadata"]["last_updated"] = datetime.now().isoformat()
+            
+            # Remove from failed tasks if it was there
+            if task_name in checkpoint.get("failed_tasks", []):
+                checkpoint["failed_tasks"].remove(task_name)
+            
+            # Save checkpoint after each task
+            _save_checkpoint(checkpoint_path, checkpoint)
+            
+            print(f"✅ {task_name} completed and saved to checkpoint")
+            print(f"   Results: {result[task_name]}")
+            
+        except Exception as e:
+            error_msg = str(e)
+            print(f"❌ {task_name} FAILED: {error_msg}")
+            
+            # Track failed task but continue
+            if "failed_tasks" not in checkpoint:
+                checkpoint["failed_tasks"] = []
+            if task_name not in checkpoint["failed_tasks"]:
+                checkpoint["failed_tasks"].append(task_name)
+            
+            checkpoint["metadata"]["last_updated"] = datetime.now().isoformat()
+            _save_checkpoint(checkpoint_path, checkpoint)
+            
+            print(f"⚠️  Continuing with next task...")
+            continue
+    
+    # Mark as completed if all tasks done
+    if not checkpoint["pending_tasks"]:
+        checkpoint["metadata"]["completed"] = True
+        checkpoint["metadata"]["completed_at"] = datetime.now().isoformat()
+        _save_checkpoint(checkpoint_path, checkpoint)
+        
+        print(f"\n{'='*70}")
+        print("🎉 ALL TASKS COMPLETED!")
+        if checkpoint.get("failed_tasks"):
+            print(f"⚠️  Some tasks failed: {checkpoint['failed_tasks']}")
+        print(f"{'='*70}\n")
+    
+    return checkpoint["results"]
+
+
+def _create_new_checkpoint(model_name, task_names):
+    """Create a new checkpoint structure."""
+    from datetime import datetime
+    return {
+        "metadata": {
+            "model_name": model_name,
+            "started_at": datetime.now().isoformat(),
+            "last_updated": datetime.now().isoformat(),
+            "completed": False
+        },
+        "results": {},
+        "pending_tasks": task_names.copy(),
+        "failed_tasks": []
+    }
+
+
+def _save_checkpoint(checkpoint_path, checkpoint):
+    """Save checkpoint to file with error handling."""
+    import json
+    import shutil
+    from pathlib import Path
+    
+    try:
+        # Write to temporary file first (atomic write)
+        temp_path = f"{checkpoint_path}.tmp"
+        with open(temp_path, 'w') as f:
+            json.dump(checkpoint, f, indent=2)
+        
+        # Move to final location
+        shutil.move(temp_path, checkpoint_path)
+        
+        # Sync with Google Drive if path contains 'drive'
+        if 'drive' in checkpoint_path.lower():
+            try:
+                # Force sync by touching the file
+                Path(checkpoint_path).touch()
+            except:
+                pass  # Drive sync is best-effort
+        
+    except Exception as e:
+        print(f"⚠️  Warning: Failed to save checkpoint: {e}")
+        # Don't crash the evaluation if checkpoint save fails
+
+
+# =============================================================================
+# UTILITY FUNCTIONS
+# =============================================================================
+
+def clear_gpu_cache():
+    """
+    Clear GPU memory cache and run garbage collection.
+    
+    Essential for Colab environments to prevent OOM errors when
+    switching between models or after pruning operations.
+    """
+    import gc
+    
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        torch.cuda.synchronize()
+    gc.collect()
+    
+    if torch.cuda.is_available():
+        print(f"🧹 GPU memory cleared. Available: {torch.cuda.get_device_properties(0).total_memory / 1e9:.2f} GB")
+
+
+def get_model_stats(model):
+    """
+    Calculate model statistics: total parameters, trainable parameters, size.
+    
+    Args:
+        model: PyTorch model object
+        
+    Returns:
+        dict: Statistics including parameter counts and model size
+    """
+    total_params = sum(p.numel() for p in model.parameters())
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    
+    # Calculate model size in MB
+    param_size = sum(p.nelement() * p.element_size() for p in model.parameters())
+    buffer_size = sum(b.nelement() * b.element_size() for b in model.buffers())
+    size_mb = (param_size + buffer_size) / 1024**2
+    
+    return {
+        "total_parameters": total_params,
+        "trainable_parameters": trainable_params,
+        "size_mb": size_mb,
+        "size_gb": size_mb / 1024
+    }
+
+
+def load_or_create_model(config_entry, device="auto"):
+    """
+    Load model from HF Hub (if star) or create via pruning (if not star).
+    
+    Args:
+        config_entry (dict): Entry from EXPERIMENT_CONFIG
+        device (str): Device placement ("auto", "cuda", "cpu")
+        
+    Returns:
+        tuple: (model, tokenizer, stats_dict)
+        
+    Example:
+        >>> config = EXPERIMENT_CONFIG[1]  # 1B-40% (star)
+        >>> model, tokenizer, stats = load_or_create_model(config)
+    """
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+    from optipfair import prune_model
+    
+    base_model_id = config_entry["base_model"]
+    hf_repo_id = config_entry["hf_repo_id"]
+    is_star = config_entry["is_star"]
+    pruning_pct = config_entry["pruning_pct"]
+    
+    print(f"\n{'='*70}")
+    print(f"Loading model: {hf_repo_id}")
+    print(f"  Base: {base_model_id}")
+    print(f"  Pruning: {pruning_pct}%")
+    print(f"  Star model: {'⭐ Yes' if is_star else 'No (on-the-fly)'}")
+    print(f"{'='*70}\n")
+    
+    # Load tokenizer (always from base model)
+    tokenizer = AutoTokenizer.from_pretrained(base_model_id)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+    
+    if is_star:
+        # Try loading from HF Hub first
+        try:
+            print(f"📥 Attempting to load from HF Hub: {hf_repo_id}")
+            model = AutoModelForCausalLM.from_pretrained(
+                hf_repo_id,
+                torch_dtype=torch.float16,
+                device_map=device
+            )
+            print(f"✅ Loaded from HF Hub")
+            stats = {"source": "hf_hub", **get_model_stats(model)}
+            return model, tokenizer, stats
+            
+        except Exception as e:
+            print(f"⚠️  HF Hub load failed: {e}")
+            print(f"   Falling back to on-the-fly pruning...")
+    
+    # Create via pruning (fallback or non-star)
+    print(f"🔧 Creating model via on-the-fly pruning...")
+    base_model = AutoModelForCausalLM.from_pretrained(
+        base_model_id,
+        torch_dtype=torch.float16,
+        device_map=device
+    )
+    
+    print(f"✂️  Pruning with MAW method ({pruning_pct}%)...")
+    pruned_model, prune_stats = prune_model(
+        model=base_model,
+        pruning_type="MLP_GLU",
+        neuron_selection_method="MAW",
+        pruning_percentage=pruning_pct,
+        show_progress=True,
+        return_stats=True
+    )
+    
+    print(f"✅ Model created")
+    print(f"   Original params: {prune_stats['original_parameters']:,}")
+    print(f"   Pruned params: {prune_stats['pruned_parameters']:,}")
+    print(f"   Reduction: {prune_stats['percentage_reduction']:.2f}%")
+    
+    stats = {
+        "source": "on_the_fly_pruning",
+        "pruning_stats": prune_stats,
+        **get_model_stats(pruned_model)
+    }
+    
+    return pruned_model, tokenizer, stats
+
+
+def format_results_table(results_dict):
+    """
+    Format evaluation results as a pretty table for display.
+    
+    Args:
+        results_dict (dict): Results from run_robust_evaluation()
+        
+    Returns:
+        str: Formatted table string
+    """
+    import pandas as pd
+    
+    # Flatten nested metrics
+    rows = []
+    for task_name, metrics in results_dict.items():
+        row = {"task": task_name}
+        row.update(metrics)
+        rows.append(row)
+    
+    df = pd.DataFrame(rows)
+    return df.to_string(index=False)
