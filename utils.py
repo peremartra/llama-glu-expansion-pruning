@@ -71,7 +71,7 @@ EXPERIMENT_CONFIG = [
         "base_model": "meta-llama/Llama-3.2-1B",
         "pruning_pct": 30,
         "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-40pct",
-        "is_star": True,  # ⭐ Star model (140% expansion - paper's optimal)
+        "is_star": False,  # ⭐ Star model (140% expansion - paper's optimal)
     },
     {
         "base_model": "meta-llama/Llama-3.2-1B",
@@ -83,7 +83,7 @@ EXPERIMENT_CONFIG = [
         "base_model": "meta-llama/Llama-3.2-1B",
         "pruning_pct": 50,
         "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-40pct",
-        "is_star": True,  # ⭐ Star model (140% expansion - paper's optimal)
+        "is_star": False,  # ⭐ Star model (140% expansion - paper's optimal)
     },
     {
         "base_model": "meta-llama/Llama-3.2-1B",
