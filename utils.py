@@ -53,28 +53,43 @@ except ImportError as e:
 
 EXPERIMENT_CONFIG = [
     # -------------------------------------------------------------------------
-    # Llama-3.2-1B Experiments (3 models)
+    # Llama-3.2-1B Experiments (5 models)
     # -------------------------------------------------------------------------
+    {
+        "base_model": "meta-llama/Llama-3.2-1B",
+        "pruning_pct": 10,
+        "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-20pct",
+        "is_star": False,  # Recreate on-the-fly
+    },
     {
         "base_model": "meta-llama/Llama-3.2-1B",
         "pruning_pct": 20,
         "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-20pct",
         "is_star": False,  # Recreate on-the-fly
-        "expansion_rate": 220,  # Target expansion: 2048 → 6554
+    },
+    {
+        "base_model": "meta-llama/Llama-3.2-1B",
+        "pruning_pct": 30,
+        "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-40pct",
+        "is_star": True,  # ⭐ Star model (140% expansion - paper's optimal)
     },
     {
         "base_model": "meta-llama/Llama-3.2-1B",
         "pruning_pct": 40,
         "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-40pct",
         "is_star": True,  # ⭐ Star model (140% expansion - paper's optimal)
-        "expansion_rate": 140,  # Target expansion: 2048 → 4916
+    },
+    {
+        "base_model": "meta-llama/Llama-3.2-1B",
+        "pruning_pct": 50,
+        "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-40pct",
+        "is_star": True,  # ⭐ Star model (140% expansion - paper's optimal)
     },
     {
         "base_model": "meta-llama/Llama-3.2-1B",
         "pruning_pct": 60,
         "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-60pct",
         "is_star": False,
-        "expansion_rate": 60,  # Target expansion: 2048 → 3277
     },
     
     # -------------------------------------------------------------------------
@@ -85,28 +100,24 @@ EXPERIMENT_CONFIG = [
         "pruning_pct": 10,
         "hf_repo_id": "peremartra/Llama-3.2-3B-pruned-10pct",
         "is_star": True,  # ⭐ Star model (140% expansion - paper's optimal)
-        "expansion_rate": 140,  # Target expansion: 3072 → 7373
     },
     {
         "base_model": "meta-llama/Llama-3.2-3B",
         "pruning_pct": 20,
         "hf_repo_id": "peremartra/Llama-3.2-3B-pruned-20pct",
         "is_star": False,
-        "expansion_rate": 113,  # Target expansion: 3072 → 6554
     },
     {
         "base_model": "meta-llama/Llama-3.2-3B",
         "pruning_pct": 40,
         "hf_repo_id": "peremartra/Llama-3.2-3B-pruned-40pct",
         "is_star": False,
-        "expansion_rate": 60,  # Target expansion: 3072 → 4916
     },
     {
         "base_model": "meta-llama/Llama-3.2-3B",
         "pruning_pct": 60,
         "hf_repo_id": "peremartra/Llama-3.2-3B-pruned-60pct",
         "is_star": False,
-        "expansion_rate": 7,  # Target expansion: 3072 → 3277
     },
 ]
 
