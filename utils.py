@@ -58,7 +58,7 @@ EXPERIMENT_CONFIG = [
     {
         "base_model": "meta-llama/Llama-3.2-1B",
         "pruning_pct": 10,
-        "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-20pct",
+        "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-10pct",
         "is_star": False,  # Recreate on-the-fly
     },
     {
@@ -70,7 +70,7 @@ EXPERIMENT_CONFIG = [
     {
         "base_model": "meta-llama/Llama-3.2-1B",
         "pruning_pct": 30,
-        "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-40pct",
+        "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-30pct",
         "is_star": False,  # ⭐ Star model (140% expansion - paper's optimal)
     },
     {
@@ -82,7 +82,7 @@ EXPERIMENT_CONFIG = [
     {
         "base_model": "meta-llama/Llama-3.2-1B",
         "pruning_pct": 50,
-        "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-40pct",
+        "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-50pct",
         "is_star": False,  # ⭐ Star model (140% expansion - paper's optimal)
     },
     {
