@@ -233,10 +233,18 @@ def model_evaluation(model_obj, tokenizer, tasks, limit=None):
     
     # Run evaluation with per-task few-shot configuration
     # Note: lm-eval handles num_fewshot per task if tasks are configured properly
+    if len(set(task_fewshot_map.values())) == 1:
+        # Todas las tareas usan el mismo num_fewshot
+        fewshot_value = list(task_fewshot_map.values())[0]
+    else:
+        # Múltiples valores diferentes (no debería pasar, pero por si acaso)
+        fewshot_value = 0
+        
     results = evaluator.simple_evaluate(
         model=model_wrapper,
         tasks=task_names,
-        num_fewshot=None,  # Let task configs handle this
+        num_fewshot=fewshot_value,  # Let task configs handle this
+        batch_size="auto",
         limit=limit,
         device=str(DEVICE)
     )
@@ -536,7 +544,8 @@ def load_or_create_model(config_entry, device="auto"):
             print(f"📥 Attempting to load from HF Hub: {hf_repo_id}")
             model = AutoModelForCausalLM.from_pretrained(
                 hf_repo_id,
-                torch_dtype=torch.float16,
+                #torch_dtype=torch.float16, #L4
+                torch_dtype=torch.bfloat16, #A100
                 device_map=device
             )
             print(f"✅ Loaded from HF Hub")
@@ -551,7 +560,8 @@ def load_or_create_model(config_entry, device="auto"):
     print(f"🔧 Creating model via on-the-fly pruning...")
     base_model = AutoModelForCausalLM.from_pretrained(
         base_model_id,
-        torch_dtype=torch.float16,
+        #torch_dtype=torch.float16,
+        torch_dtype=torch.bfloat16,
         device_map=device
     )
     
