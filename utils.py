@@ -141,7 +141,7 @@ BENCHMARKS_BASE = [
     {"name": "truthfulqa_mc2", "num_fewshot": 0},
     {"name": "gsm8k", "num_fewshot": 5},  # Chain-of-thought requires few-shot
     {"name": "ifeval", "num_fewshot": 0},
-    {"name": "musr", "num_fewshot": 0},
+    {"name": "leaderboard_musr", "num_fewshot": 0},
 ]
 
 # Instruct models additional benchmark (+1)
