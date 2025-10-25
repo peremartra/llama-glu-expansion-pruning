@@ -32,7 +32,7 @@ Usage:
     )
 
 Author: Pere Martra
-Repository: https://github.com/peremartra/glu-pruning
+Repository: https://github.com/oopere/glu-pruning
 Paper: "Exploring GLU Expansion Ratios: Structured Pruning in Llama-3.2 Models"
 """
 
@@ -58,37 +58,37 @@ EXPERIMENT_CONFIG = [
     {
         "base_model": "meta-llama/Llama-3.2-1B",
         "pruning_pct": 10,
-        "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-10pct",
+        "hf_repo_id": "oopere/Llama-3.2-1B-pruned-10pct",
         "is_star": False,  # Recreate on-the-fly
     },
     {
         "base_model": "meta-llama/Llama-3.2-1B",
         "pruning_pct": 20,
-        "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-20pct",
+        "hf_repo_id": "oopere/Llama-3.2-1B-pruned-20pct",
         "is_star": False,  # Recreate on-the-fly
     },
     {
         "base_model": "meta-llama/Llama-3.2-1B",
         "pruning_pct": 30,
-        "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-30pct",
-        "is_star": False,  # ⭐ Star model (140% expansion - paper's optimal)
+        "hf_repo_id": "oopere/Llama-3.2-1B-pruned-30pct",
+        "is_star": False,  
     },
     {
         "base_model": "meta-llama/Llama-3.2-1B",
         "pruning_pct": 40,
-        "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-40pct",
+        "hf_repo_id": "oopere/Llama-3.2-1B-pruned-40pct",
         "is_star": True,  # ⭐ Star model (140% expansion - paper's optimal)
     },
     {
         "base_model": "meta-llama/Llama-3.2-1B",
         "pruning_pct": 50,
-        "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-50pct",
-        "is_star": False,  # ⭐ Star model (140% expansion - paper's optimal)
+        "hf_repo_id": "oopere/Llama-3.2-1B-pruned-50pct",
+        "is_star": False,  
     },
     {
         "base_model": "meta-llama/Llama-3.2-1B",
         "pruning_pct": 60,
-        "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-60pct",
+        "hf_repo_id": "oopere/Llama-3.2-1B-pruned-60pct",
         "is_star": False,
     },
     
@@ -98,25 +98,37 @@ EXPERIMENT_CONFIG = [
     {
         "base_model": "meta-llama/Llama-3.2-3B",
         "pruning_pct": 10,
-        "hf_repo_id": "peremartra/Llama-3.2-3B-pruned-10pct",
+        "hf_repo_id": "oopere/Llama-3.2-3B-pruned-10pct",
         "is_star": True,  # ⭐ Star model (140% expansion - paper's optimal)
     },
     {
         "base_model": "meta-llama/Llama-3.2-3B",
         "pruning_pct": 20,
-        "hf_repo_id": "peremartra/Llama-3.2-3B-pruned-20pct",
+        "hf_repo_id": "oopere/Llama-3.2-3B-pruned-20pct",
+        "is_star": False,
+    },
+    {
+        "base_model": "meta-llama/Llama-3.2-3B",
+        "pruning_pct": 30,
+        "hf_repo_id": "oopere/Llama-3.2-3B-pruned-30pct",
+        "is_star": False,
+    },    
+    {
+        "base_model": "meta-llama/Llama-3.2-3B",
+        "pruning_pct": 40,
+        "hf_repo_id": "oopere/Llama-3.2-3B-pruned-40pct",
         "is_star": False,
     },
     {
         "base_model": "meta-llama/Llama-3.2-3B",
         "pruning_pct": 40,
-        "hf_repo_id": "peremartra/Llama-3.2-3B-pruned-40pct",
+        "hf_repo_id": "oopere/Llama-3.2-3B-pruned-40pct",
         "is_star": False,
     },
     {
         "base_model": "meta-llama/Llama-3.2-3B",
         "pruning_pct": 60,
-        "hf_repo_id": "peremartra/Llama-3.2-3B-pruned-60pct",
+        "hf_repo_id": "oopere/Llama-3.2-3B-pruned-60pct",
         "is_star": False,
     },
 ]
