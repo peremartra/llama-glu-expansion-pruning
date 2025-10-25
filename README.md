@@ -74,6 +74,28 @@ Before conducting the main pruning experiments, we empirically validated three n
 See [Notebook 00 Neuron Selection Method](notebooks/00_Neuron_Selection_Method_Comparison.ipynb) for full experimental details.
 
 ---
+## Results Highlights - Llama-3.2-1B
+
+### Key Findings
+
+**1. Instruction Following Improves (+75%)**
+- IFEval performance peaks at 30% pruning with +75% improvement over baseline
+- Remains elevated (+46%) even at optimal 140% Expansion (40% pruning) configuration
+- Mechanism unclear; may relate to reduced capacity for elaboration
+
+**2. Validates 140% Expansion (40% Pruning) as Effective configuration**
+- Maintains 87% of MMLU performance (-13.6%)
+- Improves instruction following by +46.5% (IFEval)
+- Improves multi-step reasoning by +26.1% (MUSR)
+- Improves truthfulness metrics by +13.9% (see caveats in detailed [results](results/))
+
+**3. Clear Performance Dichotomy**
+- **Improves:** IFEval (+75%), MUSR (+26%), TruthfulQA (+24%)
+- **Degrades:** GSM8K (-69%), Perplexity (+2,691%), HellaSwag (-41%)
+- Reveals trade-off: pruning sacrifices computational fluency but improves performance on literal instruction-following tasks
+
+📊 **[View complete results and analysis →](results/)**
+---
 
 ## Execution Details
 
@@ -90,23 +112,24 @@ See [Notebook 00 Neuron Selection Method](notebooks/00_Neuron_Selection_Method_C
 
 ---
 
-## Expected Insights
-
-### Width pruning hypothesis:
-1. **Selective degradation:** Factual knowledge (MMLU) degrades
-2. **Preserved:** Context processing (Lambada) survives
-3. **Potential improvement:** Truthfulness (TruthfulQA) may increase
-4. **Non-linear:** BoolQ may show U-curve behavior
+### Validation Status (Llama-3.2-1B):
+Selective degradation: MMLU degrades moderately (-14% at 40% pruning)
+Preserved capabilities: Some metrics show resistance (BoolQ stable until 50%)
+Truthfulness metrics improve: TruthfulQA-MC2 +14% at 40% (baseline near-random, see detailed [analysis](results/))
+Non-monotonic patterns: IFEval peaks at 30% (+75%), remains elevated at 40% (+47%)
+Unexpected gains: IFEval improves substantially, MUSR shows consistent gains (+26%)
 
 ### Paper narrative:
 > "Width pruning in GLU-MLP layers selectively reduces memorized knowledge capacity while preserving algorithmic processing capabilities, potentially improving model truthfulness."
 
 ---
 
-## Next Steps
+## Progress Tracker
 
-- [ ] Setup LM Evaluation Harness
-- [ ] Implement width pruning at different expansion ratios
-- [ ] Run benchmark suite on all 4 models
-- [ ] Analyze capability fragility hierarchy
-- [ ] Compare base vs instruct degradation patterns
+- [x] **Llama-3.2-1B (Base)** - Completed ✅ 
+  - 7 pruning levels (0-60%)
+  - 13 benchmarks evaluated
+  - [See detailed results](results/)
+- [ ] Llama-3.2-3B (Base)
+- [ ] Llama-3.2-1B-Instruct
+- [ ] Llama-3.2-3B-Instruct
