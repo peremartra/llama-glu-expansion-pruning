@@ -41,7 +41,7 @@ This directory contains evaluation results for **Llama-3.2-1B** base model with 
 ### 1. 🎯 Instruction Following (IFEval) Dramatically Improves
 - **IFEval shows remarkable gains**, peaking at +75% at 30% pruning
 - Performance remains elevated even at 60% pruning (+32.2%)
-- Suggests that **pruning removes neurons that interfered with instruction adherence**
+- Suggests that **The pruned model is less able to "digress" or "over-elaborate", which paradoxically helps in tasks that require following simple instructions to the letter.**
 - This is a critical finding for practical deployment where instruction-following is essential
 
 ### 2. 🧠 Multi-Step Reasoning (MUSR) Also Benefits
@@ -50,11 +50,12 @@ This directory contains evaluation results for **Llama-3.2-1B** base model with 
 - Indicates that **compositional reasoning capabilities can be enhanced** through targeted pruning
 - Complements the IFEval findings on structured task execution
 
-### 3. 📊 Truthfulness Shows Progressive Improvement
-- **TruthfulQA-MC2 consistently improves** with increased pruning, from +6.7% at 10% to +23.6% at 60%
-- **TruthfulQA-MC1 also improves** across all levels (+1.6% to +6.3%)
-- Validates the **knowledge-in-weights hypothesis**: removing neurons eliminates memorized incorrect facts
-- Even at aggressive 60% pruning, both truthfulness metrics continue to improve
+### 3. 📊 Truthfulness Shows Apparent Improvement (With Caveats)
+- **TruthfulQA-MC2** improves progressively: +6.7% (10%) → +23.6% (60%)
+- **TruthfulQA-MC1** shows modest gains: +1.6% to +6.3%
+- **Critical context**: Baseline is near-random (23.38% vs ~25% chance). At 60% pruning, multiple benchmarks collapse to chance level (ARC-C: 23.98%, MMLU: 25.54%, WinoGrande: 48.70%)
+- **Most likely mechanism**: Pruning flattens probability distributions, reducing the model's confidence in popular misconceptions that are over-represented in training data. This is bias reduction, not genuine knowledge improvement (note MMLU degrades -17.9% at 60%)
+- **Practical benefit**: Pruning does reduce confident misinformation, but interpret cautiously at high pruning levels
 
 ### 4. 💥 Trade-offs: Knowledge vs Processing Capabilities
 **What degrades:**
@@ -68,7 +69,7 @@ This directory contains evaluation results for **Llama-3.2-1B** base model with 
 - **Multi-step reasoning** (MUSR): Up to +26%
 - **Truthfulness** (TruthfulQA): Up to +24%
 
-This reveals a fundamental trade-off: **width pruning sacrifices raw language modeling and computational fluency but enhances higher-level reasoning, instruction adherence, and factual accuracy**.
+This reveals a fundamental trade-off: **width pruning sacrifices general computational capacity, but improves in tasks that benefit from direct and literal responses.**.
 
 ### 5. ⭐ Optimal Configuration at 40% Pruning (140% Expansion)
 - Maintains **~87% of MMLU performance**
