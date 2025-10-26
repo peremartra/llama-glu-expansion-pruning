@@ -23,28 +23,24 @@ Evaluation of structured width pruning in GLU-MLP layers using expansion ratio m
 
 ## Benchmarks
 
-### Base Models (10 benchmarks)
+### Base Models (13 benchmarks)
 
 | Benchmark | Type | Config | Rationale |
-|-----------|------|--------|-----------|
-| **WikiText-2 PPL** | Perplexity | - | Fundamental language modeling capability |
-| **MMLU** | Knowledge | 5-shot | Knowledge stored in weights (MLP-sensitive) |
-| **ARC-Challenge** | Reasoning | 0-shot | Depth-sensitive reasoning |
-| **HellaSwag** | Common Sense | 0-shot | Universal in pruning literature |
-| **WinoGrande** | Common Sense | 0-shot | Standard suite (90%+ papers) |
-| **PIQA** | Physical Reasoning | 0-shot | Universal, fundamental |
-| **BoolQ** | QA | 0-shot | Non-monotonic behavior at high pruning |
-| **Lambada** | Context | 0-shot | Resistant to pruning (in-context learning) |
-| **TruthfulQA** | Truthfulness | MC1/MC2 | May improve post-pruning (reduces false knowledge) |
-| **GSM8K** | Math Reasoning | 5-8 shot CoT | Extremely fragile stress test |
+|----------|------|--------|-----------|
+| WikiText-2 PPL | Perplexity | 0-shot | Fundamental language modeling capability |
+| MMLU | Knowledge | 5-shot | Knowledge stored in weights (MLP-sensitive) |
+| ARC-Challenge | Reasoning | 0-shot | Depth-sensitive reasoning |
+| HellaSwag | Common Sense | 0-shot | Universal in pruning literature |
+| WinoGrande | Common Sense | 0-shot | Standard suite (90%+ papers) |
+| PIQA | Physical Reasoning | 0-shot | Universal, fundamental |
+| BoolQ | QA | 0-shot | Non-monotonic behavior at high pruning |
+| Lambada | Context | 0-shot | Language modeling stress test (context-dependent prediction) |
+| TruthfulQA MC1 | Truthfulness | 0-shot | May improve post-pruning (single correct answer) |
+| TruthfulQA MC2 | Truthfulness | 0-shot | May improve post-pruning (reduces false knowledge) |
+| GSM8K | Math Reasoning | 5-shot | Extremely fragile stress test |
+| IFEval | Instruction Following | 0-shot | Core instruct capability |
+| MUSR | Multi-Step Reasoning | 0-shot | Complex compositional reasoning benchmark |
 
-### Instruct Models (+1 additional)
-
-| Benchmark | Type | Config | Rationale |
-|-----------|------|--------|-----------|
-| **IFEval** | Instruction Following | 0-shot | Core instruct capability |
-
-**Total:** 11 benchmark evaluations per model
 
 ---
 
