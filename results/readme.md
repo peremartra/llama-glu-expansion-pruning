@@ -20,8 +20,6 @@ This directory contains evaluation results for **Llama-3.2-1B** base model with 
 | 50%             | 0.2606 (-16.2%) | 0.0167 (-74.7%) | 0.2474 (-31.8%) | 0.3251 (-48.9%) | 0.6141 (-3.2%)  | 0.6088 (-18.2%) | 117.04 (+911.5%)  | 428.3 (+7348.7%)    |
 | 60%             | 0.2554 (-17.9%) | 0.0205 (-68.9%) | 0.2398 (-33.9%) | 0.2909 (-54.3%) | 0.5535 (-12.7%) | 0.5756 (-22.6%) | 322.95 (+2691.0%) | 2941.08 (+51049.2%) |
 
-
-
 ### Benchmarks That Improve With Pruning
 
 | Pruning % | IFEval | MUSR | TruthfulQA-MC1 | TruthfulQA-MC2 | WinoGrande |
