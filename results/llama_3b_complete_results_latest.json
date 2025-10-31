@@ -1,0 +1,681 @@
+{
+  "experiment_metadata": {
+    "timestamp": "2025-10-31T16:07:38.468329",
+    "notebook": "02_Evaluate_3B.ipynb",
+    "model_family": "Llama-3.2-3B",
+    "pruning_method": "MAW (Maximum Absolute Weight)",
+    "hardware": {
+      "device": "NVIDIA L4",
+      "gpu_memory_gb": 23.795204096
+    }
+  },
+  "benchmarks": [
+    {
+      "name": "wikitext",
+      "num_fewshot": 0
+    },
+    {
+      "name": "boolq",
+      "num_fewshot": 0
+    },
+    {
+      "name": "lambada_openai",
+      "num_fewshot": 0
+    },
+    {
+      "name": "mmlu",
+      "num_fewshot": 5
+    },
+    {
+      "name": "arc_challenge",
+      "num_fewshot": 0
+    },
+    {
+      "name": "hellaswag",
+      "num_fewshot": 0
+    },
+    {
+      "name": "winogrande",
+      "num_fewshot": 0
+    },
+    {
+      "name": "piqa",
+      "num_fewshot": 0
+    },
+    {
+      "name": "truthfulqa_mc1",
+      "num_fewshot": 0
+    },
+    {
+      "name": "truthfulqa_mc2",
+      "num_fewshot": 0
+    },
+    {
+      "name": "gsm8k",
+      "num_fewshot": 5
+    },
+    {
+      "name": "ifeval",
+      "num_fewshot": 0
+    },
+    {
+      "name": "leaderboard_musr",
+      "num_fewshot": 0
+    }
+  ],
+  "models_evaluated": {
+    "baseline": {
+      "name": "Llama-3.2-3B",
+      "pruning_pct": 0,
+      "expansion_rate": 300,
+      "is_star": false,
+      "hf_repo": "meta-llama/Llama-3.2-3B",
+      "results": {
+        "arc_challenge": {
+          "accuracy": 0.4241,
+          "acc_norm": 0.4582
+        },
+        "boolq": {
+          "accuracy": 0.7294,
+          "acc_norm": "N/A"
+        },
+        "gsm8k": {
+          "exact_match,strict-match": 0.2638,
+          "exact_match_stderr,strict-match": 0.0121,
+          "exact_match,flexible-extract": 0.2684,
+          "exact_match_stderr,flexible-extract": 0.0122
+        },
+        "hellaswag": {
+          "accuracy": 0.5529,
+          "acc_norm": 0.7357
+        },
+        "ifeval": {
+          "prompt_level_strict_acc,none": 0.0943,
+          "prompt_level_strict_acc_stderr,none": 0.0126,
+          "inst_level_strict_acc,none": 0.1763,
+          "prompt_level_loose_acc,none": 0.0961,
+          "prompt_level_loose_acc_stderr,none": 0.0127,
+          "inst_level_loose_acc,none": 0.1823
+        },
+        "lambada_openai": {
+          "perplexity": 3.95,
+          "word_perplexity": 0.0,
+          "bits_per_byte": 0.0
+        },
+        "leaderboard_musr": {
+          "acc_norm,none": 0.3638,
+          "acc_norm_stderr,none": 0.0171
+        },
+        "mmlu": {
+          "accuracy": 0.5605,
+          "acc_norm": "N/A"
+        },
+        "piqa": {
+          "accuracy": 0.7677,
+          "acc_norm": 0.7748
+        },
+        "truthfulqa_mc1": {
+          "accuracy": 0.2497,
+          "acc_norm": "N/A"
+        },
+        "truthfulqa_mc2": {
+          "accuracy": 0.3919,
+          "acc_norm": "N/A"
+        },
+        "wikitext": {
+          "word_perplexity,none": 9.2628,
+          "byte_perplexity,none": 1.5163,
+          "bits_per_byte,none": 0.6006
+        },
+        "winogrande": {
+          "accuracy": 0.6953,
+          "acc_norm": "N/A"
+        }
+      }
+    },
+    "pruned_10pct": {
+      "name": "Llama-3.2-3B-pruned-10%",
+      "pruning_pct": 10,
+      "expansion_rate": null,
+      "is_star": true,
+      "hf_repo": "peremartra/Llama-3.2-3B-pruned-10pct",
+      "results": {
+        "arc_challenge": {
+          "accuracy": 0.378,
+          "acc_norm": 0.3959
+        },
+        "boolq": {
+          "accuracy": 0.5046,
+          "acc_norm": "N/A"
+        },
+        "gsm8k": {
+          "exact_match,strict-match": 0.135,
+          "exact_match_stderr,strict-match": 0.0094,
+          "exact_match,flexible-extract": 0.1418,
+          "exact_match_stderr,flexible-extract": 0.0096
+        },
+        "hellaswag": {
+          "accuracy": 0.5116,
+          "acc_norm": 0.6853
+        },
+        "ifeval": {
+          "prompt_level_strict_acc,none": 0.1312,
+          "prompt_level_strict_acc_stderr,none": 0.0145,
+          "inst_level_strict_acc,none": 0.235,
+          "prompt_level_loose_acc,none": 0.1442,
+          "prompt_level_loose_acc_stderr,none": 0.0151,
+          "inst_level_loose_acc,none": 0.2518
+        },
+        "lambada_openai": {
+          "perplexity": 6.11,
+          "word_perplexity": 0.0,
+          "bits_per_byte": 0.0
+        },
+        "leaderboard_musr": {
+          "acc_norm,none": 0.373,
+          "acc_norm_stderr,none": 0.0173
+        },
+        "mmlu": {
+          "accuracy": 0.4333,
+          "acc_norm": "N/A"
+        },
+        "piqa": {
+          "accuracy": 0.7454,
+          "acc_norm": 0.7508
+        },
+        "truthfulqa_mc1": {
+          "accuracy": 0.2203,
+          "acc_norm": "N/A"
+        },
+        "truthfulqa_mc2": {
+          "accuracy": 0.3767,
+          "acc_norm": "N/A"
+        },
+        "wikitext": {
+          "word_perplexity,none": 11.8759,
+          "byte_perplexity,none": 1.5884,
+          "bits_per_byte,none": 0.6676
+        },
+        "winogrande": {
+          "accuracy": 0.6748,
+          "acc_norm": "N/A"
+        }
+      }
+    },
+    "pruned_20pct": {
+      "name": "Llama-3.2-3B-pruned-20%",
+      "pruning_pct": 20,
+      "expansion_rate": null,
+      "is_star": false,
+      "hf_repo": "peremartra/Llama-3.2-3B-pruned-20pct",
+      "results": {
+        "arc_challenge": {
+          "accuracy": 0.3456,
+          "acc_norm": 0.3669
+        },
+        "boolq": {
+          "accuracy": 0.3972,
+          "acc_norm": "N/A"
+        },
+        "gsm8k": {
+          "exact_match,strict-match": 0.0607,
+          "exact_match_stderr,strict-match": 0.0066,
+          "exact_match,flexible-extract": 0.0728,
+          "exact_match_stderr,flexible-extract": 0.0072
+        },
+        "hellaswag": {
+          "accuracy": 0.4575,
+          "acc_norm": 0.6158
+        },
+        "ifeval": {
+          "prompt_level_strict_acc,none": 0.122,
+          "prompt_level_strict_acc_stderr,none": 0.0141,
+          "inst_level_strict_acc,none": 0.229,
+          "prompt_level_loose_acc,none": 0.1442,
+          "prompt_level_loose_acc_stderr,none": 0.0151,
+          "inst_level_loose_acc,none": 0.2542
+        },
+        "lambada_openai": {
+          "perplexity": 8.16,
+          "word_perplexity": 0.0,
+          "bits_per_byte": 0.0
+        },
+        "leaderboard_musr": {
+          "acc_norm,none": 0.3439,
+          "acc_norm_stderr,none": 0.0169
+        },
+        "mmlu": {
+          "accuracy": 0.2909,
+          "acc_norm": "N/A"
+        },
+        "piqa": {
+          "accuracy": 0.7209,
+          "acc_norm": 0.7307
+        },
+        "truthfulqa_mc1": {
+          "accuracy": 0.2387,
+          "acc_norm": "N/A"
+        },
+        "truthfulqa_mc2": {
+          "accuracy": 0.4302,
+          "acc_norm": "N/A"
+        },
+        "wikitext": {
+          "word_perplexity,none": 15.8608,
+          "byte_perplexity,none": 1.6767,
+          "bits_per_byte,none": 0.7457
+        },
+        "winogrande": {
+          "accuracy": 0.6385,
+          "acc_norm": "N/A"
+        }
+      }
+    },
+    "pruned_30pct": {
+      "name": "Llama-3.2-3B-pruned-30%",
+      "pruning_pct": 30,
+      "expansion_rate": null,
+      "is_star": false,
+      "hf_repo": "peremartra/Llama-3.2-3B-pruned-30pct",
+      "results": {
+        "arc_challenge": {
+          "accuracy": 0.2807,
+          "acc_norm": 0.3123
+        },
+        "boolq": {
+          "accuracy": 0.4269,
+          "acc_norm": "N/A"
+        },
+        "gsm8k": {
+          "exact_match,strict-match": 0.0273,
+          "exact_match_stderr,strict-match": 0.0045,
+          "exact_match,flexible-extract": 0.0364,
+          "exact_match_stderr,flexible-extract": 0.0052
+        },
+        "hellaswag": {
+          "accuracy": 0.3973,
+          "acc_norm": 0.5232
+        },
+        "ifeval": {
+          "prompt_level_strict_acc,none": 0.1534,
+          "prompt_level_strict_acc_stderr,none": 0.0155,
+          "inst_level_strict_acc,none": 0.2722,
+          "prompt_level_loose_acc,none": 0.1701,
+          "prompt_level_loose_acc_stderr,none": 0.0162,
+          "inst_level_loose_acc,none": 0.2878
+        },
+        "lambada_openai": {
+          "perplexity": 14.72,
+          "word_perplexity": 0.0,
+          "bits_per_byte": 0.0
+        },
+        "leaderboard_musr": {
+          "acc_norm,none": 0.3373,
+          "acc_norm_stderr,none": 0.0168
+        },
+        "mmlu": {
+          "accuracy": 0.2307,
+          "acc_norm": "N/A"
+        },
+        "piqa": {
+          "accuracy": 0.6866,
+          "acc_norm": 0.6812
+        },
+        "truthfulqa_mc1": {
+          "accuracy": 0.2607,
+          "acc_norm": "N/A"
+        },
+        "truthfulqa_mc2": {
+          "accuracy": 0.439,
+          "acc_norm": "N/A"
+        },
+        "wikitext": {
+          "word_perplexity,none": 23.3515,
+          "byte_perplexity,none": 1.8025,
+          "bits_per_byte,none": 0.85
+        },
+        "winogrande": {
+          "accuracy": 0.5927,
+          "acc_norm": "N/A"
+        }
+      }
+    },
+    "pruned_40pct": {
+      "name": "Llama-3.2-3B-pruned-40%",
+      "pruning_pct": 40,
+      "expansion_rate": null,
+      "is_star": false,
+      "hf_repo": "peremartra/Llama-3.2-3B-pruned-40pct",
+      "results": {
+        "arc_challenge": {
+          "accuracy": 0.2423,
+          "acc_norm": 0.2654
+        },
+        "boolq": {
+          "accuracy": 0.4208,
+          "acc_norm": "N/A"
+        },
+        "gsm8k": {
+          "exact_match,strict-match": 0.0083,
+          "exact_match_stderr,strict-match": 0.0025,
+          "exact_match,flexible-extract": 0.0182,
+          "exact_match_stderr,flexible-extract": 0.0037
+        },
+        "hellaswag": {
+          "accuracy": 0.3361,
+          "acc_norm": 0.4145
+        },
+        "ifeval": {
+          "prompt_level_strict_acc,none": 0.1645,
+          "prompt_level_strict_acc_stderr,none": 0.016,
+          "inst_level_strict_acc,none": 0.2782,
+          "prompt_level_loose_acc,none": 0.1738,
+          "prompt_level_loose_acc_stderr,none": 0.0163,
+          "inst_level_loose_acc,none": 0.2878
+        },
+        "lambada_openai": {
+          "perplexity": 51.02,
+          "word_perplexity": 0.0,
+          "bits_per_byte": 0.0
+        },
+        "leaderboard_musr": {
+          "acc_norm,none": 0.3558,
+          "acc_norm_stderr,none": 0.017
+        },
+        "mmlu": {
+          "accuracy": 0.2587,
+          "acc_norm": "N/A"
+        },
+        "piqa": {
+          "accuracy": 0.6534,
+          "acc_norm": 0.6474
+        },
+        "truthfulqa_mc1": {
+          "accuracy": 0.2448,
+          "acc_norm": "N/A"
+        },
+        "truthfulqa_mc2": {
+          "accuracy": 0.4484,
+          "acc_norm": "N/A"
+        },
+        "wikitext": {
+          "word_perplexity,none": 42.1811,
+          "byte_perplexity,none": 2.0133,
+          "bits_per_byte,none": 1.0096
+        },
+        "winogrande": {
+          "accuracy": 0.5572,
+          "acc_norm": "N/A"
+        }
+      }
+    },
+    "pruned_50pct": {
+      "name": "Llama-3.2-3B-pruned-50%",
+      "pruning_pct": 50,
+      "expansion_rate": null,
+      "is_star": false,
+      "hf_repo": "peremartra/Llama-3.2-3B-pruned-50pct",
+      "results": {
+        "arc_challenge": {
+          "accuracy": 0.2278,
+          "acc_norm": 0.2381
+        },
+        "boolq": {
+          "accuracy": 0.5119,
+          "acc_norm": "N/A"
+        },
+        "gsm8k": {
+          "exact_match,strict-match": 0.0068,
+          "exact_match_stderr,strict-match": 0.0023,
+          "exact_match,flexible-extract": 0.0136,
+          "exact_match_stderr,flexible-extract": 0.0032
+        },
+        "hellaswag": {
+          "accuracy": 0.3043,
+          "acc_norm": 0.3399
+        },
+        "ifeval": {
+          "prompt_level_strict_acc,none": 0.1627,
+          "prompt_level_strict_acc_stderr,none": 0.0159,
+          "inst_level_strict_acc,none": 0.271,
+          "prompt_level_loose_acc,none": 0.1664,
+          "prompt_level_loose_acc_stderr,none": 0.016,
+          "inst_level_loose_acc,none": 0.2806
+        },
+        "lambada_openai": {
+          "perplexity": 240.72,
+          "word_perplexity": 0.0,
+          "bits_per_byte": 0.0
+        },
+        "leaderboard_musr": {
+          "acc_norm,none": 0.3545,
+          "acc_norm_stderr,none": 0.0169
+        },
+        "mmlu": {
+          "accuracy": 0.2555,
+          "acc_norm": "N/A"
+        },
+        "piqa": {
+          "accuracy": 0.6088,
+          "acc_norm": 0.6045
+        },
+        "truthfulqa_mc1": {
+          "accuracy": 0.2472,
+          "acc_norm": "N/A"
+        },
+        "truthfulqa_mc2": {
+          "accuracy": 0.4391,
+          "acc_norm": "N/A"
+        },
+        "wikitext": {
+          "word_perplexity,none": 74.828,
+          "byte_perplexity,none": 2.2411,
+          "bits_per_byte,none": 1.1642
+        },
+        "winogrande": {
+          "accuracy": 0.4886,
+          "acc_norm": "N/A"
+        }
+      }
+    },
+    "pruned_60pct": {
+      "name": "Llama-3.2-3B-pruned-60%",
+      "pruning_pct": 60,
+      "expansion_rate": null,
+      "is_star": false,
+      "hf_repo": "peremartra/Llama-3.2-3B-pruned-60pct",
+      "results": {
+        "arc_challenge": {
+          "accuracy": 0.1971,
+          "acc_norm": 0.215
+        },
+        "boolq": {
+          "accuracy": 0.5034,
+          "acc_norm": "N/A"
+        },
+        "gsm8k": {
+          "exact_match,strict-match": 0.0106,
+          "exact_match_stderr,strict-match": 0.0028,
+          "exact_match,flexible-extract": 0.0227,
+          "exact_match_stderr,flexible-extract": 0.0041
+        },
+        "hellaswag": {
+          "accuracy": 0.2781,
+          "acc_norm": 0.2959
+        },
+        "ifeval": {
+          "prompt_level_strict_acc,none": 0.1331,
+          "prompt_level_strict_acc_stderr,none": 0.0146,
+          "inst_level_strict_acc,none": 0.2398,
+          "prompt_level_loose_acc,none": 0.1386,
+          "prompt_level_loose_acc_stderr,none": 0.0149,
+          "inst_level_loose_acc,none": 0.2458
+        },
+        "lambada_openai": {
+          "perplexity": 5960.46,
+          "word_perplexity": 0.0,
+          "bits_per_byte": 0.0
+        },
+        "leaderboard_musr": {
+          "acc_norm,none": 0.3598,
+          "acc_norm_stderr,none": 0.0172
+        },
+        "mmlu": {
+          "accuracy": 0.2589,
+          "acc_norm": "N/A"
+        },
+        "piqa": {
+          "accuracy": 0.5696,
+          "acc_norm": 0.5539
+        },
+        "truthfulqa_mc1": {
+          "accuracy": 0.2387,
+          "acc_norm": "N/A"
+        },
+        "truthfulqa_mc2": {
+          "accuracy": 0.4574,
+          "acc_norm": "N/A"
+        },
+        "wikitext": {
+          "word_perplexity,none": 162.4732,
+          "byte_perplexity,none": 2.5908,
+          "bits_per_byte,none": 1.3734
+        },
+        "winogrande": {
+          "accuracy": 0.4815,
+          "acc_norm": "N/A"
+        }
+      }
+    }
+  },
+  "summary_statistics": {
+    "baseline": {
+      "avg_accuracy": 0.5464375,
+      "avg_perplexity": 3.95
+    },
+    "pruned_models": [
+      {
+        "pruning_pct": 10,
+        "is_star": true,
+        "avg_accuracy": 0.4805875,
+        "avg_perplexity": 6.11,
+        "accuracy_degradation_pct": -12.050783483930005,
+        "perplexity_degradation_pct": 54.68354430379747
+      },
+      {
+        "pruning_pct": 20,
+        "is_star": false,
+        "avg_accuracy": 0.4399375,
+        "avg_perplexity": 8.16,
+        "accuracy_degradation_pct": -19.489877616378823,
+        "perplexity_degradation_pct": 106.58227848101265
+      },
+      {
+        "pruning_pct": 30,
+        "is_star": false,
+        "avg_accuracy": 0.414325,
+        "avg_perplexity": 14.72,
+        "accuracy_degradation_pct": -24.177055930458653,
+        "perplexity_degradation_pct": 272.65822784810126
+      },
+      {
+        "pruning_pct": 40,
+        "is_star": false,
+        "avg_accuracy": 0.39521249999999997,
+        "avg_perplexity": 51.02,
+        "accuracy_degradation_pct": -27.67471119752946,
+        "perplexity_degradation_pct": 1191.6455696202531
+      },
+      {
+        "pruning_pct": 50,
+        "is_star": false,
+        "avg_accuracy": 0.3854,
+        "avg_perplexity": 240.72,
+        "accuracy_degradation_pct": -29.470433489648862,
+        "perplexity_degradation_pct": 5994.177215189873
+      },
+      {
+        "pruning_pct": 60,
+        "is_star": false,
+        "avg_accuracy": 0.37308749999999996,
+        "avg_perplexity": 5960.46,
+        "accuracy_degradation_pct": -31.723664646002526,
+        "perplexity_degradation_pct": 150797.72151898735
+      }
+    ]
+  },
+  "upload_decisions": [
+    {
+      "model": "Llama-3.2-3B-pruned-10%",
+      "pruning": 10,
+      "star": "⭐",
+      "outperform_count": 0,
+      "outperforming_tasks": [],
+      "upload": true,
+      "reason": "Star model. Won/Tied: None"
+    },
+    {
+      "model": "Llama-3.2-3B-pruned-20%",
+      "pruning": 20,
+      "star": "",
+      "outperform_count": 1,
+      "outperforming_tasks": [
+        "truthfulqa_mc2"
+      ],
+      "upload": false,
+      "reason": "Only 1 tasks won (truthfulqa_mc2)"
+    },
+    {
+      "model": "Llama-3.2-3B-pruned-30%",
+      "pruning": 30,
+      "star": "",
+      "outperform_count": 2,
+      "outperforming_tasks": [
+        "truthfulqa_mc1",
+        "truthfulqa_mc2"
+      ],
+      "upload": false,
+      "reason": "Only 2 tasks won (truthfulqa_mc1, truthfulqa_mc2)"
+    },
+    {
+      "model": "Llama-3.2-3B-pruned-40%",
+      "pruning": 40,
+      "star": "",
+      "outperform_count": 1,
+      "outperforming_tasks": [
+        "truthfulqa_mc2"
+      ],
+      "upload": false,
+      "reason": "Only 1 tasks won (truthfulqa_mc2)"
+    },
+    {
+      "model": "Llama-3.2-3B-pruned-50%",
+      "pruning": 50,
+      "star": "",
+      "outperform_count": 1,
+      "outperforming_tasks": [
+        "truthfulqa_mc2"
+      ],
+      "upload": false,
+      "reason": "Only 1 tasks won (truthfulqa_mc2)"
+    },
+    {
+      "model": "Llama-3.2-3B-pruned-60%",
+      "pruning": 60,
+      "star": "",
+      "outperform_count": 1,
+      "outperforming_tasks": [
+        "truthfulqa_mc2"
+      ],
+      "upload": false,
+      "reason": "Only 1 tasks won (truthfulqa_mc2)"
+    }
+  ],
+  "citation": {
+    "paper": "Exploring GLU Expansion Ratios: Structured Pruning in Llama-3.2 Models",
+    "author": "Pere Martra",
+    "doi": "https://doi.org/10.31219/osf.io/qgxea",
+    "github": "https://github.com/peremartra/llama-glu-expansion-pruning",
+    "note": "Results are freely available for research purposes. Please cite the paper if you use this data."
+  }
+}
