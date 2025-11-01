@@ -126,6 +126,8 @@ Unexpected gains: IFEval improves substantially, MUSR shows consistent gains (+2
   - 7 pruning levels (0-60%)
   - 13 benchmarks evaluated
   - [See detailed results](results/)
-- [ ] Llama-3.2-3B (Base)
+- [x] **Llama-3.2-3B (Base)** - Completed ✅
+   - 7 pruning levels (0-60%)
+   - 13 benchmarks evaluated
 - [ ] Llama-3.2-1B-Instruct
 - [ ] Llama-3.2-3B-Instruct
