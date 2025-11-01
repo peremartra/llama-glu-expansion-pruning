@@ -53,7 +53,7 @@ except ImportError as e:
 
 EXPERIMENT_CONFIG = [
     # -------------------------------------------------------------------------
-    # Llama-3.2-1B Experiments (5 models)
+    # Llama-3.2-1B Experiments (6 models)
     # -------------------------------------------------------------------------
     {
         "base_model": "meta-llama/Llama-3.2-1B",
@@ -91,9 +91,25 @@ EXPERIMENT_CONFIG = [
         "hf_repo_id": "oopere/Llama-3.2-1B-pruned-60pct",
         "is_star": False,
     },
+
+    # -------------------------------------------------------------------------
+    # Llama-3.2-1B Instruct Experiments (2 models)
+    # -------------------------------------------------------------------------
+    {
+        "base_model": "meta-llama/Llama-3.2-1B",
+        "pruning_pct": 40,
+        "hf_repo_id": "oopere/Llama-3.2-1B-I-pruned-40pct",
+        "is_star": False,  # Recreate on-the-fly
+    },
+    {
+        "base_model": "meta-llama/Llama-3.2-1B",
+        "pruning_pct": 60,
+        "hf_repo_id": "oopere/Llama-3.2-1B-I-pruned-60pct",
+        "is_star": False,
+    },
     
     # -------------------------------------------------------------------------
-    # Llama-3.2-3B Experiments (4 models)
+    # Llama-3.2-3B Experiments (6 models)
     # -------------------------------------------------------------------------
     {
         "base_model": "meta-llama/Llama-3.2-3B",
@@ -157,7 +173,13 @@ BENCHMARKS_BASE = [
 ]
 
 # Instruct models additional benchmark (+1)
-BENCHMARKS_INSTRUCT = BENCHMARKS_BASE + [
+BENCHMARKS_INSTRUCT = [
+    {"name": "leaderboard_musr", "num_fewshot": 0},  
+    {"name": "truthfulqa_mc1", "num_fewshot": 0},
+    {"name": "truthfulqa_mc2", "num_fewshot": 0},
+    {"name": "lambada_openai", "num_fewshot": 0},
+    {"name": "mmlu", "num_fewshot": 5},  # Standard is 5-shot for MMLU
+    {"name": "gsm8k", "num_fewshot": 5},  # Chain-of-thought requires few-shot
     {"name": "ifeval", "num_fewshot": 0},
 ]
 
