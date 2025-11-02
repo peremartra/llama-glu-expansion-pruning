@@ -1,0 +1,538 @@
+{
+  "metadata": {
+    "generated_at": "2025-11-02T11:50:08.516681",
+    "optipfair_version": "latest",
+    "total_models": 15,
+    "successful": 15,
+    "failed": 0,
+    "pruning_method": "MAW",
+    "pruning_type": "MLP_GLU"
+  },
+  "models": [
+    {
+      "base_model": "meta-llama/Llama-3.2-1B",
+      "pruning_pct": 10,
+      "original_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 8192,
+        "num_hidden_layers": 16,
+        "expansion_rate": 4.0,
+        "expansion_rate_percentage": 400.0,
+        "total_parameters": 1235814400,
+        "total_parameters_millions": 1235.81
+      },
+      "pruned_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 7373,
+        "num_hidden_layers": 16,
+        "expansion_rate": 3.6,
+        "expansion_rate_percentage": 360.0,
+        "total_parameters": 1155303424,
+        "total_parameters_millions": 1155.3
+      },
+      "reductions": {
+        "parameter_reduction_pct": 6.51,
+        "expansion_reduction_pct": 10.0,
+        "parameters_saved_millions": 80.51
+      },
+      "optipfair_stats": {
+        "original_parameters": 1235814400,
+        "pruned_parameters": 1155303424,
+        "reduction": 80510976,
+        "percentage_reduction": 6.5148112855781575,
+        "expansion_rate": 360.009765625
+      },
+      "status": "success"
+    },
+    {
+      "base_model": "meta-llama/Llama-3.2-1B",
+      "pruning_pct": 20,
+      "original_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 8192,
+        "num_hidden_layers": 16,
+        "expansion_rate": 4.0,
+        "expansion_rate_percentage": 400.0,
+        "total_parameters": 1235814400,
+        "total_parameters_millions": 1235.81
+      },
+      "pruned_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 6554,
+        "num_hidden_layers": 16,
+        "expansion_rate": 3.2,
+        "expansion_rate_percentage": 320.0,
+        "total_parameters": 1074792448,
+        "total_parameters_millions": 1074.79
+      },
+      "reductions": {
+        "parameter_reduction_pct": 13.03,
+        "expansion_reduction_pct": 20.0,
+        "parameters_saved_millions": 161.02
+      },
+      "optipfair_stats": {
+        "original_parameters": 1235814400,
+        "pruned_parameters": 1074792448,
+        "reduction": 161021952,
+        "percentage_reduction": 13.029622571156315,
+        "expansion_rate": 320.01953125
+      },
+      "status": "success"
+    },
+    {
+      "base_model": "meta-llama/Llama-3.2-1B",
+      "pruning_pct": 30,
+      "original_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 8192,
+        "num_hidden_layers": 16,
+        "expansion_rate": 4.0,
+        "expansion_rate_percentage": 400.0,
+        "total_parameters": 1235814400,
+        "total_parameters_millions": 1235.81
+      },
+      "pruned_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 5735,
+        "num_hidden_layers": 16,
+        "expansion_rate": 2.8,
+        "expansion_rate_percentage": 280.0,
+        "total_parameters": 994281472,
+        "total_parameters_millions": 994.28
+      },
+      "reductions": {
+        "parameter_reduction_pct": 19.54,
+        "expansion_reduction_pct": 30.0,
+        "parameters_saved_millions": 241.53
+      },
+      "optipfair_stats": {
+        "original_parameters": 1235814400,
+        "pruned_parameters": 994281472,
+        "reduction": 241532928,
+        "percentage_reduction": 19.544433856734475,
+        "expansion_rate": 280.029296875
+      },
+      "status": "success"
+    },
+    {
+      "base_model": "meta-llama/Llama-3.2-1B",
+      "pruning_pct": 40,
+      "original_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 8192,
+        "num_hidden_layers": 16,
+        "expansion_rate": 4.0,
+        "expansion_rate_percentage": 400.0,
+        "total_parameters": 1235814400,
+        "total_parameters_millions": 1235.81
+      },
+      "pruned_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 4916,
+        "num_hidden_layers": 16,
+        "expansion_rate": 2.4,
+        "expansion_rate_percentage": 240.0,
+        "total_parameters": 913770496,
+        "total_parameters_millions": 913.77
+      },
+      "reductions": {
+        "parameter_reduction_pct": 26.06,
+        "expansion_reduction_pct": 40.0,
+        "parameters_saved_millions": 322.04
+      },
+      "optipfair_stats": {
+        "original_parameters": 1235814400,
+        "pruned_parameters": 913770496,
+        "reduction": 322043904,
+        "percentage_reduction": 26.05924514231263,
+        "expansion_rate": 240.0390625
+      },
+      "status": "success"
+    },
+    {
+      "base_model": "meta-llama/Llama-3.2-1B",
+      "pruning_pct": 50,
+      "original_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 8192,
+        "num_hidden_layers": 16,
+        "expansion_rate": 4.0,
+        "expansion_rate_percentage": 400.0,
+        "total_parameters": 1235814400,
+        "total_parameters_millions": 1235.81
+      },
+      "pruned_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 4096,
+        "num_hidden_layers": 16,
+        "expansion_rate": 2.0,
+        "expansion_rate_percentage": 200.0,
+        "total_parameters": 833161216,
+        "total_parameters_millions": 833.16
+      },
+      "reductions": {
+        "parameter_reduction_pct": 32.58,
+        "expansion_reduction_pct": 50.0,
+        "parameters_saved_millions": 402.65
+      },
+      "optipfair_stats": {
+        "original_parameters": 1235814400,
+        "pruned_parameters": 833161216,
+        "reduction": 402653184,
+        "percentage_reduction": 32.58201102042507,
+        "expansion_rate": 200.0
+      },
+      "status": "success"
+    },
+    {
+      "base_model": "meta-llama/Llama-3.2-1B",
+      "pruning_pct": 60,
+      "original_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 8192,
+        "num_hidden_layers": 16,
+        "expansion_rate": 4.0,
+        "expansion_rate_percentage": 400.0,
+        "total_parameters": 1235814400,
+        "total_parameters_millions": 1235.81
+      },
+      "pruned_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 3277,
+        "num_hidden_layers": 16,
+        "expansion_rate": 1.6,
+        "expansion_rate_percentage": 160.0,
+        "total_parameters": 752650240,
+        "total_parameters_millions": 752.65
+      },
+      "reductions": {
+        "parameter_reduction_pct": 39.1,
+        "expansion_reduction_pct": 60.0,
+        "parameters_saved_millions": 483.16
+      },
+      "optipfair_stats": {
+        "original_parameters": 1235814400,
+        "pruned_parameters": 752650240,
+        "reduction": 483164160,
+        "percentage_reduction": 39.09682230600323,
+        "expansion_rate": 160.009765625
+      },
+      "status": "success"
+    },
+    {
+      "base_model": "meta-llama/Llama-3.2-1B-Instruct",
+      "pruning_pct": 10,
+      "original_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 8192,
+        "num_hidden_layers": 16,
+        "expansion_rate": 4.0,
+        "expansion_rate_percentage": 400.0,
+        "total_parameters": 1235814400,
+        "total_parameters_millions": 1235.81
+      },
+      "pruned_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 7373,
+        "num_hidden_layers": 16,
+        "expansion_rate": 3.6,
+        "expansion_rate_percentage": 360.0,
+        "total_parameters": 1155303424,
+        "total_parameters_millions": 1155.3
+      },
+      "reductions": {
+        "parameter_reduction_pct": 6.51,
+        "expansion_reduction_pct": 10.0,
+        "parameters_saved_millions": 80.51
+      },
+      "optipfair_stats": {
+        "original_parameters": 1235814400,
+        "pruned_parameters": 1155303424,
+        "reduction": 80510976,
+        "percentage_reduction": 6.5148112855781575,
+        "expansion_rate": 360.009765625
+      },
+      "status": "success"
+    },
+    {
+      "base_model": "meta-llama/Llama-3.2-1B-Instruct",
+      "pruning_pct": 40,
+      "original_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 8192,
+        "num_hidden_layers": 16,
+        "expansion_rate": 4.0,
+        "expansion_rate_percentage": 400.0,
+        "total_parameters": 1235814400,
+        "total_parameters_millions": 1235.81
+      },
+      "pruned_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 4916,
+        "num_hidden_layers": 16,
+        "expansion_rate": 2.4,
+        "expansion_rate_percentage": 240.0,
+        "total_parameters": 913770496,
+        "total_parameters_millions": 913.77
+      },
+      "reductions": {
+        "parameter_reduction_pct": 26.06,
+        "expansion_reduction_pct": 40.0,
+        "parameters_saved_millions": 322.04
+      },
+      "optipfair_stats": {
+        "original_parameters": 1235814400,
+        "pruned_parameters": 913770496,
+        "reduction": 322043904,
+        "percentage_reduction": 26.05924514231263,
+        "expansion_rate": 240.0390625
+      },
+      "status": "success"
+    },
+    {
+      "base_model": "meta-llama/Llama-3.2-1B-Instruct",
+      "pruning_pct": 60,
+      "original_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 8192,
+        "num_hidden_layers": 16,
+        "expansion_rate": 4.0,
+        "expansion_rate_percentage": 400.0,
+        "total_parameters": 1235814400,
+        "total_parameters_millions": 1235.81
+      },
+      "pruned_architecture": {
+        "hidden_size": 2048,
+        "intermediate_size": 3277,
+        "num_hidden_layers": 16,
+        "expansion_rate": 1.6,
+        "expansion_rate_percentage": 160.0,
+        "total_parameters": 752650240,
+        "total_parameters_millions": 752.65
+      },
+      "reductions": {
+        "parameter_reduction_pct": 39.1,
+        "expansion_reduction_pct": 60.0,
+        "parameters_saved_millions": 483.16
+      },
+      "optipfair_stats": {
+        "original_parameters": 1235814400,
+        "pruned_parameters": 752650240,
+        "reduction": 483164160,
+        "percentage_reduction": 39.09682230600323,
+        "expansion_rate": 160.009765625
+      },
+      "status": "success"
+    },
+    {
+      "base_model": "meta-llama/Llama-3.2-3B",
+      "pruning_pct": 10,
+      "original_architecture": {
+        "hidden_size": 3072,
+        "intermediate_size": 8192,
+        "num_hidden_layers": 28,
+        "expansion_rate": 2.67,
+        "expansion_rate_percentage": 266.7,
+        "total_parameters": 3212749824,
+        "total_parameters_millions": 3212.75
+      },
+      "pruned_architecture": {
+        "hidden_size": 3072,
+        "intermediate_size": 7373,
+        "num_hidden_layers": 28,
+        "expansion_rate": 2.4,
+        "expansion_rate_percentage": 240.0,
+        "total_parameters": 3001408512,
+        "total_parameters_millions": 3001.41
+      },
+      "reductions": {
+        "parameter_reduction_pct": 6.58,
+        "expansion_reduction_pct": 10.11,
+        "parameters_saved_millions": 211.34
+      },
+      "optipfair_stats": {
+        "original_parameters": 3212749824,
+        "pruned_parameters": 3001408512,
+        "reduction": 211341312,
+        "percentage_reduction": 6.578206320991148,
+        "expansion_rate": 240.00651041666666
+      },
+      "status": "success"
+    },
+    {
+      "base_model": "meta-llama/Llama-3.2-3B",
+      "pruning_pct": 20,
+      "original_architecture": {
+        "hidden_size": 3072,
+        "intermediate_size": 8192,
+        "num_hidden_layers": 28,
+        "expansion_rate": 2.67,
+        "expansion_rate_percentage": 266.7,
+        "total_parameters": 3212749824,
+        "total_parameters_millions": 3212.75
+      },
+      "pruned_architecture": {
+        "hidden_size": 3072,
+        "intermediate_size": 6554,
+        "num_hidden_layers": 28,
+        "expansion_rate": 2.13,
+        "expansion_rate_percentage": 213.3,
+        "total_parameters": 2790067200,
+        "total_parameters_millions": 2790.07
+      },
+      "reductions": {
+        "parameter_reduction_pct": 13.16,
+        "expansion_reduction_pct": 20.22,
+        "parameters_saved_millions": 422.68
+      },
+      "optipfair_stats": {
+        "original_parameters": 3212749824,
+        "pruned_parameters": 2790067200,
+        "reduction": 422682624,
+        "percentage_reduction": 13.156412641982296,
+        "expansion_rate": 213.34635416666666
+      },
+      "status": "success"
+    },
+    {
+      "base_model": "meta-llama/Llama-3.2-3B",
+      "pruning_pct": 30,
+      "original_architecture": {
+        "hidden_size": 3072,
+        "intermediate_size": 8192,
+        "num_hidden_layers": 28,
+        "expansion_rate": 2.67,
+        "expansion_rate_percentage": 266.7,
+        "total_parameters": 3212749824,
+        "total_parameters_millions": 3212.75
+      },
+      "pruned_architecture": {
+        "hidden_size": 3072,
+        "intermediate_size": 5735,
+        "num_hidden_layers": 28,
+        "expansion_rate": 1.87,
+        "expansion_rate_percentage": 186.7,
+        "total_parameters": 2578725888,
+        "total_parameters_millions": 2578.73
+      },
+      "reductions": {
+        "parameter_reduction_pct": 19.73,
+        "expansion_reduction_pct": 29.96,
+        "parameters_saved_millions": 634.02
+      },
+      "optipfair_stats": {
+        "original_parameters": 3212749824,
+        "pruned_parameters": 2578725888,
+        "reduction": 634023936,
+        "percentage_reduction": 19.734618962973446,
+        "expansion_rate": 186.68619791666669
+      },
+      "status": "success"
+    },
+    {
+      "base_model": "meta-llama/Llama-3.2-3B",
+      "pruning_pct": 40,
+      "original_architecture": {
+        "hidden_size": 3072,
+        "intermediate_size": 8192,
+        "num_hidden_layers": 28,
+        "expansion_rate": 2.67,
+        "expansion_rate_percentage": 266.7,
+        "total_parameters": 3212749824,
+        "total_parameters_millions": 3212.75
+      },
+      "pruned_architecture": {
+        "hidden_size": 3072,
+        "intermediate_size": 4916,
+        "num_hidden_layers": 28,
+        "expansion_rate": 1.6,
+        "expansion_rate_percentage": 160.0,
+        "total_parameters": 2367384576,
+        "total_parameters_millions": 2367.38
+      },
+      "reductions": {
+        "parameter_reduction_pct": 26.31,
+        "expansion_reduction_pct": 40.07,
+        "parameters_saved_millions": 845.37
+      },
+      "optipfair_stats": {
+        "original_parameters": 3212749824,
+        "pruned_parameters": 2367384576,
+        "reduction": 845365248,
+        "percentage_reduction": 26.312825283964592,
+        "expansion_rate": 160.02604166666669
+      },
+      "status": "success"
+    },
+    {
+      "base_model": "meta-llama/Llama-3.2-3B",
+      "pruning_pct": 50,
+      "original_architecture": {
+        "hidden_size": 3072,
+        "intermediate_size": 8192,
+        "num_hidden_layers": 28,
+        "expansion_rate": 2.67,
+        "expansion_rate_percentage": 266.7,
+        "total_parameters": 3212749824,
+        "total_parameters_millions": 3212.75
+      },
+      "pruned_architecture": {
+        "hidden_size": 3072,
+        "intermediate_size": 4096,
+        "num_hidden_layers": 28,
+        "expansion_rate": 1.33,
+        "expansion_rate_percentage": 133.3,
+        "total_parameters": 2155785216,
+        "total_parameters_millions": 2155.79
+      },
+      "reductions": {
+        "parameter_reduction_pct": 32.9,
+        "expansion_reduction_pct": 50.19,
+        "parameters_saved_millions": 1056.96
+      },
+      "optipfair_stats": {
+        "original_parameters": 3212749824,
+        "pruned_parameters": 2155785216,
+        "reduction": 1056964608,
+        "percentage_reduction": 32.89906360290567,
+        "expansion_rate": 133.33333333333331
+      },
+      "status": "success"
+    },
+    {
+      "base_model": "meta-llama/Llama-3.2-3B",
+      "pruning_pct": 60,
+      "original_architecture": {
+        "hidden_size": 3072,
+        "intermediate_size": 8192,
+        "num_hidden_layers": 28,
+        "expansion_rate": 2.67,
+        "expansion_rate_percentage": 266.7,
+        "total_parameters": 3212749824,
+        "total_parameters_millions": 3212.75
+      },
+      "pruned_architecture": {
+        "hidden_size": 3072,
+        "intermediate_size": 3277,
+        "num_hidden_layers": 28,
+        "expansion_rate": 1.07,
+        "expansion_rate_percentage": 106.7,
+        "total_parameters": 1944443904,
+        "total_parameters_millions": 1944.44
+      },
+      "reductions": {
+        "parameter_reduction_pct": 39.48,
+        "expansion_reduction_pct": 59.93,
+        "parameters_saved_millions": 1268.31
+      },
+      "optipfair_stats": {
+        "original_parameters": 3212749824,
+        "pruned_parameters": 1944443904,
+        "reduction": 1268305920,
+        "percentage_reduction": 39.47726992389682,
+        "expansion_rate": 106.67317708333333
+      },
+      "status": "success"
+    }
+  ]
+}
