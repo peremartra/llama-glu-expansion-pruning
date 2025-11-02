@@ -84,4 +84,4 @@ These configurations were generated using the OptIFAIR library with:
 
 All pruning is applied uniformly across transformer blocks.
 
-[![Powered by OptIPFair](https://img.shields.io/badge/Powered%20by-OptIPFair-orange?style=flat&logo=github)](https://github.com/peremartra/optipfair)
+[![Powered by OptipFair](https://img.shields.io/badge/Powered%20by-OptIPFair-orange?style=flat&logo=github)](https://github.com/peremartra/optipfair)
