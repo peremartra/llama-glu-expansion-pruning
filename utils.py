@@ -97,6 +97,12 @@ EXPERIMENT_CONFIG = [
     # -------------------------------------------------------------------------
     {
         "base_model": "meta-llama/Llama-3.2-1B-Instruct",
+        "pruning_pct": 10,
+        "hf_repo_id": "oopere/Llama-3.2-1B-I-pruned-10pct",
+        "is_star": False,  
+    },
+    {
+        "base_model": "meta-llama/Llama-3.2-1B-Instruct",
         "pruning_pct": 40,
         "hf_repo_id": "oopere/Llama-3.2-1B-I-pruned-40pct",
         "is_star": True,  
