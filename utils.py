@@ -262,7 +262,7 @@ BENCHMARKS_CARBON = [
         "max_new_tokens": 150, 
         "dataset": "IFEval",
         "subset": "train", 
-        "description": "Instruction (Latency, TTFT, bsz=1)"
+        "description": "Instruction (Latency, TTFT, bsz=1)", 
         "batch_size": 1
     },
     {
