@@ -239,7 +239,7 @@ EXPERIMENT_CONFIG_CARBON = [
 BENCHMARKS_CARBON = [
     {
         "name": "gsm8k_workload",
-        "num_prompts": 500,
+        "num_prompts": 100,
         "max_new_tokens": 100,
         "dataset": "gsm8k",
         "subset": "test",
@@ -247,7 +247,7 @@ BENCHMARKS_CARBON = [
     },
     {
         "name": "mmlu_workload",
-        "num_prompts": 500,
+        "num_prompts": 100,
         "max_new_tokens": 50,
         "dataset": "mmlu",
         "subset": "test",
