@@ -1018,6 +1018,65 @@ def format_results_table(results_dict):
 # =============================================================================
 # CARBON PROFILING MAIN FUNCTION
 # =============================================================================
+def _capture_hardware_metadata(tracker):
+    """
+    Helper function to capture hardware metadata from CodeCarbon tracker.
+    Separated for clarity and error handling.
+    """
+    try:
+        gpu_model = tracker._gpu.model_
+        gpu_count = tracker._gpu.gpu_count_
+        gpu_power_W = tracker._gpu.power_
+    except Exception:
+        gpu_model = "N/A"
+        gpu_count = 0
+        gpu_power_W = "N/A"
+
+    try:
+        cpu_model = tracker._cpu.model_
+        cpu_count = tracker._cpu.cpu_count_
+        cpu_power_W = tracker._cpu.power_
+    except Exception:
+        cpu_model = "N/A"
+        cpu_count = 0
+        cpu_power_W = "N/A"
+        
+    try:
+        location = tracker.location_
+        country_name = location['country_name'] if location else "N/A"
+        country_iso = location['country_iso_code'] if location else "N/A"
+        region = location['region'] if location else "N/A"
+        cloud_provider = location['cloud_provider'] if location else "N/A"
+        cloud_region = location['cloud_region'] if location else "N/A"
+    except Exception:
+        country_name = "N/A"
+        country_iso = "N/A"
+        region = "N/A"
+        cloud_provider = "N/A"
+        cloud_region = "N/A"
+
+    return {
+        "timestamp": getattr(tracker, 'timestamp_', "N/A"),
+        "project_name": getattr(tracker, 'project_name_', "N/A"),
+        "duration_sec": getattr(tracker, 'duration_', "N/A"),
+        "energy_kwh": getattr(tracker, 'energy_consumed_', "N/A"),
+        "co2_g": getattr(tracker, 'emissions_', "N/A"),
+        "carbon_intensity_gCO2_kWh": getattr(tracker, 'carbon_intensity_', "N/A"),
+        "country_name": country_name,
+        "country_iso_code": country_iso,
+        "region": region,
+        "cloud_provider": cloud_provider,
+        "cloud_region": cloud_region,
+        "os": getattr(tracker, 'os_', "N/A"),
+        "python_version": getattr(tracker, 'python_version_', "N/A"),
+        "codecarbon_version": getattr(codecarbon, '__version__', "N/A"),
+        "cpu_model": cpu_model,
+        "cpu_count": cpu_count,
+        "cpu_power_usage_W": cpu_power_W,
+        "gpu_model": gpu_model,
+        "gpu_count": gpu_count,
+        "gpu_power_usage_W": gpu_power_W
+    }
 
 def run_carbon_profiling(
     model,
