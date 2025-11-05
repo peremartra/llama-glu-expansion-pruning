@@ -627,7 +627,7 @@ def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, ba
                 )
             gen_time_sec = time.time() - gen_start
             
-             if i >= WARMUP_STEPS:
+            if i >= WARMUP_STEPS:
                 total_inference_time_sec += gen_time_sec
                 
                 # Contar TODOS los tokens generados (outputs - inputs)
