@@ -1018,6 +1018,8 @@ def format_results_table(results_dict):
 # CARBON PROFILING MAIN FUNCTION
 # =============================================================================
 
+# (En utils.py, REEMPLAZA la función run_carbon_profiling completa)
+
 def run_carbon_profiling(
     model,
     tokenizer,
@@ -1116,10 +1118,9 @@ def run_carbon_profiling(
         print("-"*70)
         print("   Clearing GPU cache...")
         clear_gpu_cache()
-        
         # ==========================================================
         # CODECARBON WARM UP
-        # =G========================================================
+        # ==========================================================
         print("   Running GPU warm-up for CodeCarbon sensors...")
         # Initialize CodeCarbon tracker
         tracker = EmissionsTracker(
@@ -1147,17 +1148,22 @@ def run_carbon_profiling(
             prompts = _load_workload_prompts(workload)
             
             # Measure inference performance
-            print(f"   Running inference
+            print(f"   Running inference...")
+            
+            # --- MODIFICACIÓN INTEGRADA ---
+            # Leer batch_size del workload, default a 1 si no se especifica
             batch_size = workload.get("batch_size", 1)
             print(f"   (Batch Size: {batch_size})")
+            
             perf_metrics = _measure_inference_performance(
                 model=model,
                 tokenizer=tokenizer,
                 prompts=prompts,
                 max_new_tokens=workload["max_new_tokens"],
-                batch_size=batch_size,
+                batch_size=batch_size, # <-- Parámetro pasado
                 device=device
             )
+            # --- FIN DE LA MODIFICACIÓN ---
             
             # Stop tracker and get emissions
             emissions: float = tracker.stop()
@@ -1165,8 +1171,7 @@ def run_carbon_profiling(
             # Get memory stats
             memory_stats = _get_memory_stats(model, device)
             
-            # --- NUEVA SECCIÓN PARA CAPTURAR METADATOS DETALLADOS ---
-            # CodeCarbon guarda los datos detallados en el atributo emissions_data
+            # --- CAPTURAR METADATOS DETALLADOS ---
             emissions_data = tracker.emissions_data
             hardware_metadata = {
                 "timestamp": emissions_data.get("timestamp", "N/A"),
@@ -1190,15 +1195,15 @@ def run_carbon_profiling(
                 "gpu_count": emissions_data.get("gpu_count", "N/A"),
                 "gpu_power_usage_W": emissions_data.get("gpu_power", "N/A")
             }
-            # --- FIN DE LA NUEVA SECCIÓN ---
+            # --- FIN DE LA CAPTURA ---
 
             # Consolidate results
             result = {
                 **perf_metrics,
                 **memory_stats,
                 "energy_kwh": float(emissions) if emissions else 0.0,
-                "hardware_metadata": hardware_metadata, 
-                "batch_size": batch_size,
+                "hardware_metadata": hardware_metadata,
+                "batch_size": batch_size, # <-- Metadato añadido
                 "num_prompts": len(prompts),
                 "max_new_tokens": workload["max_new_tokens"],
                 "workload_description": workload.get("description", "")
@@ -1217,7 +1222,11 @@ def run_carbon_profiling(
             print(f"✅ {workload_name} completed")
             print(f"   Energy: {result['energy_kwh']:.6f} kWh")
             print(f"   Throughput: {result['throughput_tokens_per_sec']:.2f} tok/s")
-            print(f"   Avg TTFT: {result['avg_ttft_ms']:.2f} ms")
+            # Solo mostrar TTFT si es relevante (bsz=1)
+            if result.get("avg_ttft_ms"):
+                print(f"   Avg TTFT: {result['avg_ttft_ms']:.2f} ms")
+            if result.get("avg_batch_time_ms"):
+                 print(f"   Avg Batch Time: {result['avg_batch_time_ms']:.2f} ms")
             print(f"   Memory: {result['model_size_gb']:.2f} GB\n")
             
         except Exception as e:
