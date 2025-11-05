@@ -239,28 +239,58 @@ EXPERIMENT_CONFIG_CARBON = [
 
 BENCHMARKS_CARBON = [
     {
-        "name": "gsm8k_workload",
-        "num_prompts": 100,
+        "name": "gsm8k_latency_b1",
+        "num_prompts": 10, # 
         "max_new_tokens": 100,
         "dataset": "gsm8k",
         "subset": "test",
-        "description": "Math reasoning workload"
+        "description": "Math reasoning (Latency, TTFT, bsz=1)",
+        "batch_size": 1 
     },
     {
-        "name": "mmlu_workload",
-        "num_prompts": 100,
+        "name": "mmlu_latency_b1",
+        "num_prompts": 10,
         "max_new_tokens": 50,
         "dataset": "mmlu",
         "subset": "test",
-        "description": "Knowledge QA workload"
+        "description": "Knowledge QA (Latency, TTFT, bsz=1)",
+        "batch_size": 1
     },
     {
         "name": "ifeval_workload",
-        "num_prompts": 100,  
+        "num_prompts": 10,  
         "max_new_tokens": 150, 
         "dataset": "IFEval",
         "subset": "train", 
-        "description": "Instruction following workload"
+        "description": "Instruction (Latency, TTFT, bsz=1)"
+        "batch_size": 1
+    },
+    {
+        "name": "gsm8k_throughput_b8",
+        "num_prompts": 10, 
+        "max_new_tokens": 100,
+        "dataset": "gsm8k",
+        "subset": "test",
+        "description": "Math reasoning (Throughput, bsz=8)",
+        "batch_size": 8
+    },
+    {
+        "name": "mmlu_throughput_b8",
+        "num_prompts": 10, 
+        "max_new_tokens": 50,
+        "dataset": "mmlu",
+        "subset": "test",
+        "description": "Knowledge QA (Throughput, bsz=8)",
+        "batch_size": 8
+    },
+    {
+        "name": "ifeval_workload",
+        "num_prompts": 10,  
+        "max_new_tokens": 150, 
+        "dataset": "IFEval",
+        "subset": "train", 
+        "description": "Instruction (Throughput, bsz=8)"
+        "batch_size": 8
     },
 ]
 
@@ -499,51 +529,129 @@ def _load_workload_prompts(workload):
         return [f"Sample prompt {i+1} for {dataset_name}" for i in range(num_prompts)]
 
 
-def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, device="cuda"):
+def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, batch_size=1, device="cuda"):
     """
     Measure inference performance with warm-up period.
     
-    The first 5 prompts are used for GPU warm-up and excluded from metrics
-    to avoid CUDA kernel compilation overhead.
+    Handles two modes:
+    1. batch_size = 1: Measures TTFT (Time To First Token) and latency.
+    2. batch_size > 1: Measures batched throughput. TTFT metrics will be None.
+    
+    The first 5 prompts/batches are used for GPU warm-up and excluded from metrics.
     """
-    WARMUP_PROMPTS = 5
+    WARMUP_STEPS = 5 # 5 prompts or 5 batches
     
-    ttft_times = []
-    total_tokens = 0
-    start_time = time.time()
+    ttft_times_ms = []
+    total_new_tokens = 0
+    total_inference_time_sec = 0
     
-    for i, prompt in enumerate(prompts):
-        inputs = tokenizer(prompt, return_tensors="pt").to(device)
+    # Helper para crear lotes
+    def create_batches(data, size):
+        for i in range(0, len(data), size):
+            yield data[i:i + size]
+
+    # --- LÓGICA PARA BATCH SIZE = 1 (LATENCIA / TTFT) ---
+    if batch_size == 1:
+        print(f"   Running in LATENCY mode (bsz=1). Measuring TTFT...")
+        loop_start_time = time.time()
         
-        gen_start = time.time()
-        with torch.no_grad():
-            outputs = model.generate(
-                **inputs,
-                max_new_tokens=max_new_tokens,
-                do_sample=False,
-                pad_token_id=tokenizer.eos_token_id
-            )
-        gen_time = time.time() - gen_start
+        for i, prompt in enumerate(prompts):
+            inputs = tokenizer(prompt, return_tensors="pt").to(device)
+            
+            gen_start = time.time()
+            with torch.no_grad():
+                outputs = model.generate(
+                    **inputs,
+                    max_new_tokens=max_new_tokens,
+                    do_sample=False,
+                    pad_token_id=tokenizer.eos_token_id
+                )
+            gen_time_sec = time.time() - gen_start
+            
+            # Solo contar métricas después del calentamiento
+            if i >= WARMUP_STEPS:
+                ttft_times_ms.append(gen_time_sec * 1000) # TTFT es el tiempo total de generación para bsz=1
+                total_new_tokens += (outputs.shape[1] - inputs.input_ids.shape[1])
+                total_inference_time_sec += gen_time_sec
         
-        # Only count metrics after warm-up period
-        if i >= WARMUP_PROMPTS:
-            ttft_times.append(gen_time)
-            total_tokens += outputs.shape[1]
-    
-    total_time = time.time() - start_time
-    
-    return {
-        "avg_ttft_ms": float(np.mean(ttft_times) * 1000),
-        "std_ttft_ms": float(np.std(ttft_times) * 1000),
-        "min_ttft_ms": float(np.min(ttft_times) * 1000),
-        "max_ttft_ms": float(np.max(ttft_times) * 1000),
-        "throughput_tokens_per_sec": float(total_tokens / total_time),
-        "total_time_sec": float(total_time),
-        "total_tokens": int(total_tokens),
-        "avg_tokens_per_prompt": float(total_tokens / len(ttft_times)),  # ← Usar len(ttft_times)
-        "num_measured_prompts": len(ttft_times),  # ← Nuevo: explícito
-        "num_warmup_prompts": WARMUP_PROMPTS      # ← Nuevo: documentar
-    }
+        total_time_sec = time.time() - loop_start_time # Tiempo total del bucle
+        num_measured_prompts = len(ttft_times_ms)
+        
+        return {
+            "mode": "latency",
+            "avg_ttft_ms": float(np.mean(ttft_times_ms)) if num_measured_prompts > 0 else None,
+            "std_ttft_ms": float(np.std(ttft_times_ms)) if num_measured_prompts > 0 else None,
+            "throughput_tokens_per_sec": float(total_new_tokens / total_inference_time_sec) if total_inference_time_sec > 0 else 0.0,
+            "total_loop_time_sec": float(total_time_sec),
+            "total_new_tokens": int(total_new_tokens),
+            "avg_new_tokens_per_prompt": float(total_new_tokens / num_measured_prompts) if num_measured_prompts > 0 else 0.0,
+            "num_measured_prompts": num_measured_prompts,
+            "num_warmup_prompts": WARMUP_STEPS
+        }
+
+    # --- LÓGICA PARA BATCH SIZE > 1 (THROUGHPUT) ---
+    else:
+        print(f"   Running in THROUGHPUT mode (bsz={batch_size}). TTFT will not be measured.")
+        # El tokenizer necesita padding para los lotes
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
+            model.config.pad_token_id = tokenizer.eos_token_id
+        tokenizer.padding_side = "left" # Para decodificación
+        
+        prompt_batches = list(create_batches(prompts, batch_size))
+        loop_start_time = time.time()
+        
+        for i, batch_prompts in enumerate(prompt_batches):
+            inputs = tokenizer(
+                batch_prompts, 
+                return_tensors="pt", 
+                padding=True, 
+                truncation=True, 
+                max_length=512 # Añadir max_length para seguridad
+            ).to(device)
+            
+            gen_start = time.time()
+            with torch.no_grad():
+                outputs = model.generate(
+                    **inputs,
+                    max_new_tokens=max_new_tokens,
+                    do_sample=False,
+                    pad_token_id=tokenizer.eos_token_id
+                )
+            gen_time_sec = time.time() - gen_start
+            
+            # Solo contar métricas después del calentamiento
+            if i >= WARMUP_STEPS:
+                total_inference_time_sec += gen_time_sec
+                
+                # Contar solo los tokens NUEVOS, excluyendo padding y prompt
+                input_lengths = inputs.input_ids.shape[1]
+                generated_tokens = outputs[:, input_lengths:]
+                
+                # Crear máscara para ignorar tokens de padding (eos_token_id)
+                # (Asumimos que pad_token_id es el mismo que eos_token_id para generate)
+                padding_mask = (generated_tokens != tokenizer.eos_token_id)
+                num_new = padding_mask.sum().item()
+                
+                total_new_tokens += num_new
+                ttft_times_ms.append(gen_time_sec * 1000) # Esto es ahora "tiempo por lote"
+        
+        total_time_sec = time.time() - loop_start_time
+        num_measured_batches = len(ttft_times_ms)
+        num_measured_prompts = num_measured_batches * batch_size
+
+        return {
+            "mode": "throughput",
+            "avg_ttft_ms": None, # TTFT no es relevante para lotes
+            "std_ttft_ms": None,
+            "avg_batch_time_ms": float(np.mean(ttft_times_ms)) if num_measured_batches > 0 else None,
+            "throughput_tokens_per_sec": float(total_new_tokens / total_inference_time_sec) if total_inference_time_sec > 0 else 0.0,
+            "total_loop_time_sec": float(total_time_sec),
+            "total_new_tokens": int(total_new_tokens),
+            "avg_new_tokens_per_prompt": float(total_new_tokens / num_measured_prompts) if num_measured_prompts > 0 else 0.0,
+            "num_measured_prompts": num_measured_prompts,
+            "num_warmup_batches": WARMUP_STEPS
+        }
 
 
 def _get_memory_stats(model, device="cuda"):
@@ -1039,12 +1147,15 @@ def run_carbon_profiling(
             prompts = _load_workload_prompts(workload)
             
             # Measure inference performance
-            print(f"   Running inference...")
+            print(f"   Running inference
+            batch_size = workload.get("batch_size", 1)
+            print(f"   (Batch Size: {batch_size})")
             perf_metrics = _measure_inference_performance(
                 model=model,
                 tokenizer=tokenizer,
                 prompts=prompts,
                 max_new_tokens=workload["max_new_tokens"],
+                batch_size=batch_size,
                 device=device
             )
             
@@ -1086,7 +1197,8 @@ def run_carbon_profiling(
                 **perf_metrics,
                 **memory_stats,
                 "energy_kwh": float(emissions) if emissions else 0.0,
-                "hardware_metadata": hardware_metadata, # <-- AÑADIDO
+                "hardware_metadata": hardware_metadata, 
+                "batch_size": batch_size,
                 "num_prompts": len(prompts),
                 "max_new_tokens": workload["max_new_tokens"],
                 "workload_description": workload.get("description", "")
