@@ -40,6 +40,10 @@ try:
     import lm_eval
     import transformers
     import optipfair
+    # Additional imports for carbon profiling
+    import time
+    import numpy as np
+    from datetime import datetime
 except ImportError as e:
     raise ImportError(
         f"Missing required library: {e.name}\n"
@@ -155,7 +159,6 @@ EXPERIMENT_CONFIG = [
     },
 ]
 
-
 # =============================================================================
 # BENCHMARK CONFIGURATIONS
 # =============================================================================
@@ -176,6 +179,80 @@ BENCHMARKS_BASE = [
     {"name": "gsm8k", "num_fewshot": 5},  # Chain-of-thought requires few-shot
     {"name": "ifeval", "num_fewshot": 0},
     {"name": "leaderboard_musr", "num_fewshot": 0},
+]
+
+
+# =============================================================================
+# CARBON PROFILING CONFIGURATION
+# =============================================================================
+
+EXPERIMENT_CONFIG_CARBON = [
+    # -------------------------------------------------------------------------
+    # Llama-3.2-1B: Baseline + Star Model Only
+    # -------------------------------------------------------------------------
+    {
+        "base_model": "meta-llama/Llama-3.2-1B",
+        "pruning_pct": 0,
+        "hf_repo_id": None,  # Baseline
+        "is_star": False,
+    },
+    {
+        "base_model": "meta-llama/Llama-3.2-1B",
+        "pruning_pct": 40,
+        "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-40pct",
+        "is_star": True,  # Star model (140% expansion)
+    },
+    
+    # -------------------------------------------------------------------------
+    # Llama-3.2-3B: Baseline + Star Model Only
+    # -------------------------------------------------------------------------
+    {
+        "base_model": "meta-llama/Llama-3.2-3B",
+        "pruning_pct": 0,
+        "hf_repo_id": None,  # Baseline
+        "is_star": False,
+    },
+    {
+        "base_model": "meta-llama/Llama-3.2-3B",
+        "pruning_pct": 10,
+        "hf_repo_id": "peremartra/Llama-3.2-3B-pruned-10pct",
+        "is_star": True,  # Star model
+    },
+    
+    # -------------------------------------------------------------------------
+    # Llama-3.2-1B-Instruct: Baseline + Star Model Only
+    # -------------------------------------------------------------------------
+    {
+        "base_model": "meta-llama/Llama-3.2-1B-Instruct",
+        "pruning_pct": 0,
+        "hf_repo_id": None,  # Baseline
+        "is_star": False,
+    },
+    {
+        "base_model": "meta-llama/Llama-3.2-1B-Instruct",
+        "pruning_pct": 40,
+        "hf_repo_id": "peremartra/Llama-3.2-1B-I-pruned-40pct",
+        "is_star": True,  # Star model
+    },
+]
+
+BENCHMARKS_CARBON = [
+    {
+        "name": "gsm8k_workload",
+        "num_prompts": 100,
+        "max_new_tokens": 100,
+        "dataset": "gsm8k",
+        "subset": "test",
+        "description": "Math reasoning workload"
+    },
+    {
+        "name": "mmlu_workload",
+        "num_prompts": 100,
+        "max_new_tokens": 50,
+        "dataset": "mmlu",
+        "subset": "test",
+        "description": "Knowledge QA workload"
+    },
 ]
 
 # Instruct models additional benchmark (+1)
@@ -316,6 +393,178 @@ def model_evaluation(model_obj, tokenizer, tasks, limit=None):
             }
     
     return formatted_results
+
+# =============================================================================
+# INTERNAL HELPER FUNCTIONS FOR CARBON PROFILING
+# =============================================================================
+
+def _get_checkpoint_dir(base_dir, model_size, mode="evaluation"):
+    """
+    Internal helper: Construct checkpoint directory based on mode.
+    
+    Args:
+        base_dir: Base checkpoint directory
+        model_size: "1b", "3b", "1b_instruct", etc.
+        mode: "evaluation" (default) or "carbon"
+    
+    Returns:
+        str: Full checkpoint directory path (created if doesn't exist)
+    """
+    import os
+    
+    if mode == "evaluation":
+        subdir = model_size
+    elif mode == "carbon":
+        subdir = f"{model_size}_carbon"
+    else:
+        raise ValueError(f"Invalid mode: {mode}. Use 'evaluation' or 'carbon'")
+    
+    checkpoint_dir = os.path.join(base_dir, subdir)
+    os.makedirs(checkpoint_dir, exist_ok=True)
+    
+    return checkpoint_dir
+
+
+def _get_results_filename(model_size, mode="evaluation", version="latest"):
+    """
+    Internal helper: Construct results filename based on mode.
+    
+    Args:
+        model_size: "1b", "3b", etc.
+        mode: "evaluation" (default) or "carbon"
+        version: "latest" or timestamp string
+    
+    Returns:
+        str: Results filename
+    """
+    prefix = "carbon_" if mode == "carbon" else ""
+    return f"{prefix}llama_{model_size}_results_{version}.csv"
+
+
+def _load_workload_prompts(workload):
+    """
+    Internal helper: Load prompts from specified dataset.
+    
+    Args:
+        workload (dict): Workload specification with keys:
+            - dataset: "gsm8k", "mmlu", etc.
+            - subset: "test", "train", etc.
+            - num_prompts: Number of prompts to load
+    
+    Returns:
+        list[str]: List of text prompts
+    """
+    from datasets import load_dataset
+    
+    dataset_name = workload["dataset"]
+    num_prompts = workload["num_prompts"]
+    subset = workload.get("subset", "test")
+    
+    try:
+        if dataset_name == "gsm8k":
+            dataset = load_dataset("gsm8k", "main", split=subset)
+            prompts = [item["question"] for item in dataset.select(range(min(num_prompts, len(dataset))))]
+        
+        elif dataset_name == "mmlu":
+            # Use a specific MMLU subset (e.g., "abstract_algebra") or aggregate
+            dataset = load_dataset("cais/mmlu", "all", split=subset)
+            prompts = [item["question"] for item in dataset.select(range(min(num_prompts, len(dataset))))]
+        
+        else:
+            # Fallback: generic prompts
+            print(f"⚠️ Dataset {dataset_name} not implemented, using generic prompts")
+            prompts = [
+                f"Solve this problem: What is {i} + {i+1}?" 
+                for i in range(num_prompts)
+            ]
+        
+        return prompts
+    
+    except Exception as e:
+        print(f"⚠️ Error loading dataset {dataset_name}: {e}")
+        print(f"   Using fallback generic prompts")
+        # Fallback: generic prompts
+        return [f"Sample prompt {i+1} for {dataset_name}" for i in range(num_prompts)]
+
+
+def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, device="cuda"):
+    """
+    Internal helper: Measure inference performance metrics.
+    
+    Measures:
+        - TTFT (Time To First Token) - latency
+        - Throughput (tokens/second)
+        - Total generation time
+        - Token statistics
+    
+    Args:
+        model: PyTorch model
+        tokenizer: Model tokenizer
+        prompts (list[str]): Input prompts
+        max_new_tokens (int): Maximum tokens to generate
+        device (str): Device placement
+    
+    Returns:
+        dict: Performance metrics
+    """
+    ttft_times = []
+    total_tokens = 0
+    start_time = time.time()
+    
+    for prompt in prompts:
+        inputs = tokenizer(prompt, return_tensors="pt").to(device)
+        
+        # Measure Time To First Token (TTFT)
+        gen_start = time.time()
+        with torch.no_grad():
+            outputs = model.generate(
+                **inputs,
+                max_new_tokens=max_new_tokens,
+                do_sample=False,
+                pad_token_id=tokenizer.eos_token_id
+            )
+        gen_time = time.time() - gen_start
+        
+        ttft_times.append(gen_time)
+        total_tokens += outputs.shape[1]
+    
+    total_time = time.time() - start_time
+    
+    return {
+        "avg_ttft_ms": float(np.mean(ttft_times) * 1000),
+        "std_ttft_ms": float(np.std(ttft_times) * 1000),
+        "min_ttft_ms": float(np.min(ttft_times) * 1000),
+        "max_ttft_ms": float(np.max(ttft_times) * 1000),
+        "throughput_tokens_per_sec": float(total_tokens / total_time),
+        "total_time_sec": float(total_time),
+        "total_tokens": int(total_tokens),
+        "avg_tokens_per_prompt": float(total_tokens / len(prompts))
+    }
+
+
+def _get_memory_stats(model, device="cuda"):
+    """
+    Internal helper: Get memory usage statistics.
+    
+    Args:
+        model: PyTorch model
+        device (str): Device placement
+    
+    Returns:
+        dict: Memory statistics in GB
+    """
+    stats = {}
+    
+    if device == "cuda" and torch.cuda.is_available():
+        stats["memory_allocated_gb"] = float(torch.cuda.memory_allocated() / (1024**3))
+        stats["memory_reserved_gb"] = float(torch.cuda.memory_reserved() / (1024**3))
+        stats["max_memory_allocated_gb"] = float(torch.cuda.max_memory_allocated() / (1024**3))
+    
+    # Model size (works for both CPU and CUDA)
+    model_size_bytes = sum(p.numel() * p.element_size() for p in model.parameters())
+    stats["model_size_gb"] = float(model_size_bytes / (1024**3))
+    
+    return stats
 
 def run_robust_evaluation(model, tokenizer, tasks, checkpoint_path, model_name=None):
     """
@@ -652,3 +901,187 @@ def format_results_table(results_dict):
     
     df = pd.DataFrame(rows)
     return df.to_string(index=False)
+
+# =============================================================================
+# CARBON PROFILING MAIN FUNCTION
+# =============================================================================
+
+def run_carbon_profiling(
+    model,
+    tokenizer,
+    workloads,
+    checkpoint_path,
+    model_name=None,
+    device="cuda"
+):
+    """
+    Run carbon and performance profiling on a model (parallel to run_robust_evaluation).
+    
+    Measures:
+        - Energy consumption (CodeCarbon)
+        - Throughput (tokens/second)
+        - Latency (Time To First Token)
+        - Memory footprint
+    
+    Uses the same checkpoint/resume system as run_robust_evaluation for reliability.
+    
+    Args:
+        model: PyTorch model object
+        tokenizer: Tokenizer for the model
+        workloads (list): List of workload dicts from BENCHMARKS_CARBON
+        checkpoint_path (str): Path to checkpoint JSON file
+        model_name (str, optional): Human-readable model name
+        device (str): Device placement ("cuda" or "cpu")
+    
+    Returns:
+        dict: Complete profiling results with all metrics
+    
+    Example:
+        >>> results = run_carbon_profiling(
+        ...     model, tokenizer,
+        ...     workloads=BENCHMARKS_CARBON,
+        ...     checkpoint_path="/path/carbon_baseline.json",
+        ...     model_name="Llama-3.2-1B-baseline"
+        ... )
+    """
+    import json
+    import os
+    from codecarbon import EmissionsTracker
+    
+    # Extract model name
+    if model_name is None:
+        model_name = getattr(model.config, '_name_or_path', 'unknown')
+    
+    # Ensure checkpoint directory exists
+    checkpoint_dir = os.path.dirname(checkpoint_path)
+    if checkpoint_dir:
+        os.makedirs(checkpoint_dir, exist_ok=True)
+    
+    # Load or create checkpoint
+    if os.path.exists(checkpoint_path):
+        print(f"📂 Found existing checkpoint: {checkpoint_path}")
+        with open(checkpoint_path, 'r') as f:
+            checkpoint = json.load(f)
+        
+        if "results" not in checkpoint:
+            checkpoint["results"] = {}
+        if "metadata" not in checkpoint:
+            checkpoint["metadata"] = {
+                "model_name": model_name,
+                "started_at": datetime.now().isoformat(),
+                "mode": "carbon_profiling"
+            }
+    else:
+        print(f"🆕 Creating new checkpoint: {checkpoint_path}")
+        checkpoint = {
+            "metadata": {
+                "model_name": model_name,
+                "started_at": datetime.now().isoformat(),
+                "last_updated": datetime.now().isoformat(),
+                "mode": "carbon_profiling"
+            },
+            "results": {},
+            "completed_workloads": [],
+            "failed_workloads": []
+        }
+    
+    completed = checkpoint.get("completed_workloads", [])
+    failed = checkpoint.get("failed_workloads", [])
+    
+    # Determine pending workloads
+    pending = [w for w in workloads 
+               if w["name"] not in completed and w["name"] not in failed]
+    
+    print(f"✅ Loaded checkpoint. Completed: {len(completed)}/{len(workloads)} workloads")
+    if failed:
+        print(f"⚠️ Previously failed: {failed}")
+    
+    if not pending:
+        print("🎉 All workloads completed!")
+        return checkpoint["results"]
+    
+    print(f"\n🚀 Starting profiling: {len(pending)} workloads remaining")
+    print("="*70 + "\n")
+    
+    # Process each workload
+    for i, workload in enumerate(pending, 1):
+        workload_name = workload["name"]
+        
+        print(f"[{i}/{len(pending)}] Profiling: {workload_name}")
+        print("-"*70)
+        
+        try:
+            # Initialize CodeCarbon tracker
+            tracker = EmissionsTracker(
+                project_name=f"glu_pruning_{model_name}",
+                measure_power_secs=1,
+                save_to_file=False,  # We'll manage output ourselves
+                log_level="warning"  # Reduce verbosity
+            )
+            tracker.start()
+            
+            # Load prompts
+            print(f"   Loading {workload['num_prompts']} prompts from {workload['dataset']}...")
+            prompts = _load_workload_prompts(workload)
+            
+            # Measure inference performance
+            print(f"   Running inference...")
+            perf_metrics = _measure_inference_performance(
+                model=model,
+                tokenizer=tokenizer,
+                prompts=prompts,
+                max_new_tokens=workload["max_new_tokens"],
+                device=device
+            )
+            
+            # Stop tracker and get emissions
+            emissions: float = tracker.stop()
+            
+            # Get memory stats
+            memory_stats = _get_memory_stats(model, device)
+            
+            # Consolidate results
+            result = {
+                **perf_metrics,
+                **memory_stats,
+                "energy_kwh": float(emissions) if emissions else 0.0,
+                "num_prompts": len(prompts),
+                "max_new_tokens": workload["max_new_tokens"],
+                "workload_description": workload.get("description", "")
+            }
+            
+            # Save to checkpoint
+            checkpoint["results"][workload_name] = result
+            checkpoint["completed_workloads"] = checkpoint.get("completed_workloads", []) + [workload_name]
+            checkpoint["metadata"]["last_updated"] = datetime.now().isoformat()
+            
+            # Persist checkpoint
+            with open(checkpoint_path, 'w') as f:
+                json.dump(checkpoint, f, indent=2)
+            
+            # Print summary
+            print(f"✅ {workload_name} completed")
+            print(f"   Energy: {result['energy_kwh']:.6f} kWh")
+            print(f"   Throughput: {result['throughput_tokens_per_sec']:.2f} tok/s")
+            print(f"   Avg TTFT: {result['avg_ttft_ms']:.2f} ms")
+            print(f"   Memory: {result['model_size_gb']:.2f} GB\n")
+            
+        except Exception as e:
+            print(f"❌ {workload_name} FAILED: {str(e)}")
+            checkpoint["failed_workloads"] = checkpoint.get("failed_workloads", []) + [workload_name]
+            checkpoint["metadata"]["last_updated"] = datetime.now().isoformat()
+            
+            # Save checkpoint even on failure
+            with open(checkpoint_path, 'w') as f:
+                json.dump(checkpoint, f, indent=2)
+            
+            print("⚠️ Continuing with next workload...\n")
+            continue
+    
+    print("="*70)
+    print("🎉 ALL WORKLOADS COMPLETED!")
+    if checkpoint.get("failed_workloads"):
+        print(f"⚠️ Some workloads failed: {checkpoint['failed_workloads']}")
+    print("="*70 + "\n")
+    
+    return checkpoint["results"]
