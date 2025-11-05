@@ -257,7 +257,7 @@ BENCHMARKS_CARBON = [
         "batch_size": 1
     },
     {
-        "name": "ifeval_workload",
+        "name": "ifeval_latency_b1",
         "num_prompts": 10,  
         "max_new_tokens": 150, 
         "dataset": "IFEval",
@@ -284,7 +284,7 @@ BENCHMARKS_CARBON = [
         "batch_size": 8
     },
     {
-        "name": "ifeval_workload",
+        "name": "ifeval_throughput_b8",
         "num_prompts": 10,  
         "max_new_tokens": 150, 
         "dataset": "IFEval",
@@ -539,7 +539,14 @@ def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, ba
     
     The first 5 prompts/batches are used for GPU warm-up and excluded from metrics.
     """
-    WARMUP_STEPS = 5 # 5 prompts or 5 batches
+    if batch_size == 1:
+        total_iterations = len(prompts)
+    else:
+        total_iterations = (len(prompts) + batch_size - 1) // batch_size  # Ceiling division
+    
+    # Usar al menos 20% de iteraciones para warmup, o 5, lo que sea MENOR
+    WARMUP_STEPS = min(5, max(1, int(total_iterations * 0.2)))
+    print(f"   Using {WARMUP_STEPS} warmup iterations (out of {total_iterations} total)")
     
     ttft_times_ms = []
     total_new_tokens = 0
@@ -620,29 +627,23 @@ def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, ba
                 )
             gen_time_sec = time.time() - gen_start
             
-            # Solo contar métricas después del calentamiento
-            if i >= WARMUP_STEPS:
+             if i >= WARMUP_STEPS:
                 total_inference_time_sec += gen_time_sec
                 
-                # Contar solo los tokens NUEVOS, excluyendo padding y prompt
-                input_lengths = inputs.input_ids.shape[1]
-                generated_tokens = outputs[:, input_lengths:]
+                # Contar TODOS los tokens generados (outputs - inputs)
+                input_length = inputs.input_ids.shape[1]
+                num_new_tokens_in_batch = (outputs.shape[1] - input_length) * len(batch_prompts)
+                total_new_tokens += num_new_tokens_in_batch
                 
-                # Crear máscara para ignorar tokens de padding (eos_token_id)
-                # (Asumimos que pad_token_id es el mismo que eos_token_id para generate)
-                padding_mask = (generated_tokens != tokenizer.eos_token_id)
-                num_new = padding_mask.sum().item()
-                
-                total_new_tokens += num_new
-                ttft_times_ms.append(gen_time_sec * 1000) # Esto es ahora "tiempo por lote"
-        
-        total_time_sec = time.time() - loop_start_time
-        num_measured_batches = len(ttft_times_ms)
-        num_measured_prompts = num_measured_batches * batch_size
+                ttft_times_ms.append(gen_time_sec * 1000)
+                    
+                    total_time_sec = time.time() - loop_start_time
+                    num_measured_batches = len(ttft_times_ms)
+                    num_measured_prompts = num_measured_batches * batch_size
 
         return {
             "mode": "throughput",
-            "avg_ttft_ms": None, # TTFT no es relevante para lotes
+            "avg_ttft_ms": None, 
             "std_ttft_ms": None,
             "avg_batch_time_ms": float(np.mean(ttft_times_ms)) if num_measured_batches > 0 else None,
             "throughput_tokens_per_sec": float(total_new_tokens / total_inference_time_sec) if total_inference_time_sec > 0 else 0.0,
@@ -1018,10 +1019,6 @@ def format_results_table(results_dict):
 # CARBON PROFILING MAIN FUNCTION
 # =============================================================================
 
-# (En utils.py, REEMPLAZA la función run_carbon_profiling completa)
-
-# (En utils.py, REEMPLAZA la función run_carbon_profiling completa)
-
 def run_carbon_profiling(
     model,
     tokenizer,
@@ -1030,87 +1027,7 @@ def run_carbon_profiling(
     model_name=None,
     device="cuda"
 ):
-    """
-    Run carbon and performance profiling on a model (parallel to run_robust_evaluation).
-    
-    Measures:
-        - Energy consumption (CodeCarbon)
-        - Throughput (tokens/second)
-        - Latency (Time To First Token)
-        - Memory footprint
-        - Detailed hardware & emissions metadata
-    
-    Uses the same checkpoint/resume system as run_robust_evaluation for reliability.
-    
-    Args:
-        model: PyTorch model object
-        tokenizer: Tokenizer for the model
-        workloads (list): List of workload dicts from BENCHMARKS_CARBON
-        checkpoint_path (str): Path to checkpoint JSON file
-        model_name (str, optional): Human-readable model name
-        device (str): Device placement ("cuda" or "cpu")
-    
-    Returns:
-        dict: Complete profiling results with all metrics
-    """
-    import json
-    import os
-    from codecarbon import EmissionsTracker
-    
-    # Extract model name
-    if model_name is None:
-        model_name = getattr(model.config, '_name_or_path', 'unknown')
-    
-    # Ensure checkpoint directory exists
-    checkpoint_dir = os.path.dirname(checkpoint_path)
-    if checkpoint_dir:
-        os.makedirs(checkpoint_dir, exist_ok=True)
-    
-    # Load or create checkpoint
-    if os.path.exists(checkpoint_path):
-        print(f"📂 Found existing checkpoint: {checkpoint_path}")
-        with open(checkpoint_path, 'r') as f:
-            checkpoint = json.load(f)
-        
-        if "results" not in checkpoint:
-            checkpoint["results"] = {}
-        if "metadata" not in checkpoint:
-            checkpoint["metadata"] = {
-                "model_name": model_name,
-                "started_at": datetime.now().isoformat(),
-                "mode": "carbon_profiling"
-            }
-    else:
-        print(f"🆕 Creating new checkpoint: {checkpoint_path}")
-        checkpoint = {
-            "metadata": {
-                "model_name": model_name,
-                "started_at": datetime.now().isoformat(),
-                "last_updated": datetime.now().isoformat(),
-                "mode": "carbon_profiling"
-            },
-            "results": {},
-            "completed_workloads": [],
-            "failed_workloads": []
-        }
-    
-    completed = checkpoint.get("completed_workloads", [])
-    failed = checkpoint.get("failed_workloads", [])
-    
-    # Determine pending workloads
-    pending = [w for w in workloads 
-               if w["name"] not in completed and w["name"] not in failed]
-    
-    print(f"✅ Loaded checkpoint. Completed: {len(completed)}/{len(workloads)} workloads")
-    if failed:
-        print(f"⚠️ Previously failed: {failed}")
-    
-    if not pending:
-        print("🎉 All workloads completed!")
-        return checkpoint["results"]
-    
-    print(f"\n🚀 Starting profiling: {len(pending)} workloads remaining")
-    print("="*70 + "\n")
+    # ... [código inicial de checkpoint loading igual] ...
     
     # Process each workload
     for i, workload in enumerate(pending, 1):
@@ -1131,6 +1048,7 @@ def run_carbon_profiling(
             save_to_file=False,
             log_level="warning"
         )
+        
         try:
             dummy_prompt = "Warm-up GPU"
             dummy_inputs = tokenizer(dummy_prompt, return_tensors="pt").to(device)
@@ -1140,14 +1058,14 @@ def run_carbon_profiling(
             print("   GPU warm-up complete.")
         except Exception as warmup_e:
             print(f"   ⚠️ GPU warm-up failed (continuing anyway): {warmup_e}")
-            pass      
-            
-        # Inicializar variables de resultado
-        perf_metrics = {}
-        emissions = 0.0
-        hardware_metadata = {}
+        
+        # ==========================================================
+        # MAIN PROFILING LOGIC
+        # ==========================================================
+        workload_success = False
         
         try:
+            # Start tracker
             tracker.start()
             
             # Load prompts
@@ -1156,7 +1074,6 @@ def run_carbon_profiling(
             
             # Measure inference performance
             print(f"   Running inference...")
-            
             batch_size = workload.get("batch_size", 1)
             print(f"   (Batch Size: {batch_size})")
             
@@ -1168,81 +1085,15 @@ def run_carbon_profiling(
                 batch_size=batch_size,
                 device=device
             )
-
-        except Exception as e:
-            print(f"❌ {workload_name} FAILED during inference: {str(e)}")
-            checkpoint["failed_workloads"] = checkpoint.get("failed_workloads", []) + [workload_name]
-            # Salta al bloque finally, pero luego continúa con el siguiente workload
-            continue 
-
-        finally:
-            # --- BLOQUE 'FINALLY' MEJORADO ---
-            # Esto se ejecuta incluso si _measure_inference_performance falla
-            # pero SOLO si el tracker.start() tuvo éxito.
-            if tracker._scheduler: # Comprobar si el tracker está "activo"
-                emissions: float = tracker.stop()
-                print(f"   Tracker stopped. Emissions captured: {emissions} kWh")
-
-                # --- CAPTURA DE METADATOS CORREGIDA ---
-                # Los detalles se leen directamente desde el objeto 'tracker'
-                
-                try:
-                    gpu_model = tracker._gpu.model_
-                    gpu_count = tracker._gpu.gpu_count_
-                    gpu_power_W = tracker._gpu.power_
-                except Exception:
-                    gpu_model = "N/A"
-                    gpu_count = 0
-                    gpu_power_W = "N/A"
-
-                try:
-                    cpu_model = tracker._cpu.model_
-                    cpu_count = tracker._cpu.cpu_count_
-                    cpu_power_W = tracker._cpu.power_
-                except Exception:
-                    cpu_model = "N/A"
-                    cpu_count = 0
-                    cpu_power_W = "N/A"
-                    
-                try:
-                    location = tracker.location_
-                    country_name = location['country_name'] if location else "N/A"
-                    country_iso = location['country_iso_code'] if location else "N/A"
-                    region = location['region'] if location else "N/A"
-                    cloud_provider = location['cloud_provider'] if location else "N/A"
-                    cloud_region = location['cloud_region'] if location else "N/A"
-                except Exception:
-                    country_name = "N/A (Geo API failed)"
-                    country_iso = "N/A"
-                    region = "N/A"
-                    cloud_provider = "N/A"
-                    cloud_region = "N/A"
-
-                hardware_metadata = {
-                    "timestamp": getattr(tracker, 'timestamp_', "N/A"),
-                    "project_name": getattr(tracker, 'project_name_', "N/A"),
-                    "duration_sec": getattr(tracker, 'duration_', "N/A"),
-                    "energy_kwh": getattr(tracker, 'energy_consumed_', "N/A"),
-                    "co2_g": getattr(tracker, 'emissions_', "N/A"),
-                    "carbon_intensity_gCO2_kWh": getattr(tracker, 'carbon_intensity_', "N/A"),
-                    "country_name": country_name,
-                    "country_iso_code": country_iso,
-                    "region": region,
-                    "cloud_provider": cloud_provider,
-                    "cloud_region": cloud_region,
-                    "os": getattr(tracker, 'os_', "N/A"),
-                    "python_version": getattr(tracker, 'python_version_', "N/A"),
-                    "codecarbon_version": getattr(codecarbon, '__version__', "N/A"),
-                    "cpu_model": cpu_model,
-                    "cpu_count": cpu_count,
-                    "cpu_power_usage_W": cpu_power_W,
-                    "gpu_model": gpu_model,
-                    "gpu_count": gpu_count,
-                    "gpu_power_usage_W": gpu_power_W
-                }
-                # --- FIN DE LA CAPTURA ---
             
-            # Get memory stats (esto es seguro llamarlo fuera)
+            # Stop tracker (SOLO si llegamos aquí sin excepciones)
+            emissions = tracker.stop()
+            print(f"   Tracker stopped. Emissions: {emissions:.6f} kWh")
+            
+            # Capturar metadata de hardware
+            hardware_metadata = _capture_hardware_metadata(tracker)
+            
+            # Get memory stats
             memory_stats = _get_memory_stats(model, device)
             
             # Consolidate results
@@ -1257,27 +1108,45 @@ def run_carbon_profiling(
                 "workload_description": workload.get("description", "")
             }
             
-            # Guardar en checkpoint (solo si perf_metrics no está vacío, es decir, si la inferencia no falló)
-            if perf_metrics:
-                checkpoint["results"][workload_name] = result
-                checkpoint["completed_workloads"] = checkpoint.get("completed_workloads", []) + [workload_name]
-                print(f"✅ {workload_name} completed")
-                print(f"   Energy: {result['energy_kwh']:.6f} kWh")
-                print(f"   Throughput: {result['throughput_tokens_per_sec']:.2f} tok/s")
-                if result.get("avg_ttft_ms"):
-                    print(f"   Avg TTFT: {result['avg_ttft_ms']:.2f} ms")
-                if result.get("avg_batch_time_ms"):
-                    print(f"   Avg Batch Time: {result['avg_batch_time_ms']:.2f} ms")
-                print(f"   Memory: {result['model_size_gb']:.2f} GB\n")
+            # Save to checkpoint
+            checkpoint["results"][workload_name] = result
+            checkpoint["completed_workloads"].append(workload_name)
+            workload_success = True
             
+            # Print summary
+            print(f"✅ {workload_name} completed")
+            print(f"   Energy: {result['energy_kwh']:.6f} kWh")
+            print(f"   Throughput: {result['throughput_tokens_per_sec']:.2f} tok/s")
+            if result.get("avg_ttft_ms"):
+                print(f"   Avg TTFT: {result['avg_ttft_ms']:.2f} ms")
+            if result.get("avg_batch_time_ms"):
+                print(f"   Avg Batch Time: {result['avg_batch_time_ms']:.2f} ms")
+            print(f"   Memory: {result['model_size_gb']:.2f} GB\n")
+            
+        except Exception as e:
+            print(f"❌ {workload_name} FAILED: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            checkpoint["failed_workloads"].append(workload_name)
+            workload_success = False
+            
+            # Intentar detener el tracker si está corriendo
+            try:
+                if tracker._scheduler:
+                    tracker.stop()
+                    print("   Tracker stopped after error.")
+            except:
+                pass
+        
+        finally:
+            # Siempre actualizar checkpoint (incluso si falló)
             checkpoint["metadata"]["last_updated"] = datetime.now().isoformat()
-            
-            # Persist checkpoint
             with open(checkpoint_path, 'w') as f:
                 json.dump(checkpoint, f, indent=2)
-
-            # --- FIN DEL BLOQUE FINALLY ---
-
+            
+            if not workload_success:
+                print("   Continuing with next workload...\n")
+    
     print("="*70)
     print("🎉 ALL WORKLOADS COMPLETED!")
     if checkpoint.get("failed_workloads"):
@@ -1285,3 +1154,64 @@ def run_carbon_profiling(
     print("="*70 + "\n")
     
     return checkpoint["results"]
+
+
+def _capture_hardware_metadata(tracker):
+    """
+    Helper function to capture hardware metadata from CodeCarbon tracker.
+    Separated for clarity and error handling.
+    """
+    try:
+        gpu_model = tracker._gpu.model_
+        gpu_count = tracker._gpu.gpu_count_
+        gpu_power_W = tracker._gpu.power_
+    except Exception:
+        gpu_model = "N/A"
+        gpu_count = 0
+        gpu_power_W = "N/A"
+
+    try:
+        cpu_model = tracker._cpu.model_
+        cpu_count = tracker._cpu.cpu_count_
+        cpu_power_W = tracker._cpu.power_
+    except Exception:
+        cpu_model = "N/A"
+        cpu_count = 0
+        cpu_power_W = "N/A"
+        
+    try:
+        location = tracker.location_
+        country_name = location['country_name'] if location else "N/A"
+        country_iso = location['country_iso_code'] if location else "N/A"
+        region = location['region'] if location else "N/A"
+        cloud_provider = location['cloud_provider'] if location else "N/A"
+        cloud_region = location['cloud_region'] if location else "N/A"
+    except Exception:
+        country_name = "N/A"
+        country_iso = "N/A"
+        region = "N/A"
+        cloud_provider = "N/A"
+        cloud_region = "N/A"
+
+    return {
+        "timestamp": getattr(tracker, 'timestamp_', "N/A"),
+        "project_name": getattr(tracker, 'project_name_', "N/A"),
+        "duration_sec": getattr(tracker, 'duration_', "N/A"),
+        "energy_kwh": getattr(tracker, 'energy_consumed_', "N/A"),
+        "co2_g": getattr(tracker, 'emissions_', "N/A"),
+        "carbon_intensity_gCO2_kWh": getattr(tracker, 'carbon_intensity_', "N/A"),
+        "country_name": country_name,
+        "country_iso_code": country_iso,
+        "region": region,
+        "cloud_provider": cloud_provider,
+        "cloud_region": cloud_region,
+        "os": getattr(tracker, 'os_', "N/A"),
+        "python_version": getattr(tracker, 'python_version_', "N/A"),
+        "codecarbon_version": getattr(codecarbon, '__version__', "N/A"),
+        "cpu_model": cpu_model,
+        "cpu_count": cpu_count,
+        "cpu_power_usage_W": cpu_power_W,
+        "gpu_model": gpu_model,
+        "gpu_count": gpu_count,
+        "gpu_power_usage_W": gpu_power_W
+    }
