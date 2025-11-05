@@ -199,7 +199,7 @@ EXPERIMENT_CONFIG_CARBON = [
     {
         "base_model": "meta-llama/Llama-3.2-1B",
         "pruning_pct": 40,
-        "hf_repo_id": "peremartra/Llama-3.2-1B-pruned-40pct",
+        "hf_repo_id": "oopere/Llama-3.2-1B-pruned-40pct",
         "is_star": True,  # Star model (140% expansion)
     },
     
@@ -215,7 +215,7 @@ EXPERIMENT_CONFIG_CARBON = [
     {
         "base_model": "meta-llama/Llama-3.2-3B",
         "pruning_pct": 10,
-        "hf_repo_id": "peremartra/Llama-3.2-3B-pruned-10pct",
+        "hf_repo_id": "oopere/Llama-3.2-3B-pruned-10pct",
         "is_star": True,  # Star model
     },
     
@@ -231,7 +231,7 @@ EXPERIMENT_CONFIG_CARBON = [
     {
         "base_model": "meta-llama/Llama-3.2-1B-Instruct",
         "pruning_pct": 40,
-        "hf_repo_id": "peremartra/Llama-3.2-1B-I-pruned-40pct",
+        "hf_repo_id": "oopere/Llama-3.2-1B-I-pruned-40pct",
         "is_star": True,  # Star model
     },
 ]
