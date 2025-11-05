@@ -479,7 +479,7 @@ def _load_workload_prompts(workload):
             prompts = [item["question"] for item in dataset.select(range(min(num_prompts, len(dataset))))]
         elif dataset_name == "ifeval":
             # IFEval (google/ifeval) usa el campo 'prompt'
-            dataset = load_dataset("google/ifeval", split="test")
+            dataset = load_dataset("google/ifeval")
             prompts = [item["prompt"] for item in dataset.select(range(min(num_prompts, len(dataset))))]
         else:
             # Fallback: generic prompts
