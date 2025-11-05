@@ -1020,6 +1020,8 @@ def format_results_table(results_dict):
 
 # (En utils.py, REEMPLAZA la función run_carbon_profiling completa)
 
+# (En utils.py, REEMPLAZA la función run_carbon_profiling completa)
+
 def run_carbon_profiling(
     model,
     tokenizer,
@@ -1118,16 +1120,16 @@ def run_carbon_profiling(
         print("-"*70)
         print("   Clearing GPU cache...")
         clear_gpu_cache()
+        
         # ==========================================================
         # CODECARBON WARM UP
         # ==========================================================
         print("   Running GPU warm-up for CodeCarbon sensors...")
-        # Initialize CodeCarbon tracker
         tracker = EmissionsTracker(
             project_name=f"glu_pruning_{model_name}",
             measure_power_secs=1,
-            save_to_file=False,  # We'll manage output ourselves
-            log_level="warning"  # Reduce verbosity
+            save_to_file=False,
+            log_level="warning"
         )
         try:
             dummy_prompt = "Warm-up GPU"
@@ -1140,6 +1142,11 @@ def run_carbon_profiling(
             print(f"   ⚠️ GPU warm-up failed (continuing anyway): {warmup_e}")
             pass      
             
+        # Inicializar variables de resultado
+        perf_metrics = {}
+        emissions = 0.0
+        hardware_metadata = {}
+        
         try:
             tracker.start()
             
@@ -1150,8 +1157,6 @@ def run_carbon_profiling(
             # Measure inference performance
             print(f"   Running inference...")
             
-            # --- MODIFICACIÓN INTEGRADA ---
-            # Leer batch_size del workload, default a 1 si no se especifica
             batch_size = workload.get("batch_size", 1)
             print(f"   (Batch Size: {batch_size})")
             
@@ -1160,93 +1165,119 @@ def run_carbon_profiling(
                 tokenizer=tokenizer,
                 prompts=prompts,
                 max_new_tokens=workload["max_new_tokens"],
-                batch_size=batch_size, # <-- Parámetro pasado
+                batch_size=batch_size,
                 device=device
             )
-            # --- FIN DE LA MODIFICACIÓN ---
+
+        except Exception as e:
+            print(f"❌ {workload_name} FAILED during inference: {str(e)}")
+            checkpoint["failed_workloads"] = checkpoint.get("failed_workloads", []) + [workload_name]
+            # Salta al bloque finally, pero luego continúa con el siguiente workload
+            continue 
+
+        finally:
+            # --- BLOQUE 'FINALLY' MEJORADO ---
+            # Esto se ejecuta incluso si _measure_inference_performance falla
+            # pero SOLO si el tracker.start() tuvo éxito.
+            if tracker._scheduler: # Comprobar si el tracker está "activo"
+                emissions: float = tracker.stop()
+                print(f"   Tracker stopped. Emissions captured: {emissions} kWh")
+
+                # --- CAPTURA DE METADATOS CORREGIDA ---
+                # Los detalles se leen directamente desde el objeto 'tracker'
+                
+                try:
+                    gpu_model = tracker._gpu.model_
+                    gpu_count = tracker._gpu.gpu_count_
+                    gpu_power_W = tracker._gpu.power_
+                except Exception:
+                    gpu_model = "N/A"
+                    gpu_count = 0
+                    gpu_power_W = "N/A"
+
+                try:
+                    cpu_model = tracker._cpu.model_
+                    cpu_count = tracker._cpu.cpu_count_
+                    cpu_power_W = tracker._cpu.power_
+                except Exception:
+                    cpu_model = "N/A"
+                    cpu_count = 0
+                    cpu_power_W = "N/A"
+                    
+                try:
+                    location = tracker.location_
+                    country_name = location['country_name'] if location else "N/A"
+                    country_iso = location['country_iso_code'] if location else "N/A"
+                    region = location['region'] if location else "N/A"
+                    cloud_provider = location['cloud_provider'] if location else "N/A"
+                    cloud_region = location['cloud_region'] if location else "N/A"
+                except Exception:
+                    country_name = "N/A (Geo API failed)"
+                    country_iso = "N/A"
+                    region = "N/A"
+                    cloud_provider = "N/A"
+                    cloud_region = "N/A"
+
+                hardware_metadata = {
+                    "timestamp": getattr(tracker, 'timestamp_', "N/A"),
+                    "project_name": getattr(tracker, 'project_name_', "N/A"),
+                    "duration_sec": getattr(tracker, 'duration_', "N/A"),
+                    "energy_kwh": getattr(tracker, 'energy_consumed_', "N/A"),
+                    "co2_g": getattr(tracker, 'emissions_', "N/A"),
+                    "carbon_intensity_gCO2_kWh": getattr(tracker, 'carbon_intensity_', "N/A"),
+                    "country_name": country_name,
+                    "country_iso_code": country_iso,
+                    "region": region,
+                    "cloud_provider": cloud_provider,
+                    "cloud_region": cloud_region,
+                    "os": getattr(tracker, 'os_', "N/A"),
+                    "python_version": getattr(tracker, 'python_version_', "N/A"),
+                    "codecarbon_version": getattr(codecarbon, '__version__', "N/A"),
+                    "cpu_model": cpu_model,
+                    "cpu_count": cpu_count,
+                    "cpu_power_usage_W": cpu_power_W,
+                    "gpu_model": gpu_model,
+                    "gpu_count": gpu_count,
+                    "gpu_power_usage_W": gpu_power_W
+                }
+                # --- FIN DE LA CAPTURA ---
             
-            # Stop tracker and get emissions
-            emissions: float = tracker.stop()
-            
-            # Get memory stats
+            # Get memory stats (esto es seguro llamarlo fuera)
             memory_stats = _get_memory_stats(model, device)
             
-            # --- CAPTURAR METADATOS DETALLADOS ---
-            emissions_data = tracker.emissions_data
-            hardware_metadata = {
-                "timestamp": emissions_data.get("timestamp", "N/A"),
-                "project_name": emissions_data.get("project_name", "N/A"),
-                "duration_sec": emissions_data.get("duration", "N/A"),
-                "energy_kwh": emissions_data.get("energy_consumed", "N/A"),
-                "co2_g": emissions_data.get("emissions", "N/A"),
-                "carbon_intensity_gCO2_kWh": emissions_data.get("carbon_intensity", "N/A"),
-                "country_name": emissions_data.get("country_name", "N/A"),
-                "country_iso_code": emissions_data.get("country_iso_code", "N/A"),
-                "region": emissions_data.get("region", "N/A"),
-                "cloud_provider": emissions_data.get("cloud_provider", "N/A"),
-                "cloud_region": emissions_data.get("cloud_region", "N/A"),
-                "os": emissions_data.get("os", "N/A"),
-                "python_version": emissions_data.get("python_version", "N/A"),
-                "codecarbon_version": emissions_data.get("codecarbon_version", "N/A"),
-                "cpu_model": emissions_data.get("cpu_model", "N/A"),
-                "cpu_count": emissions_data.get("cpu_count", "N/A"),
-                "cpu_power_usage_W": emissions_data.get("cpu_power", "N/A"),
-                "gpu_model": emissions_data.get("gpu_model", "N/A"),
-                "gpu_count": emissions_data.get("gpu_count", "N/A"),
-                "gpu_power_usage_W": emissions_data.get("gpu_power", "N/A")
-            }
-            # --- FIN DE LA CAPTURA ---
-
             # Consolidate results
             result = {
                 **perf_metrics,
                 **memory_stats,
                 "energy_kwh": float(emissions) if emissions else 0.0,
                 "hardware_metadata": hardware_metadata,
-                "batch_size": batch_size, # <-- Metadato añadido
+                "batch_size": workload.get("batch_size", 1),
                 "num_prompts": len(prompts),
                 "max_new_tokens": workload["max_new_tokens"],
                 "workload_description": workload.get("description", "")
             }
             
-            # Save to checkpoint
-            checkpoint["results"][workload_name] = result
-            checkpoint["completed_workloads"] = checkpoint.get("completed_workloads", []) + [workload_name]
+            # Guardar en checkpoint (solo si perf_metrics no está vacío, es decir, si la inferencia no falló)
+            if perf_metrics:
+                checkpoint["results"][workload_name] = result
+                checkpoint["completed_workloads"] = checkpoint.get("completed_workloads", []) + [workload_name]
+                print(f"✅ {workload_name} completed")
+                print(f"   Energy: {result['energy_kwh']:.6f} kWh")
+                print(f"   Throughput: {result['throughput_tokens_per_sec']:.2f} tok/s")
+                if result.get("avg_ttft_ms"):
+                    print(f"   Avg TTFT: {result['avg_ttft_ms']:.2f} ms")
+                if result.get("avg_batch_time_ms"):
+                    print(f"   Avg Batch Time: {result['avg_batch_time_ms']:.2f} ms")
+                print(f"   Memory: {result['model_size_gb']:.2f} GB\n")
+            
             checkpoint["metadata"]["last_updated"] = datetime.now().isoformat()
             
             # Persist checkpoint
             with open(checkpoint_path, 'w') as f:
                 json.dump(checkpoint, f, indent=2)
-            
-            # Print summary
-            print(f"✅ {workload_name} completed")
-            print(f"   Energy: {result['energy_kwh']:.6f} kWh")
-            print(f"   Throughput: {result['throughput_tokens_per_sec']:.2f} tok/s")
-            # Solo mostrar TTFT si es relevante (bsz=1)
-            if result.get("avg_ttft_ms"):
-                print(f"   Avg TTFT: {result['avg_ttft_ms']:.2f} ms")
-            if result.get("avg_batch_time_ms"):
-                 print(f"   Avg Batch Time: {result['avg_batch_time_ms']:.2f} ms")
-            print(f"   Memory: {result['model_size_gb']:.2f} GB\n")
-            
-        except Exception as e:
-            # Asegúrate de que el tracker se detenga incluso si hay un error
-            try:
-                tracker.stop()
-            except:
-                pass 
-                
-            print(f"❌ {workload_name} FAILED: {str(e)}")
-            checkpoint["failed_workloads"] = checkpoint.get("failed_workloads", []) + [workload_name]
-            checkpoint["metadata"]["last_updated"] = datetime.now().isoformat()
-            
-            # Save checkpoint even on failure
-            with open(checkpoint_path, 'w') as f:
-                json.dump(checkpoint, f, indent=2)
-            
-            print("⚠️ Continuing with next workload...\n")
-            continue
-    
+
+            # --- FIN DEL BLOQUE FINALLY ---
+
     print("="*70)
     print("🎉 ALL WORKLOADS COMPLETED!")
     if checkpoint.get("failed_workloads"):
