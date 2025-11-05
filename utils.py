@@ -637,9 +637,9 @@ def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, ba
                 
                 ttft_times_ms.append(gen_time_sec * 1000)
                     
-                    total_time_sec = time.time() - loop_start_time
-                    num_measured_batches = len(ttft_times_ms)
-                    num_measured_prompts = num_measured_batches * batch_size
+                total_time_sec = time.time() - loop_start_time
+                num_measured_batches = len(ttft_times_ms)
+                num_measured_prompts = num_measured_batches * batch_size
 
         return {
             "mode": "throughput",
