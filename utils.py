@@ -289,7 +289,7 @@ BENCHMARKS_CARBON = [
         "max_new_tokens": 150, 
         "dataset": "IFEval",
         "subset": "train", 
-        "description": "Instruction (Throughput, bsz=8)"
+        "description": "Instruction (Throughput, bsz=8)",
         "batch_size": 8
     },
 ]
