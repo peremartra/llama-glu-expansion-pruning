@@ -257,8 +257,8 @@ BENCHMARKS_CARBON = [
         "name": "ifeval_workload",
         "num_prompts": 100,  
         "max_new_tokens": 150, 
-        "dataset": "ifeval",
-        "subset": "default", 
+        "dataset": "IFEval",
+        "subset": "train", 
         "description": "Instruction following workload"
     },
 ]
@@ -477,9 +477,9 @@ def _load_workload_prompts(workload):
             # Use a specific MMLU subset (e.g., "abstract_algebra") or aggregate
             dataset = load_dataset("cais/mmlu", "all", split=subset)
             prompts = [item["question"] for item in dataset.select(range(min(num_prompts, len(dataset))))]
-        elif dataset_name == "ifeval":
-            # IFEval (google/ifeval) usa el campo 'prompt'
-            dataset = load_dataset("google/ifeval", split=subset)
+        elif dataset_name == "IFEval":
+            actual_split = "train" if subset in ["default", "test"] else subset
+            dataset = load_dataset("google/IFEval", split=actual_split)
             prompts = [item["prompt"] for item in dataset.select(range(min(num_prompts, len(dataset))))]
         else:
             # Fallback: generic prompts
@@ -1019,13 +1019,6 @@ def run_carbon_profiling(
         # ==========================================================
         print("   Running GPU warm-up for CodeCarbon sensors...")
         # Initialize CodeCarbon tracker
-        tracker = EmissionsTracker(
-            project_name=f"glu_pruning_{model_name}",
-            measure_power_secs=1,
-            save_to_file=False,  # We'll manage output ourselves
-            log_level="warning"  # Reduce verbosity
-        )
-        tracker.start()
         try:
            
             dummy_prompt = "Warm-up GPU"
@@ -1037,7 +1030,7 @@ def run_carbon_profiling(
         except Exception as warmup_e:
             print(f"   ⚠️ GPU warm-up failed (continuing anyway): {warmup_e}")
             pass      
-        tracker.stop()
+            
         try:
             tracker = EmissionsTracker(
                 project_name=f"glu_pruning_{model_name}",
