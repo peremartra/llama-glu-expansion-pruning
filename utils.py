@@ -1027,7 +1027,92 @@ def run_carbon_profiling(
     model_name=None,
     device="cuda"
 ):
-    # ... [código inicial de checkpoint loading igual] ...
+    """
+    Run carbon and performance profiling on a model (parallel to run_robust_evaluation).
+    
+    Measures:
+        - Energy consumption (CodeCarbon)
+        - Throughput (tokens/second)
+        - Latency (Time To First Token)
+        - Memory footprint
+        - Detailed hardware & emissions metadata
+    
+    Uses the same checkpoint/resume system as run_robust_evaluation for reliability.
+    
+    Args:
+        model: PyTorch model object
+        tokenizer: Tokenizer for the model
+        workloads (list): List of workload dicts from BENCHMARKS_CARBON
+        checkpoint_path (str): Path to checkpoint JSON file
+        model_name (str, optional): Human-readable model name
+        device (str): Device placement ("cuda" or "cpu")
+    
+    Returns:
+        dict: Complete profiling results with all metrics
+    """
+    import json
+    import os
+    from codecarbon import EmissionsTracker
+    from datetime import datetime
+    
+    # Extract model name
+    if model_name is None:
+        model_name = getattr(model.config, '_name_or_path', 'unknown')
+    
+    # Ensure checkpoint directory exists
+    checkpoint_dir = os.path.dirname(checkpoint_path)
+    if checkpoint_dir:
+        os.makedirs(checkpoint_dir, exist_ok=True)
+    
+    # Load or create checkpoint
+    if os.path.exists(checkpoint_path):
+        print(f"📂 Found existing checkpoint: {checkpoint_path}")
+        with open(checkpoint_path, 'r') as f:
+            checkpoint = json.load(f)
+        
+        if "results" not in checkpoint:
+            checkpoint["results"] = {}
+        if "metadata" not in checkpoint:
+            checkpoint["metadata"] = {
+                "model_name": model_name,
+                "started_at": datetime.now().isoformat(),
+                "mode": "carbon_profiling"
+            }
+        if "completed_workloads" not in checkpoint:
+            checkpoint["completed_workloads"] = []
+        if "failed_workloads" not in checkpoint:
+            checkpoint["failed_workloads"] = []
+    else:
+        print(f"🆕 Creating new checkpoint: {checkpoint_path}")
+        checkpoint = {
+            "metadata": {
+                "model_name": model_name,
+                "started_at": datetime.now().isoformat(),
+                "last_updated": datetime.now().isoformat(),
+                "mode": "carbon_profiling"
+            },
+            "results": {},
+            "completed_workloads": [],
+            "failed_workloads": []
+        }
+    
+    completed = checkpoint.get("completed_workloads", [])
+    failed = checkpoint.get("failed_workloads", [])
+    
+    # Determine pending workloads
+    pending = [w for w in workloads 
+               if w["name"] not in completed and w["name"] not in failed]
+    
+    print(f"✅ Loaded checkpoint. Completed: {len(completed)}/{len(workloads)} workloads")
+    if failed:
+        print(f"⚠️ Previously failed: {failed}")
+    
+    if not pending:
+        print("🎉 All workloads completed!")
+        return checkpoint["results"]
+    
+    print(f"\n🚀 Starting profiling: {len(pending)} workloads remaining")
+    print("="*70 + "\n")
     
     # Process each workload
     for i, workload in enumerate(pending, 1):
@@ -1132,7 +1217,7 @@ def run_carbon_profiling(
             
             # Intentar detener el tracker si está corriendo
             try:
-                if tracker._scheduler:
+                if hasattr(tracker, '_scheduler') and tracker._scheduler:
                     tracker.stop()
                     print("   Tracker stopped after error.")
             except:
@@ -1154,64 +1239,3 @@ def run_carbon_profiling(
     print("="*70 + "\n")
     
     return checkpoint["results"]
-
-
-def _capture_hardware_metadata(tracker):
-    """
-    Helper function to capture hardware metadata from CodeCarbon tracker.
-    Separated for clarity and error handling.
-    """
-    try:
-        gpu_model = tracker._gpu.model_
-        gpu_count = tracker._gpu.gpu_count_
-        gpu_power_W = tracker._gpu.power_
-    except Exception:
-        gpu_model = "N/A"
-        gpu_count = 0
-        gpu_power_W = "N/A"
-
-    try:
-        cpu_model = tracker._cpu.model_
-        cpu_count = tracker._cpu.cpu_count_
-        cpu_power_W = tracker._cpu.power_
-    except Exception:
-        cpu_model = "N/A"
-        cpu_count = 0
-        cpu_power_W = "N/A"
-        
-    try:
-        location = tracker.location_
-        country_name = location['country_name'] if location else "N/A"
-        country_iso = location['country_iso_code'] if location else "N/A"
-        region = location['region'] if location else "N/A"
-        cloud_provider = location['cloud_provider'] if location else "N/A"
-        cloud_region = location['cloud_region'] if location else "N/A"
-    except Exception:
-        country_name = "N/A"
-        country_iso = "N/A"
-        region = "N/A"
-        cloud_provider = "N/A"
-        cloud_region = "N/A"
-
-    return {
-        "timestamp": getattr(tracker, 'timestamp_', "N/A"),
-        "project_name": getattr(tracker, 'project_name_', "N/A"),
-        "duration_sec": getattr(tracker, 'duration_', "N/A"),
-        "energy_kwh": getattr(tracker, 'energy_consumed_', "N/A"),
-        "co2_g": getattr(tracker, 'emissions_', "N/A"),
-        "carbon_intensity_gCO2_kWh": getattr(tracker, 'carbon_intensity_', "N/A"),
-        "country_name": country_name,
-        "country_iso_code": country_iso,
-        "region": region,
-        "cloud_provider": cloud_provider,
-        "cloud_region": cloud_region,
-        "os": getattr(tracker, 'os_', "N/A"),
-        "python_version": getattr(tracker, 'python_version_', "N/A"),
-        "codecarbon_version": getattr(codecarbon, '__version__', "N/A"),
-        "cpu_model": cpu_model,
-        "cpu_count": cpu_count,
-        "cpu_power_usage_W": cpu_power_W,
-        "gpu_model": gpu_model,
-        "gpu_count": gpu_count,
-        "gpu_power_usage_W": gpu_power_W
-    }
