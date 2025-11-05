@@ -253,6 +253,14 @@ BENCHMARKS_CARBON = [
         "subset": "test",
         "description": "Knowledge QA workload"
     },
+    {
+        "name": "ifeval_workload",
+        "num_prompts": 100,  
+        "max_new_tokens": 150, 
+        "dataset": "ifeval",
+        "subset": "default", 
+        "description": "Instruction following workload"
+    },
 ]
 
 # Instruct models additional benchmark (+1)
@@ -469,7 +477,10 @@ def _load_workload_prompts(workload):
             # Use a specific MMLU subset (e.g., "abstract_algebra") or aggregate
             dataset = load_dataset("cais/mmlu", "all", split=subset)
             prompts = [item["question"] for item in dataset.select(range(min(num_prompts, len(dataset))))]
-        
+        elif dataset_name == "ifeval":
+            # IFEval (google/ifeval) usa el campo 'prompt'
+            dataset = load_dataset("google/ifeval", split="test")
+            prompts = [item["prompt"] for item in dataset.select(range(min(num_prompts, len(dataset))))]
         else:
             # Fallback: generic prompts
             print(f"⚠️ Dataset {dataset_name} not implemented, using generic prompts")
