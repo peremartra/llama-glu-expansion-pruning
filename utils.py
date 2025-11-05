@@ -1249,7 +1249,8 @@ def run_carbon_profiling(
     workloads,
     checkpoint_path,
     model_name="model",
-    idle_power_calibration=None  # ← NUEVO PARÁMETRO
+    idle_power_calibration=None,  
+    device="cuda"  
 ):
     """
     Run carbon and performance profiling on a model (parallel to run_robust_evaluation).
