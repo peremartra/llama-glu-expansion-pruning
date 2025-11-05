@@ -1019,6 +1019,12 @@ def run_carbon_profiling(
         # ==========================================================
         print("   Running GPU warm-up for CodeCarbon sensors...")
         # Initialize CodeCarbon tracker
+        tracker = EmissionsTracker(
+            project_name=f"glu_pruning_{model_name}",
+            measure_power_secs=1,
+            save_to_file=False,  # We'll manage output ourselves
+            log_level="warning"  # Reduce verbosity
+        )
         try:
            
             dummy_prompt = "Warm-up GPU"
@@ -1032,12 +1038,6 @@ def run_carbon_profiling(
             pass      
             
         try:
-            tracker = EmissionsTracker(
-                project_name=f"glu_pruning_{model_name}",
-                measure_power_secs=1,
-                save_to_file=False,  # We'll manage output ourselves
-                log_level="warning"  # Reduce verbosity
-            )
             tracker.start()
             # Load prompts
             print(f"   Loading {workload['num_prompts']} prompts from {workload['dataset']}...")
