@@ -489,32 +489,20 @@ def _load_workload_prompts(workload):
 
 def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, device="cuda"):
     """
-    Internal helper: Measure inference performance metrics.
+    Measure inference performance with warm-up period.
     
-    Measures:
-        - TTFT (Time To First Token) - latency
-        - Throughput (tokens/second)
-        - Total generation time
-        - Token statistics
-    
-    Args:
-        model: PyTorch model
-        tokenizer: Model tokenizer
-        prompts (list[str]): Input prompts
-        max_new_tokens (int): Maximum tokens to generate
-        device (str): Device placement
-    
-    Returns:
-        dict: Performance metrics
+    The first 5 prompts are used for GPU warm-up and excluded from metrics
+    to avoid CUDA kernel compilation overhead.
     """
+    WARMUP_PROMPTS = 5
+    
     ttft_times = []
     total_tokens = 0
     start_time = time.time()
     
-    for prompt in prompts:
+    for i, prompt in enumerate(prompts):
         inputs = tokenizer(prompt, return_tensors="pt").to(device)
         
-        # Measure Time To First Token (TTFT)
         gen_start = time.time()
         with torch.no_grad():
             outputs = model.generate(
@@ -525,8 +513,10 @@ def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, de
             )
         gen_time = time.time() - gen_start
         
-        ttft_times.append(gen_time)
-        total_tokens += outputs.shape[1]
+        # Only count metrics after warm-up period
+        if i >= WARMUP_PROMPTS:
+            ttft_times.append(gen_time)
+            total_tokens += outputs.shape[1]
     
     total_time = time.time() - start_time
     
@@ -538,7 +528,9 @@ def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, de
         "throughput_tokens_per_sec": float(total_tokens / total_time),
         "total_time_sec": float(total_time),
         "total_tokens": int(total_tokens),
-        "avg_tokens_per_prompt": float(total_tokens / len(prompts))
+        "avg_tokens_per_prompt": float(total_tokens / len(ttft_times)),  # ← Usar len(ttft_times)
+        "num_measured_prompts": len(ttft_times),  # ← Nuevo: explícito
+        "num_warmup_prompts": WARMUP_PROMPTS      # ← Nuevo: documentar
     }
 
 
@@ -1009,6 +1001,8 @@ def run_carbon_profiling(
         
         print(f"[{i}/{len(pending)}] Profiling: {workload_name}")
         print("-"*70)
+        print("   Clearing GPU cache...")
+        clear_gpu_cache()
         
         try:
             # Initialize CodeCarbon tracker
