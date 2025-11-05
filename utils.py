@@ -44,6 +44,7 @@ try:
     import time
     import numpy as np
     from datetime import datetime
+    import codecarbon
 except ImportError as e:
     raise ImportError(
         f"Missing required library: {e.name}\n"
@@ -925,6 +926,7 @@ def run_carbon_profiling(
         - Throughput (tokens/second)
         - Latency (Time To First Token)
         - Memory footprint
+        - Detailed hardware & emissions metadata
     
     Uses the same checkpoint/resume system as run_robust_evaluation for reliability.
     
@@ -938,14 +940,6 @@ def run_carbon_profiling(
     
     Returns:
         dict: Complete profiling results with all metrics
-    
-    Example:
-        >>> results = run_carbon_profiling(
-        ...     model, tokenizer,
-        ...     workloads=BENCHMARKS_CARBON,
-        ...     checkpoint_path="/path/carbon_baseline.json",
-        ...     model_name="Llama-3.2-1B-baseline"
-        ... )
     """
     import json
     import os
@@ -1014,9 +1008,10 @@ def run_carbon_profiling(
         print("-"*70)
         print("   Clearing GPU cache...")
         clear_gpu_cache()
+        
         # ==========================================================
         # CODECARBON WARM UP
-        # ==========================================================
+        # =G========================================================
         print("   Running GPU warm-up for CodeCarbon sensors...")
         # Initialize CodeCarbon tracker
         tracker = EmissionsTracker(
@@ -1026,7 +1021,6 @@ def run_carbon_profiling(
             log_level="warning"  # Reduce verbosity
         )
         try:
-           
             dummy_prompt = "Warm-up GPU"
             dummy_inputs = tokenizer(dummy_prompt, return_tensors="pt").to(device)
             with torch.no_grad():
@@ -1039,6 +1033,7 @@ def run_carbon_profiling(
             
         try:
             tracker.start()
+            
             # Load prompts
             print(f"   Loading {workload['num_prompts']} prompts from {workload['dataset']}...")
             prompts = _load_workload_prompts(workload)
@@ -1059,11 +1054,39 @@ def run_carbon_profiling(
             # Get memory stats
             memory_stats = _get_memory_stats(model, device)
             
+            # --- NUEVA SECCIÓN PARA CAPTURAR METADATOS DETALLADOS ---
+            # CodeCarbon guarda los datos detallados en el atributo emissions_data
+            emissions_data = tracker.emissions_data
+            hardware_metadata = {
+                "timestamp": emissions_data.get("timestamp", "N/A"),
+                "project_name": emissions_data.get("project_name", "N/A"),
+                "duration_sec": emissions_data.get("duration", "N/A"),
+                "energy_kwh": emissions_data.get("energy_consumed", "N/A"),
+                "co2_g": emissions_data.get("emissions", "N/A"),
+                "carbon_intensity_gCO2_kWh": emissions_data.get("carbon_intensity", "N/A"),
+                "country_name": emissions_data.get("country_name", "N/A"),
+                "country_iso_code": emissions_data.get("country_iso_code", "N/A"),
+                "region": emissions_data.get("region", "N/A"),
+                "cloud_provider": emissions_data.get("cloud_provider", "N/A"),
+                "cloud_region": emissions_data.get("cloud_region", "N/A"),
+                "os": emissions_data.get("os", "N/A"),
+                "python_version": emissions_data.get("python_version", "N/A"),
+                "codecarbon_version": emissions_data.get("codecarbon_version", "N/A"),
+                "cpu_model": emissions_data.get("cpu_model", "N/A"),
+                "cpu_count": emissions_data.get("cpu_count", "N/A"),
+                "cpu_power_usage_W": emissions_data.get("cpu_power", "N/A"),
+                "gpu_model": emissions_data.get("gpu_model", "N/A"),
+                "gpu_count": emissions_data.get("gpu_count", "N/A"),
+                "gpu_power_usage_W": emissions_data.get("gpu_power", "N/A")
+            }
+            # --- FIN DE LA NUEVA SECCIÓN ---
+
             # Consolidate results
             result = {
                 **perf_metrics,
                 **memory_stats,
                 "energy_kwh": float(emissions) if emissions else 0.0,
+                "hardware_metadata": hardware_metadata, # <-- AÑADIDO
                 "num_prompts": len(prompts),
                 "max_new_tokens": workload["max_new_tokens"],
                 "workload_description": workload.get("description", "")
@@ -1086,6 +1109,12 @@ def run_carbon_profiling(
             print(f"   Memory: {result['model_size_gb']:.2f} GB\n")
             
         except Exception as e:
+            # Asegúrate de que el tracker se detenga incluso si hay un error
+            try:
+                tracker.stop()
+            except:
+                pass 
+                
             print(f"❌ {workload_name} FAILED: {str(e)}")
             checkpoint["failed_workloads"] = checkpoint.get("failed_workloads", []) + [workload_name]
             checkpoint["metadata"]["last_updated"] = datetime.now().isoformat()
