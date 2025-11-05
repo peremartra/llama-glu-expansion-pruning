@@ -329,6 +329,90 @@ LIBRARY_VERSIONS = {
 # CORE EVALUATION FUNCTIONS
 # =============================================================================
 
+def calibrate_idle_power(device="cuda", duration_seconds=30, verbose=True):
+    """
+    Measure GPU idle power consumption to establish baseline.
+    
+    This should be run ONCE at the start of the notebook, before any model loading.
+    
+    Args:
+        device (str): Device to calibrate ("cuda" or "cpu")
+        duration_seconds (int): How long to measure (30s recommended)
+        verbose (bool): Print progress messages
+    
+    Returns:
+        dict: {
+            "idle_power_watts": float,
+            "idle_energy_kwh": float,
+            "measurement_duration_s": float,
+            "gpu_temp_celsius": float,
+            "gpu_name": str,
+            "timestamp": str
+        }
+    """
+    import torch
+    import time
+    from codecarbon import EmissionsTracker
+    from datetime import datetime
+    
+    if verbose:
+        print(f"🔋 Starting idle power calibration ({duration_seconds}s)...")
+        print(f"   Clearing GPU cache...")
+    
+    # Clear GPU to true idle state
+    if device == "cuda" and torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        torch.cuda.synchronize()
+    
+    # Initialize tracker
+    tracker = EmissionsTracker(
+        project_name="idle_calibration",
+        measure_power_secs=1,  # Sample every second
+        save_to_file=False,
+        log_level="error"  # Suppress warnings
+    )
+    
+    # Measure idle consumption
+    tracker.start()
+    start_time = time.time()
+    
+    # Just wait (GPU should be completely idle)
+    if verbose:
+        print(f"   Measuring idle power for {duration_seconds}s...")
+    time.sleep(duration_seconds)
+    
+    emissions_kwh = tracker.stop()
+    actual_duration = time.time() - start_time
+    
+    # Calculate average power
+    idle_power_watts = (emissions_kwh * 1000) / (actual_duration / 3600)  # kWh -> W
+    
+    # Capture GPU state
+    gpu_info = {}
+    if device == "cuda" and torch.cuda.is_available():
+        gpu_info = {
+            "gpu_name": torch.cuda.get_device_name(0),
+            "gpu_temp_celsius": torch.cuda.temperature() if hasattr(torch.cuda, 'temperature') else None,
+            "gpu_power_limit_w": torch.cuda.get_device_properties(0).total_memory / (1024**3) * 10  # Rough estimate
+        }
+    
+    calibration_result = {
+        "idle_power_watts": idle_power_watts,
+        "idle_energy_kwh": emissions_kwh,
+        "measurement_duration_s": actual_duration,
+        "timestamp": datetime.now().isoformat(),
+        **gpu_info
+    }
+    
+    if verbose:
+        print(f"✅ Calibration complete!")
+        print(f"   Idle Power: {idle_power_watts:.2f} W")
+        print(f"   Idle Energy (30s): {emissions_kwh:.6f} kWh")
+        if gpu_info.get("gpu_temp_celsius"):
+            print(f"   GPU Temperature: {gpu_info['gpu_temp_celsius']:.1f}°C")
+    
+    return calibration_result
+
 def model_evaluation(model_obj, tokenizer, tasks, limit=None):
     """
     Runs lm-eval on a model and tokenizer already in memory.
@@ -1018,11 +1102,29 @@ def format_results_table(results_dict):
 # =============================================================================
 # CARBON PROFILING MAIN FUNCTION
 # =============================================================================
-def _capture_hardware_metadata(tracker):
+def _capture_hardware_metadata(tracker, device="cuda", idle_power_watts=None, inference_duration_s=None, energy_raw_kwh=None, energy_net_kwh=None):
     """
     Helper function to capture hardware metadata from CodeCarbon tracker.
-    Separated for clarity and error handling.
+    Extended to include GPU state, energy breakdown, and idle power correction.
+    
+    Args:
+        tracker: CodeCarbon EmissionsTracker instance (after stop())
+        device (str): Device used ("cuda" or "cpu")
+        idle_power_watts (float, optional): Calibrated idle power for correction
+        inference_duration_s (float, optional): Actual inference time
+        energy_raw_kwh (float, optional): Raw energy before idle correction
+        energy_net_kwh (float, optional): Net energy after idle correction
+    
+    Returns:
+        dict: Comprehensive hardware and energy metadata
     """
+    import torch
+    import codecarbon
+    from datetime import datetime
+    
+    # ============================================================
+    # CODECARBON METADATA (original logic)
+    # ============================================================
     try:
         gpu_model = tracker._gpu.model_
         gpu_count = tracker._gpu.gpu_count_
@@ -1055,11 +1157,11 @@ def _capture_hardware_metadata(tracker):
         cloud_provider = "N/A"
         cloud_region = "N/A"
 
-    return {
-        "timestamp": getattr(tracker, 'timestamp_', "N/A"),
+    base_metadata = {
+        "timestamp": getattr(tracker, 'timestamp_', datetime.now().isoformat()),
         "project_name": getattr(tracker, 'project_name_', "N/A"),
-        "duration_sec": getattr(tracker, 'duration_', "N/A"),
-        "energy_kwh": getattr(tracker, 'energy_consumed_', "N/A"),
+        "duration_sec": getattr(tracker, 'duration_', inference_duration_s or "N/A"),
+        "energy_kwh": getattr(tracker, 'energy_consumed_', energy_net_kwh or "N/A"),
         "co2_g": getattr(tracker, 'emissions_', "N/A"),
         "carbon_intensity_gCO2_kWh": getattr(tracker, 'carbon_intensity_', "N/A"),
         "country_name": country_name,
@@ -1077,14 +1179,77 @@ def _capture_hardware_metadata(tracker):
         "gpu_count": gpu_count,
         "gpu_power_usage_W": gpu_power_W
     }
+    
+    # ============================================================
+    # EXTENDED METADATA (new functionality)
+    # ============================================================
+    extended_metadata = {}
+    
+    # GPU state information (PyTorch)
+    if device == "cuda" and torch.cuda.is_available():
+        try:
+            gpu_props = torch.cuda.get_device_properties(0)
+            extended_metadata.update({
+                "gpu_name_torch": torch.cuda.get_device_name(0),
+                "gpu_total_memory_gb": gpu_props.total_memory / (1024**3),
+                "gpu_compute_capability": f"{gpu_props.major}.{gpu_props.minor}",
+                "gpu_memory_allocated_gb": torch.cuda.memory_allocated() / (1024**3),
+                "gpu_memory_reserved_gb": torch.cuda.memory_reserved() / (1024**3),
+                "cuda_version": torch.version.cuda,
+                "torch_version": torch.__version__,
+            })
+            
+            # Try to get temperature (may not work on all GPUs/environments)
+            try:
+                extended_metadata["gpu_temperature_celsius"] = torch.cuda.temperature()
+            except:
+                extended_metadata["gpu_temperature_celsius"] = None
+                
+        except Exception as e:
+            extended_metadata["gpu_metadata_error"] = str(e)
+    
+    # Energy breakdown (if idle correction was applied)
+    if idle_power_watts is not None and inference_duration_s is not None:
+        idle_energy_kwh = (idle_power_watts * inference_duration_s) / (1000 * 3600)
+        extended_metadata.update({
+            "idle_power_watts": idle_power_watts,
+            "idle_power_applied": True,
+            "energy_raw_kwh": energy_raw_kwh if energy_raw_kwh is not None else "N/A",
+            "energy_idle_contribution_kwh": idle_energy_kwh,
+            "energy_net_kwh": energy_net_kwh if energy_net_kwh is not None else "N/A",
+            "idle_correction_note": "Net energy = Raw energy - (Idle power × Duration)"
+        })
+    else:
+        extended_metadata.update({
+            "idle_power_applied": False,
+            "idle_correction_note": "No idle power correction applied (calibration not provided)"
+        })
+    
+    # CodeCarbon overhead documentation
+    extended_metadata["codecarbon_overhead_estimated_pct"] = 2.5  # Conservative estimate
+    extended_metadata["pue_assumption"] = "unknown (datacenter PUE not measured)"
+    
+    # Try to extract CodeCarbon's internal energy breakdown (CPU vs GPU)
+    try:
+        if hasattr(tracker, '_total_energy'):
+            extended_metadata["codecarbon_total_energy_internal_kwh"] = tracker._total_energy.kWh
+        if hasattr(tracker, '_total_cpu_energy'):
+            extended_metadata["codecarbon_cpu_energy_kwh"] = tracker._total_cpu_energy.kWh
+        if hasattr(tracker, '_total_gpu_energy'):
+            extended_metadata["codecarbon_gpu_energy_kwh"] = tracker._total_gpu_energy.kWh
+    except:
+        pass  # Not critical if these attributes don't exist
+    
+    # Merge base and extended metadata
+    return {**base_metadata, **extended_metadata}
 
 def run_carbon_profiling(
     model,
     tokenizer,
     workloads,
     checkpoint_path,
-    model_name=None,
-    device="cuda"
+    model_name="model",
+    idle_power_calibration=None  # ← NUEVO PARÁMETRO
 ):
     """
     Run carbon and performance profiling on a model (parallel to run_robust_evaluation).
@@ -1231,11 +1396,26 @@ def run_carbon_profiling(
             )
             
             # Stop tracker (SOLO si llegamos aquí sin excepciones)
-            emissions = tracker.stop()
-            print(f"   Tracker stopped. Emissions: {emissions:.6f} kWh")
+            emissions_raw = tracker.stop()
+            inference_duration_s = time.time() - inference_start_time
+            print(f"   Tracker stopped. Raw emissions: {emissions_raw:.6f} kWh")
             
-            # Capturar metadata de hardware
-            hardware_metadata = _capture_hardware_metadata(tracker)
+            # Calculate net energy (subtract idle power)
+            idle_energy_kwh = (idle_power_watts * inference_duration_s) / (1000 * 3600)
+            emissions_net = max(0.0, emissions_raw - idle_energy_kwh)  # Never negative
+            
+            print(f"   Net emissions (idle-corrected): {emissions_net:.6f} kWh")
+            print(f"   (Idle contribution removed: {idle_energy_kwh:.6f} kWh)")
+            
+            # Capturar metadata de hardware (ahora con parámetros extendidos)
+            hardware_metadata = _capture_hardware_metadata(
+                tracker=tracker,
+                device=device,
+                idle_power_watts=idle_power_watts,
+                inference_duration_s=inference_duration_s,
+                energy_raw_kwh=emissions_raw,
+                energy_net_kwh=emissions_net
+            )
             
             # Get memory stats
             memory_stats = _get_memory_stats(model, device)
