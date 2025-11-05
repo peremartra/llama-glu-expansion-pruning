@@ -1014,9 +1014,31 @@ def run_carbon_profiling(
         print("-"*70)
         print("   Clearing GPU cache...")
         clear_gpu_cache()
-        
+        # ==========================================================
+        # CODECARBON WARM UP
+        # ==========================================================
+        print("   Running GPU warm-up for CodeCarbon sensors...")
+        # Initialize CodeCarbon tracker
+        tracker = EmissionsTracker(
+            project_name=f"glu_pruning_{model_name}",
+            measure_power_secs=1,
+            save_to_file=False,  # We'll manage output ourselves
+            log_level="warning"  # Reduce verbosity
+        )
+        tracker.start()
         try:
-            # Initialize CodeCarbon tracker
+           
+            dummy_prompt = "Warm-up GPU"
+            dummy_inputs = tokenizer(dummy_prompt, return_tensors="pt").to(device)
+            with torch.no_grad():
+                model.generate(**dummy_inputs, max_new_tokens=2, pad_token_id=tokenizer.eos_token_id)
+            torch.cuda.synchronize()
+            print("   GPU warm-up complete.")
+        except Exception as warmup_e:
+            print(f"   ⚠️ GPU warm-up failed (continuing anyway): {warmup_e}")
+            pass      
+        tracker.stop()
+        try:
             tracker = EmissionsTracker(
                 project_name=f"glu_pruning_{model_name}",
                 measure_power_secs=1,
@@ -1024,7 +1046,6 @@ def run_carbon_profiling(
                 log_level="warning"  # Reduce verbosity
             )
             tracker.start()
-            
             # Load prompts
             print(f"   Loading {workload['num_prompts']} prompts from {workload['dataset']}...")
             prompts = _load_workload_prompts(workload)
