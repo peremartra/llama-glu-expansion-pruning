@@ -1335,8 +1335,20 @@ def run_carbon_profiling(
         print("🎉 All workloads completed!")
         return checkpoint["results"]
     
+    # Validate idle power calibration
+    if idle_power_calibration is None:
+        print("⚠️  WARNING: No idle power calibration provided!")
+        print("   Energy measurements will include GPU idle consumption.")
+        print("   Run calibrate_idle_power() before evaluation for accurate results.\n")
+        idle_power_watts = 0.0  # No correction
+    else:
+        idle_power_watts = idle_power_calibration.get("idle_power_watts", 0.0)
+        print(f"✅ Using idle power calibration: {idle_power_watts:.2f} W")
+        print(f"   (Measured at: {idle_power_calibration.get('timestamp', 'unknown')})\n")
+    
     print(f"\n🚀 Starting profiling: {len(pending)} workloads remaining")
     print("="*70 + "\n")
+    
     
     # Process each workload
     for i, workload in enumerate(pending, 1):
@@ -1375,6 +1387,8 @@ def run_carbon_profiling(
         
         try:
             # Start tracker
+            import time
+            inference_start_time = time.time()  # ← AÑADIR ESTA LÍNEA
             tracker.start()
             
             # Load prompts
@@ -1424,7 +1438,9 @@ def run_carbon_profiling(
             result = {
                 **perf_metrics,
                 **memory_stats,
-                "energy_kwh": float(emissions) if emissions else 0.0,
+                "energy_kwh": float(emissions_net),  # ← CAMBIO AQUÍ: usar NET en vez de RAW
+                "energy_raw_kwh": float(emissions_raw),  # ← NUEVO: mantener raw para debugging
+                "energy_idle_kwh": float(idle_energy_kwh),  # ← NUEVO: documentar corrección
                 "hardware_metadata": hardware_metadata,
                 "batch_size": workload.get("batch_size", 1),
                 "num_prompts": len(prompts),
