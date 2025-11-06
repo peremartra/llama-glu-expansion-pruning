@@ -197,6 +197,12 @@ EXPERIMENT_CONFIG_CARBON = [
         "hf_repo_id": None,  # Baseline
         "is_star": False,
     },
+     {
+        "base_model": "meta-llama/Llama-3.2-1B",
+        "pruning_pct": 20,
+        "hf_repo_id": "oopere/Llama-3.2-1B-pruned-20pct",
+        "is_star": False, 
+    },
     {
         "base_model": "meta-llama/Llama-3.2-1B",
         "pruning_pct": 40,
