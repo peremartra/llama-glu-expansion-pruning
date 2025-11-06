@@ -1468,11 +1468,12 @@ def run_carbon_profiling(
             memory_stats = _get_memory_stats(model, device)
             
             # --- Joules por Token ---
-            total_tokens = perf_metrics.get("total_new_tokens", 0)
+            throughput = perf_metrics.get("throughput_tokens_per_sec", 0)
             joules_per_token = 0.0
-            if total_tokens > 0:
+            if throughput > 0 and inference_duration_s > 0:
                 # 1 kWh = 3,600,000 Joules
                 total_joules = emissions_net * 3_600_000
+                total_tokens = throughput * inference_duration_s
                 joules_per_token = total_joules / total_tokens
 
             # Consolidate results
