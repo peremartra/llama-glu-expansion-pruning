@@ -32,7 +32,7 @@ Usage:
     )
 
 Author: Pere Martra
-Repository: https://github.com/oopere/glu-pruning
+Repository: https://github.com/peremartra/llama-glu-expansion-pruning
 Paper: "Exploring GLU Expansion Ratios: Structured Pruning in Llama-3.2 Models"
 """
 
