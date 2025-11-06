@@ -573,44 +573,62 @@ def _load_workload_prompts(workload):
             - dataset: "gsm8k", "mmlu", etc.
             - subset: "test", "train", etc.
             - num_prompts: Number of prompts to load
+            - random_seed: (optional) Seed for reproducible sampling
     
     Returns:
         list[str]: List of text prompts
     """
     from datasets import load_dataset
+    import random
     
     dataset_name = workload["dataset"]
     num_prompts = workload["num_prompts"]
     subset = workload.get("subset", "test")
+    random_seed = workload.get("random_seed", None)  # ← NUEVO
     
     try:
         if dataset_name == "gsm8k":
             dataset = load_dataset("gsm8k", "main", split=subset)
-            prompts = [item["question"] for item in dataset.select(range(min(num_prompts, len(dataset))))]
+            # ← NUEVO: Selección determinística con seed
+            if random_seed is not None:
+                indices = list(range(len(dataset)))
+                random.Random(random_seed).shuffle(indices)  # Shuffle con seed fijo
+                indices = indices[:num_prompts]
+                prompts = [dataset[i]["question"] for i in indices]
+            else:
+                prompts = [item["question"] for item in dataset.select(range(min(num_prompts, len(dataset))))]
         
         elif dataset_name == "mmlu":
-            # Use a specific MMLU subset (e.g., "abstract_algebra") or aggregate
             dataset = load_dataset("cais/mmlu", "all", split=subset)
-            prompts = [item["question"] for item in dataset.select(range(min(num_prompts, len(dataset))))]
+            # ← NUEVO: Selección determinística con seed
+            if random_seed is not None:
+                indices = list(range(len(dataset)))
+                random.Random(random_seed).shuffle(indices)
+                indices = indices[:num_prompts]
+                prompts = [dataset[i]["question"] for i in indices]
+            else:
+                prompts = [item["question"] for item in dataset.select(range(min(num_prompts, len(dataset))))]
+                
         elif dataset_name == "IFEval":
             actual_split = "train" if subset in ["default", "test"] else subset
             dataset = load_dataset("google/IFEval", split=actual_split)
-            prompts = [item["prompt"] for item in dataset.select(range(min(num_prompts, len(dataset))))]
+            # ← NUEVO: Selección determinística con seed
+            if random_seed is not None:
+                indices = list(range(len(dataset)))
+                random.Random(random_seed).shuffle(indices)
+                indices = indices[:num_prompts]
+                prompts = [dataset[i]["prompt"] for i in indices]
+            else:
+                prompts = [item["prompt"] for item in dataset.select(range(min(num_prompts, len(dataset))))]
         else:
             # Fallback: generic prompts
-            print(f"⚠️ Dataset {dataset_name} not implemented, using generic prompts")
-            prompts = [
-                f"Solve this problem: What is {i} + {i+1}?" 
-                for i in range(num_prompts)
-            ]
+            prompts = [f"Test prompt {i+1}" for i in range(num_prompts)]
         
         return prompts
-    
     except Exception as e:
-        print(f"⚠️ Error loading dataset {dataset_name}: {e}")
-        print(f"   Using fallback generic prompts")
-        # Fallback: generic prompts
-        return [f"Sample prompt {i+1} for {dataset_name}" for i in range(num_prompts)]
+        print(f"❌ Failed to load dataset {dataset_name}: {e}")
+        # Fallback prompts
+        return [f"Fallback prompt {i+1}" for i in range(num_prompts)]
 
 
 def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, batch_size=1, device="cuda"):
@@ -627,8 +645,12 @@ def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, ba
         total_iterations = len(prompts)
     else:
         total_iterations = (len(prompts) + batch_size - 1) // batch_size  # Ceiling division
-    
-    # Usar al menos 20% de iteraciones para warmup, o 5, lo que sea MENOR
+
+    if random_seed is not None:
+        torch.manual_seed(random_seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(random_seed)
+            
     WARMUP_STEPS = min(5, max(1, int(total_iterations * 0.2)))
     print(f"   Using {WARMUP_STEPS} warmup iterations (out of {total_iterations} total)")
     
@@ -1248,9 +1270,10 @@ def run_carbon_profiling(
     tokenizer,
     workloads,
     checkpoint_path,
-    model_name="model",
-    idle_power_calibration=None,  
-    device="cuda"  
+    model_name="unknown",
+    idle_power_calibration=None,
+    device="cuda",
+    random_seed=None  
 ):
     """
     Run carbon and performance profiling on a model (parallel to run_robust_evaluation).
@@ -1392,9 +1415,16 @@ def run_carbon_profiling(
             inference_start_time = time.time()  # ← AÑADIR ESTA LÍNEA
             tracker.start()
             
+            # 
+            workload_with_seed = workload.copy()
+            if random_seed is not None:
+                workload_with_seed["random_seed"] = random_seed
+            
             # Load prompts
             print(f"   Loading {workload['num_prompts']} prompts from {workload['dataset']}...")
-            prompts = _load_workload_prompts(workload)
+            if random_seed is not None:
+                print(f"   Using random seed: {random_seed} for reproducible sampling")
+            prompts = _load_workload_prompts(workload_with_seed)  # ← CAMBIO AQUÍ
             
             # Measure inference performance
             print(f"   Running inference...")
@@ -1407,7 +1437,8 @@ def run_carbon_profiling(
                 prompts=prompts,
                 max_new_tokens=workload["max_new_tokens"],
                 batch_size=batch_size,
-                device=device
+                device=device,
+                random_seed=random_seed  
             )
             
             # Stop tracker (SOLO si llegamos aquí sin excepciones)
