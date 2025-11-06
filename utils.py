@@ -631,7 +631,8 @@ def _load_workload_prompts(workload):
         return [f"Fallback prompt {i+1}" for i in range(num_prompts)]
 
 
-def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, batch_size=1, device="cuda"):
+def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, batch_size, device="cuda", random_seed=None):
+
     """
     Measure inference performance with warm-up period.
     
