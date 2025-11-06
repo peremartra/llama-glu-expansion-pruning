@@ -1467,13 +1467,22 @@ def run_carbon_profiling(
             # Get memory stats
             memory_stats = _get_memory_stats(model, device)
             
+            # --- Joules por Token ---
+            total_tokens = perf_metrics.get("total_new_tokens", 0)
+            joules_per_token = 0.0
+            if total_tokens > 0:
+                # 1 kWh = 3,600,000 Joules
+                total_joules = emissions_net * 3_600_000
+                joules_per_token = total_joules / total_tokens
+
             # Consolidate results
             result = {
                 **perf_metrics,
                 **memory_stats,
-                "energy_kwh": float(emissions_net),  # ← CAMBIO AQUÍ: usar NET en vez de RAW
-                "energy_raw_kwh": float(emissions_raw),  # ← NUEVO: mantener raw para debugging
-                "energy_idle_kwh": float(idle_energy_kwh),  # ← NUEVO: documentar corrección
+                "energy_kwh": float(emissions_net),
+                "energy_raw_kwh": float(emissions_raw),
+                "energy_idle_kwh": float(idle_energy_kwh),
+                "joules_per_token": float(joules_per_token), # <-- MÉTRICA AÑADIDA
                 "hardware_metadata": hardware_metadata,
                 "batch_size": workload.get("batch_size", 1),
                 "num_prompts": len(prompts),
