@@ -270,7 +270,7 @@ EXPERIMENT_CONFIG_CARBON = [
 BENCHMARKS_CARBON = [
     {
         "name": "gsm8k_latency_b1",
-        "num_prompts": 10, # 
+        "num_prompts": 50, # 
         "max_new_tokens": 100,
         "dataset": "gsm8k",
         "subset": "test",
@@ -279,7 +279,7 @@ BENCHMARKS_CARBON = [
     },
     {
         "name": "mmlu_latency_b1",
-        "num_prompts": 10,
+        "num_prompts": 100,
         "max_new_tokens": 50,
         "dataset": "mmlu",
         "subset": "test",
@@ -288,7 +288,7 @@ BENCHMARKS_CARBON = [
     },
     {
         "name": "ifeval_latency_b1",
-        "num_prompts": 10,  
+        "num_prompts": 30,  
         "max_new_tokens": 150, 
         "dataset": "IFEval",
         "subset": "train", 
@@ -297,7 +297,7 @@ BENCHMARKS_CARBON = [
     },
     {
         "name": "gsm8k_throughput_b8",
-        "num_prompts": 10, 
+        "num_prompts": 50, 
         "max_new_tokens": 100,
         "dataset": "gsm8k",
         "subset": "test",
@@ -306,7 +306,7 @@ BENCHMARKS_CARBON = [
     },
     {
         "name": "mmlu_throughput_b8",
-        "num_prompts": 10, 
+        "num_prompts": 100, 
         "max_new_tokens": 50,
         "dataset": "mmlu",
         "subset": "test",
@@ -315,7 +315,7 @@ BENCHMARKS_CARBON = [
     },
     {
         "name": "ifeval_throughput_b8",
-        "num_prompts": 10,  
+        "num_prompts": 30,  
         "max_new_tokens": 150, 
         "dataset": "IFEval",
         "subset": "train", 
