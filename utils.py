@@ -269,13 +269,13 @@ EXPERIMENT_CONFIG_CARBON = [
 
 BENCHMARKS_CARBON = [
     {
-        "name": "gsm8k_latency_b1",
-        "num_prompts": 50, # 
-        "max_new_tokens": 100,
-        "dataset": "gsm8k",
-        "subset": "test",
-        "description": "Math reasoning (Latency, TTFT, bsz=1)",
-        "batch_size": 1 
+        "name": "hellaswag_latency_b1",
+        "num_prompts": 100,
+        "max_new_tokens": 20,
+        "dataset": "hellaswag",
+        "subset": "validation",  # ← Importante
+        "description": "Short responses (Latency, TTFT, bsz=1)",
+        "batch_size": 1
     },
     {
         "name": "mmlu_latency_b1",
@@ -296,12 +296,12 @@ BENCHMARKS_CARBON = [
         "batch_size": 1
     },
     {
-        "name": "gsm8k_throughput_b8",
-        "num_prompts": 50, 
-        "max_new_tokens": 100,
-        "dataset": "gsm8k",
-        "subset": "test",
-        "description": "Math reasoning (Throughput, bsz=8)",
+        "name": "hellaswag_throughput_b8",
+        "num_prompts": 100,
+        "max_new_tokens": 20,
+        "dataset": "hellaswag",
+        "subset": "validation",
+        "description": "Short responses (Throughput, bsz=8)",
         "batch_size": 8
     },
     {
@@ -617,16 +617,30 @@ def _load_workload_prompts(workload):
     random_seed = workload.get("random_seed", None)  # ← NUEVO
     
     try:
-        if dataset_name == "gsm8k":
-            dataset = load_dataset("gsm8k", "main", split=subset)
-            # ← NUEVO: Selección determinística con seed
+        if dataset_name == "hellaswag":
+            dataset = load_dataset("Rowan/hellaswag", split=subset)
+            
+            # Selección determinística con seed
             if random_seed is not None:
                 indices = list(range(len(dataset)))
-                random.Random(random_seed).shuffle(indices)  # Shuffle con seed fijo
+                random.Random(random_seed).shuffle(indices)
                 indices = indices[:num_prompts]
-                prompts = [dataset[i]["question"] for i in indices]
+                selected_items = [dataset[i] for i in indices]
             else:
-                prompts = [item["question"] for item in dataset.select(range(min(num_prompts, len(dataset))))]
+                selected_items = dataset.select(range(min(num_prompts, len(dataset))))
+            
+            # Construir prompts (necesario porque combinamos múltiples campos)
+            prompts = []
+            for item in selected_items:
+                context = item["ctx"]
+                endings = item["endings"]
+                
+                prompt = f"{context}\n\nWhat happens next?\n"
+                for i, ending in enumerate(endings):
+                    prompt += f"{chr(65+i)}. {ending}\n"
+                prompt += "\nAnswer:"
+                
+                prompts.append(prompt)
         
         elif dataset_name == "mmlu":
             dataset = load_dataset("cais/mmlu", "all", split=subset)
@@ -1498,13 +1512,12 @@ def run_carbon_profiling(
             memory_stats = _get_memory_stats(model, device)
             
             # --- Joules por Token ---
-            throughput = perf_metrics.get("throughput_tokens_per_sec", 0)
+            total_new_tokens = perf_metrics.get("total_new_tokens", 0)
             joules_per_token = 0.0
-            if throughput > 0 and inference_duration_s > 0:
+            if total_new_tokens > 0:
                 # 1 kWh = 3,600,000 Joules
                 total_joules = emissions_net * 3_600_000
-                total_tokens = throughput * inference_duration_s
-                joules_per_token = total_joules / total_tokens
+                joules_per_token = total_joules / total_new_tokens
 
             # Consolidate results
             result = {
@@ -1514,6 +1527,11 @@ def run_carbon_profiling(
                 "energy_raw_kwh": float(emissions_raw),
                 "energy_idle_kwh": float(idle_energy_kwh),
                 "joules_per_token": float(joules_per_token), # <-- MÉTRICA AÑADIDA
+                "joules_per_token_calculation": {
+                "total_joules": float(emissions_net * 3_600_000),
+                    "total_tokens": total_new_tokens,
+                    "formula": "total_joules / total_tokens"
+                },
                 "hardware_metadata": hardware_metadata,
                 "batch_size": workload.get("batch_size", 1),
                 "num_prompts": len(prompts),
