@@ -1,4 +1,4 @@
-# GLU Pruning - Width Pruning Evaluation
+# GLU Pruning - Llama-3.2 Width Pruning Evaluation
 
 ## Project Overview
 Evaluation of structured width pruning in GLU-MLP layers using expansion ratio modification.
