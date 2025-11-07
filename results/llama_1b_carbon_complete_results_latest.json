@@ -1,0 +1,2917 @@
+{
+  "experiment_metadata": {
+    "timestamp": "2025-11-07T13:45:16.338628",
+    "notebook": "03_Evaluate_1B_CARBON.ipynb",
+    "model_family": "Llama-3.2-1B",
+    "pruning_method": "MAW (Maximum Absolute Weight)",
+    "hardware_details": {
+      "gpu_model": "NVIDIA L4",
+      "gpu_memory_gb": 22.16,
+      "gpu_compute_capability": "8.9",
+      "cuda_version": "12.6",
+      "torch_version": "2.8.0+cu126",
+      "gpu_temperature_celsius": 51,
+      "idle_power_watts": 31.55,
+      "idle_power_measurement_duration_sec": null,
+      "idle_power_measurement_timestamp": "2025-11-07T12:04:23.315788"
+    }
+  },
+  "benchmarks": [
+    {
+      "name": "hellaswag_latency_b1",
+      "num_prompts": 100,
+      "max_new_tokens": 20,
+      "description": "Short responses (Latency, TTFT, bsz=1)"
+    },
+    {
+      "name": "mmlu_latency_b1",
+      "num_prompts": 100,
+      "max_new_tokens": 50,
+      "description": "Knowledge QA (Latency, TTFT, bsz=1)"
+    },
+    {
+      "name": "ifeval_latency_b1",
+      "num_prompts": 30,
+      "max_new_tokens": 150,
+      "description": "Instruction (Latency, TTFT, bsz=1)"
+    },
+    {
+      "name": "hellaswag_throughput_b8",
+      "num_prompts": 100,
+      "max_new_tokens": 20,
+      "description": "Short responses (Throughput, bsz=8)"
+    },
+    {
+      "name": "mmlu_throughput_b8",
+      "num_prompts": 100,
+      "max_new_tokens": 50,
+      "description": "Knowledge QA (Throughput, bsz=8)"
+    },
+    {
+      "name": "ifeval_throughput_b8",
+      "num_prompts": 30,
+      "max_new_tokens": 150,
+      "description": "Instruction (Throughput, bsz=8)"
+    }
+  ],
+  "models_evaluated": {
+    "baseline": {
+      "name": "Llama-3.2-1B",
+      "pruning_pct": 0,
+      "is_star": false,
+      "hf_repo": "meta-llama/Llama-3.2-1B-Instruct",
+      "results": {
+        "hellaswag_latency_b1": {
+          "energy_kwh_mean": 3.911542113962365e-05,
+          "energy_kwh_std": 7.149759883329151e-06,
+          "energy_kwh_min": 3.331158857837227e-05,
+          "energy_kwh_max": 4.710218865602621e-05,
+          "throughput_mean": 49.53254266776551,
+          "throughput_std": 0.3754374413366098,
+          "throughput_min": 49.1941791000682,
+          "throughput_max": 49.936428189119006,
+          "ttft_mean": 105.97429442823979,
+          "ttft_std": 13.389549746150907,
+          "ttft_min": 96.50264539216694,
+          "ttft_max": 121.2929324099892,
+          "joules_per_token_mean": 0.2815863505549408,
+          "joules_per_token_std": 0.025253939565927603,
+          "joules_per_token_min": 0.2524667765939793,
+          "joules_per_token_max": 0.29748750730121815,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 2.3018836975097656,
+          "batch_size": 1,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 3.331158857837227e-05,
+              "throughput": 49.936428189119006,
+              "ttft_ms": 100.12730548256322,
+              "joules_per_token": 0.2524667765939793,
+              "energy_raw_kwh": 0.0001606456530117894,
+              "energy_idle_kwh": 0.00012733406443341712,
+              "total_new_tokens": 475,
+              "inference_duration_sec": 14.5279061794281,
+              "memory_allocated_gb": 2.3018836975097656
+            },
+            "run_2": {
+              "energy_kwh": 3.693248618447246e-05,
+              "throughput": 49.1941791000682,
+              "ttft_ms": 96.50264539216694,
+              "joules_per_token": 0.294804767769625,
+              "energy_raw_kwh": 0.00012695677392054056,
+              "energy_idle_kwh": 9.00242877360681e-05,
+              "total_new_tokens": 451,
+              "inference_duration_sec": 10.271127462387085,
+              "memory_allocated_gb": 2.3018836975097656
+            },
+            "run_3": {
+              "energy_kwh": 4.710218865602621e-05,
+              "throughput": 49.46702071410934,
+              "ttft_ms": 121.2929324099892,
+              "joules_per_token": 0.29748750730121815,
+              "energy_raw_kwh": 0.00016155389883360945,
+              "energy_idle_kwh": 0.00011445171017758324,
+              "total_new_tokens": 570,
+              "inference_duration_sec": 13.058121681213379,
+              "memory_allocated_gb": 2.3018836975097656
+            }
+          }
+        },
+        "mmlu_latency_b1": {
+          "energy_kwh_mean": 0.0002997967942776153,
+          "energy_kwh_std": 2.931725605554271e-05,
+          "energy_kwh_min": 0.0002717294262816114,
+          "energy_kwh_max": 0.0003302215930320616,
+          "throughput_mean": 51.41668196310394,
+          "throughput_std": 0.6303257109513897,
+          "throughput_min": 50.690510567477176,
+          "throughput_max": 51.822391949960995,
+          "ttft_mean": 824.3826414409436,
+          "ttft_std": 34.21181690892628,
+          "ttft_min": 787.6487204903051,
+          "ttft_max": 855.3358128196314,
+          "joules_per_token_mean": 0.2681443568846362,
+          "joules_per_token_std": 0.02493723989317058,
+          "joules_per_token_min": 0.23935060793095206,
+          "joules_per_token_max": 0.28277776758216505,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 2.3018836975097656,
+          "batch_size": 1,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.0002717294262816114,
+              "throughput": 51.822391949960995,
+              "ttft_ms": 830.1633910128945,
+              "joules_per_token": 0.23935060793095206,
+              "energy_raw_kwh": 0.0010324806350947293,
+              "energy_idle_kwh": 0.0007607512088131179,
+              "total_new_tokens": 4087,
+              "inference_duration_sec": 86.79627275466919,
+              "memory_allocated_gb": 2.3018836975097656
+            },
+            "run_2": {
+              "energy_kwh": 0.0002974393635191729,
+              "throughput": 50.690510567477176,
+              "ttft_ms": 787.6487204903051,
+              "joules_per_token": 0.2823046951407916,
+              "energy_raw_kwh": 0.0009966499168089595,
+              "energy_idle_kwh": 0.0006992105532897866,
+              "total_new_tokens": 3793,
+              "inference_duration_sec": 79.7749240398407,
+              "memory_allocated_gb": 2.3018836975097656
+            },
+            "run_3": {
+              "energy_kwh": 0.0003302215930320616,
+              "throughput": 51.737143371873664,
+              "ttft_ms": 855.3358128196314,
+              "joules_per_token": 0.28277776758216505,
+              "energy_raw_kwh": 0.0010947079392499717,
+              "energy_idle_kwh": 0.0007644863462179101,
+              "total_new_tokens": 4204,
+              "inference_duration_sec": 87.22242522239685,
+              "memory_allocated_gb": 2.3018836975097656
+            }
+          }
+        },
+        "ifeval_latency_b1": {
+          "energy_kwh_mean": 0.00017144385870914304,
+          "energy_kwh_std": 0.0,
+          "energy_kwh_min": 0.00017144385870914304,
+          "energy_kwh_max": 0.00017144385870914304,
+          "throughput_mean": 51.74150977965075,
+          "throughput_std": 0.0,
+          "throughput_min": 51.74150977965075,
+          "throughput_max": 51.74150977965075,
+          "ttft_mean": 1701.5351963043213,
+          "ttft_std": null,
+          "ttft_min": 1701.5351963043213,
+          "ttft_max": 1701.5351963043213,
+          "joules_per_token_mean": 0.2804170337814243,
+          "joules_per_token_std": 0.0,
+          "joules_per_token_min": 0.2804170337814243,
+          "joules_per_token_max": 0.2804170337814243,
+          "num_runs_aggregated": 1,
+          "seeds_used": [
+            42
+          ],
+          "model_size_gb": 2.3018836975097656,
+          "batch_size": 1,
+          "num_prompts": 30,
+          "outliers_excluded": [
+            {
+              "run_key": "run_2",
+              "joules_per_token": 0.28277776758216505,
+              "energy_kwh": 0.0001356707911498266,
+              "reason": ">0.3000 J/token"
+            },
+            {
+              "run_key": "run_3",
+              "joules_per_token": 0.28277776758216505,
+              "energy_kwh": 0.0001481547422431393,
+              "reason": ">0.3000 J/token"
+            }
+          ],
+          "outliers_count": 2,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.00017144385870914304,
+              "throughput": 51.74150977965075,
+              "ttft_ms": 1701.5351963043213,
+              "joules_per_token": 0.2804170337814243,
+              "energy_raw_kwh": 0.0005858578545648232,
+              "energy_idle_kwh": 0.0004144139958556801,
+              "total_new_tokens": 2201,
+              "inference_duration_sec": 47.281673431396484,
+              "memory_allocated_gb": 2.3018836975097656
+            },
+            "run_2": {
+              "energy_kwh": 0.0001356707911498266,
+              "throughput": 51.158404951637245,
+              "ttft_ms": 1111.840763092041,
+              "joules_per_token": 0.34347035734133313,
+              "energy_raw_kwh": 0.00045365926550319796,
+              "energy_idle_kwh": 0.00031798847435337137,
+              "total_new_tokens": 1422,
+              "inference_duration_sec": 36.280210971832275,
+              "memory_allocated_gb": 2.3018836975097656
+            },
+            "run_3": {
+              "energy_kwh": 0.0001481547422431393,
+              "throughput": 51.51487805298242,
+              "ttft_ms": 1272.6420497894287,
+              "joules_per_token": 0.32541615135771906,
+              "energy_raw_kwh": 0.0004940847980930216,
+              "energy_idle_kwh": 0.00034593005584988227,
+              "total_new_tokens": 1639,
+              "inference_duration_sec": 39.46814560890198,
+              "memory_allocated_gb": 2.3018836975097656
+            }
+          }
+        },
+        "hellaswag_throughput_b8": {
+          "energy_kwh_mean": 2.4094573964031325e-05,
+          "energy_kwh_std": 3.8104009856273895e-07,
+          "energy_kwh_min": 2.3659813864930986e-05,
+          "energy_kwh_max": 2.4370514229474187e-05,
+          "throughput_mean": 242.94798415737807,
+          "throughput_std": 5.047820751248231,
+          "throughput_min": 239.8664603345949,
+          "throughput_max": 248.7734458871872,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.06666208373865784,
+          "joules_per_token_std": 0.0009797824583561215,
+          "joules_per_token_min": 0.0657471518612046,
+          "joules_per_token_max": 0.06769587285965052,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 2.3018836975097656,
+          "batch_size": 8,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 2.3659813864930986e-05,
+              "throughput": 240.20404625035218,
+              "ttft_ms": null,
+              "joules_per_token": 0.0665432264951184,
+              "energy_raw_kwh": 8.493377073136322e-05,
+              "energy_idle_kwh": 6.127395686643223e-05,
+              "total_new_tokens": 1280,
+              "inference_duration_sec": 6.990920305252075,
+              "memory_allocated_gb": 2.3018836975097656
+            },
+            "run_2": {
+              "energy_kwh": 2.4253393797688807e-05,
+              "throughput": 248.7734458871872,
+              "ttft_ms": null,
+              "joules_per_token": 0.0657471518612046,
+              "energy_raw_kwh": 9.016059045686544e-05,
+              "energy_idle_kwh": 6.590719665917663e-05,
+              "total_new_tokens": 1328,
+              "inference_duration_sec": 7.519539833068848,
+              "memory_allocated_gb": 2.3018836975097656
+            },
+            "run_3": {
+              "energy_kwh": 2.4370514229474187e-05,
+              "throughput": 239.8664603345949,
+              "ttft_ms": null,
+              "joules_per_token": 0.06769587285965052,
+              "energy_raw_kwh": 9.001531281185214e-05,
+              "energy_idle_kwh": 6.564479858237796e-05,
+              "total_new_tokens": 1296,
+              "inference_duration_sec": 7.489602088928223,
+              "memory_allocated_gb": 2.3018836975097656
+            }
+          }
+        },
+        "mmlu_throughput_b8": {
+          "energy_kwh_mean": 6.404097652743973e-05,
+          "energy_kwh_std": 1.2713850880980948e-06,
+          "energy_kwh_min": 6.320581306072111e-05,
+          "energy_kwh_max": 6.550416647142676e-05,
+          "throughput_mean": 275.16557763671335,
+          "throughput_std": 6.133852270346059,
+          "throughput_min": 268.7604708529884,
+          "throughput_max": 280.98635542523095,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.05489226559494834,
+          "joules_per_token_std": 0.001089758646941223,
+          "joules_per_token_min": 0.054176411194903816,
+          "joules_per_token_max": 0.05614642840408008,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 2.3018836975097656,
+          "batch_size": 8,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 6.341295005017131e-05,
+              "throughput": 280.98635542523095,
+              "ttft_ms": null,
+              "joules_per_token": 0.054353957185861126,
+              "energy_raw_kwh": 0.00022591009539591465,
+              "energy_idle_kwh": 0.00016249714534574333,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 18.539762258529663,
+              "memory_allocated_gb": 2.3018836975097656
+            },
+            "run_2": {
+              "energy_kwh": 6.550416647142676e-05,
+              "throughput": 268.7604708529884,
+              "ttft_ms": null,
+              "joules_per_token": 0.05614642840408008,
+              "energy_raw_kwh": 0.00023584906179079855,
+              "energy_idle_kwh": 0.0001703448953193718,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 19.435134410858154,
+              "memory_allocated_gb": 2.3018836975097656
+            },
+            "run_3": {
+              "energy_kwh": 6.320581306072111e-05,
+              "throughput": 275.7499066319207,
+              "ttft_ms": null,
+              "joules_per_token": 0.054176411194903816,
+              "energy_raw_kwh": 0.00022889310490251322,
+              "energy_idle_kwh": 0.0001656872918417921,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 18.903735160827637,
+              "memory_allocated_gb": 2.3018836975097656
+            }
+          }
+        },
+        "ifeval_throughput_b8": {
+          "energy_kwh_mean": 5.2597040714326744e-05,
+          "energy_kwh_std": 5.779119418333697e-07,
+          "energy_kwh_min": 5.202262399463489e-05,
+          "energy_kwh_max": 5.3178385584346866e-05,
+          "throughput_mean": 275.11216671511755,
+          "throughput_std": 1.4190046230032551,
+          "throughput_min": 273.746913272472,
+          "throughput_max": 276.579418441212,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.05737858987017463,
+          "joules_per_token_std": 0.000630449391090945,
+          "joules_per_token_min": 0.05675195344869261,
+          "joules_per_token_max": 0.05801278427383294,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 2.3018836975097656,
+          "batch_size": 8,
+          "num_prompts": 30,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 5.3178385584346866e-05,
+              "throughput": 273.746913272472,
+              "ttft_ms": null,
+              "joules_per_token": 0.05801278427383294,
+              "energy_raw_kwh": 0.00020658745645903034,
+              "energy_idle_kwh": 0.00015340907087468348,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 17.502877950668335,
+              "memory_allocated_gb": 2.3018836975097656
+            },
+            "run_2": {
+              "energy_kwh": 5.202262399463489e-05,
+              "throughput": 275.0101684316685,
+              "ttft_ms": null,
+              "joules_per_token": 0.05675195344869261,
+              "energy_raw_kwh": 0.00020010030667671236,
+              "energy_idle_kwh": 0.00014807768268207747,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 16.894604682922363,
+              "memory_allocated_gb": 2.3018836975097656
+            },
+            "run_3": {
+              "energy_kwh": 5.259011256399847e-05,
+              "throughput": 276.579418441212,
+              "ttft_ms": null,
+              "joules_per_token": 0.05737103188799833,
+              "energy_raw_kwh": 0.00020126875429710798,
+              "energy_idle_kwh": 0.0001486786417331095,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 16.963169813156128,
+              "memory_allocated_gb": 2.3018836975097656
+            }
+          }
+        }
+      }
+    },
+    "10pct": {
+      "name": "Llama-3.2-1B-pruned-10%",
+      "pruning_pct": 10,
+      "is_star": false,
+      "hf_repo": "oopere/Llama-3.2-1B-pruned-10pct",
+      "results": {
+        "hellaswag_latency_b1": {
+          "energy_kwh_mean": 6.958176933462386e-05,
+          "energy_kwh_std": 9.892757994132995e-06,
+          "energy_kwh_min": 5.82943590008138e-05,
+          "energy_kwh_max": 7.674614432027016e-05,
+          "throughput_mean": 49.950424535520845,
+          "throughput_std": 0.2736378516636368,
+          "throughput_min": 49.76750924358762,
+          "throughput_max": 50.26500584864499,
+          "ttft_mean": 190.07253144916737,
+          "ttft_std": 26.24540738578223,
+          "ttft_min": 162.0165046892668,
+          "ttft_max": 214.02354491384406,
+          "joules_per_token_mean": 0.277676957109462,
+          "joules_per_token_std": 0.009737571386125058,
+          "joules_per_token_min": 0.27033866883852503,
+          "joules_per_token_max": 0.28872393564530524,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 2.1519203186035156,
+          "batch_size": 1,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 7.370480468278765e-05,
+              "throughput": 49.81875851432991,
+              "ttft_ms": 194.17754474439118,
+              "joules_per_token": 0.28872393564530524,
+              "energy_raw_kwh": 0.00025396496535236285,
+              "energy_idle_kwh": 0.0001802601606695752,
+              "total_new_tokens": 919,
+              "inference_duration_sec": 20.56639528274536,
+              "memory_allocated_gb": 2.1519203186035156
+            },
+            "run_2": {
+              "energy_kwh": 5.82943590008138e-05,
+              "throughput": 49.76750924358762,
+              "ttft_ms": 162.0165046892668,
+              "joules_per_token": 0.2739682668445557,
+              "energy_raw_kwh": 0.00020436196976908645,
+              "energy_idle_kwh": 0.00014606761076827265,
+              "total_new_tokens": 766,
+              "inference_duration_sec": 16.66526985168457,
+              "memory_allocated_gb": 2.1519203186035156
+            },
+            "run_3": {
+              "energy_kwh": 7.674614432027016e-05,
+              "throughput": 50.26500584864499,
+              "ttft_ms": 214.02354491384406,
+              "joules_per_token": 0.27033866883852503,
+              "energy_raw_kwh": 0.0002697743344464981,
+              "energy_idle_kwh": 0.00019302819012622792,
+              "total_new_tokens": 1022,
+              "inference_duration_sec": 22.023136138916016,
+              "memory_allocated_gb": 2.1519203186035156
+            }
+          }
+        },
+        "mmlu_latency_b1": {
+          "energy_kwh_mean": 0.00028822298267042217,
+          "energy_kwh_std": 1.3029985959105723e-05,
+          "energy_kwh_min": 0.00027320788508806407,
+          "energy_kwh_max": 0.0002965615955618304,
+          "throughput_mean": 51.400207157286076,
+          "throughput_std": 0.14935304603721544,
+          "throughput_min": 51.27242991632034,
+          "throughput_max": 51.56440063746668,
+          "ttft_mean": 778.302820941858,
+          "ttft_std": 43.40784937093947,
+          "ttft_min": 730.873966217041,
+          "ttft_max": 816.057162535818,
+          "joules_per_token_mean": 0.2731576143196069,
+          "joules_per_token_std": 0.005673133961402289,
+          "joules_per_token_min": 0.26660926230561016,
+          "joules_per_token_max": 0.27658594404730297,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 2.1519203186035156,
+          "batch_size": 1,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.0002948994673613721,
+              "throughput": 51.36379091807121,
+              "ttft_ms": 816.057162535818,
+              "joules_per_token": 0.26660926230561016,
+              "energy_raw_kwh": 0.0010099632628673473,
+              "energy_idle_kwh": 0.0007150637955059752,
+              "total_new_tokens": 3982,
+              "inference_duration_sec": 81.58366560935974,
+              "memory_allocated_gb": 2.1519203186035156
+            },
+            "run_2": {
+              "energy_kwh": 0.00027320788508806407,
+              "throughput": 51.27242991632034,
+              "ttft_ms": 730.873966217041,
+              "joules_per_token": 0.2762776366059075,
+              "energy_raw_kwh": 0.0009255030757119329,
+              "energy_idle_kwh": 0.0006522951906238688,
+              "total_new_tokens": 3560,
+              "inference_duration_sec": 74.42221665382385,
+              "memory_allocated_gb": 2.1519203186035156
+            },
+            "run_3": {
+              "energy_kwh": 0.0002965615955618304,
+              "throughput": 51.56440063746668,
+              "ttft_ms": 787.9773340727154,
+              "joules_per_token": 0.27658594404730297,
+              "energy_raw_kwh": 0.0010058038266003797,
+              "energy_idle_kwh": 0.0007092422310385493,
+              "total_new_tokens": 3860,
+              "inference_duration_sec": 80.9194667339325,
+              "memory_allocated_gb": 2.1519203186035156
+            }
+          }
+        },
+        "ifeval_latency_b1": {
+          "energy_kwh_mean": 0.00020231721680779918,
+          "energy_kwh_std": 0.0,
+          "energy_kwh_min": 0.00020231721680779918,
+          "energy_kwh_max": 0.00020231721680779918,
+          "throughput_mean": 51.0612955476871,
+          "throughput_std": 0.0,
+          "throughput_min": 51.0612955476871,
+          "throughput_max": 51.0612955476871,
+          "ttft_mean": 2051.6518211364746,
+          "ttft_std": null,
+          "ttft_min": 2051.6518211364746,
+          "ttft_max": 2051.6518211364746,
+          "joules_per_token_mean": 0.27809926708975835,
+          "joules_per_token_std": 0.0,
+          "joules_per_token_min": 0.27809926708975835,
+          "joules_per_token_max": 0.27809926708975835,
+          "num_runs_aggregated": 1,
+          "seeds_used": [
+            42
+          ],
+          "model_size_gb": 2.1519203186035156,
+          "batch_size": 1,
+          "num_prompts": 30,
+          "outliers_excluded": [
+            {
+              "run_key": "run_2",
+              "joules_per_token": 0.27658594404730297,
+              "energy_kwh": 0.00020426618454436572,
+              "reason": ">0.3000 J/token"
+            },
+            {
+              "run_key": "run_3",
+              "joules_per_token": 0.27658594404730297,
+              "energy_kwh": 0.0002136692105358019,
+              "reason": ">0.3000 J/token"
+            }
+          ],
+          "outliers_count": 2,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.00020231721680779918,
+              "throughput": 51.0612955476871,
+              "ttft_ms": 2051.6518211364746,
+              "joules_per_token": 0.27809926708975835,
+              "energy_raw_kwh": 0.0006954858177082179,
+              "energy_idle_kwh": 0.0004931686009004187,
+              "total_new_tokens": 2619,
+              "inference_duration_sec": 56.26701068878174,
+              "memory_allocated_gb": 2.1519203186035156
+            },
+            "run_2": {
+              "energy_kwh": 0.00020426618454436572,
+              "throughput": 51.620240577074696,
+              "ttft_ms": 1811.6924476623535,
+              "joules_per_token": 0.3145244928826846,
+              "energy_raw_kwh": 0.0006955754971353173,
+              "energy_idle_kwh": 0.0004913093125909516,
+              "total_new_tokens": 2338,
+              "inference_duration_sec": 56.0548791885376,
+              "memory_allocated_gb": 2.1519203186035156
+            },
+            "run_3": {
+              "energy_kwh": 0.0002136692105358019,
+              "throughput": 51.7819290234899,
+              "ttft_ms": 1861.6533184051514,
+              "joules_per_token": 0.31917392445182025,
+              "energy_raw_kwh": 0.0007270289284336298,
+              "energy_idle_kwh": 0.0005133597178978279,
+              "total_new_tokens": 2410,
+              "inference_duration_sec": 58.57067275047302,
+              "memory_allocated_gb": 2.1519203186035156
+            }
+          }
+        },
+        "hellaswag_throughput_b8": {
+          "energy_kwh_mean": 3.4262865042921136e-05,
+          "energy_kwh_std": 5.132676480481679e-07,
+          "energy_kwh_min": 3.396394297983723e-05,
+          "energy_kwh_max": 3.485552792315524e-05,
+          "throughput_mean": 240.5355433776746,
+          "throughput_std": 4.406028317212811,
+          "throughput_min": 236.54233890510238,
+          "throughput_max": 245.26231485088599,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.07559436009162918,
+          "joules_per_token_std": 0.0008669607590817539,
+          "joules_per_token_min": 0.0746904169781898,
+          "joules_per_token_max": 0.07641887170463377,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 2.1519203186035156,
+          "batch_size": 8,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 3.485552792315524e-05,
+              "throughput": 239.80197637703552,
+              "ttft_ms": null,
+              "joules_per_token": 0.0746904169781898,
+              "energy_raw_kwh": 0.00011603380450064856,
+              "energy_idle_kwh": 8.117827657749332e-05,
+              "total_new_tokens": 1680,
+              "inference_duration_sec": 9.261860847473145,
+              "memory_allocated_gb": 2.1519203186035156
+            },
+            "run_2": {
+              "energy_kwh": 3.396912422577093e-05,
+              "throughput": 245.26231485088599,
+              "ttft_ms": null,
+              "joules_per_token": 0.07567379159206396,
+              "energy_raw_kwh": 0.00011030507090182718,
+              "energy_idle_kwh": 7.633594667605625e-05,
+              "total_new_tokens": 1616,
+              "inference_duration_sec": 8.709385633468628,
+              "memory_allocated_gb": 2.1519203186035156
+            },
+            "run_3": {
+              "energy_kwh": 3.396394297983723e-05,
+              "throughput": 236.54233890510238,
+              "ttft_ms": null,
+              "joules_per_token": 0.07641887170463377,
+              "energy_raw_kwh": 0.00011391832419534599,
+              "energy_idle_kwh": 7.995438121550876e-05,
+              "total_new_tokens": 1600,
+              "inference_duration_sec": 9.122223138809204,
+              "memory_allocated_gb": 2.1519203186035156
+            }
+          }
+        },
+        "mmlu_throughput_b8": {
+          "energy_kwh_mean": 7.555110174894271e-05,
+          "energy_kwh_std": 1.52447752510491e-06,
+          "energy_kwh_min": 7.448320068584533e-05,
+          "energy_kwh_max": 7.72969607812152e-05,
+          "throughput_mean": 270.88933685703967,
+          "throughput_std": 3.2004027738434764,
+          "throughput_min": 268.6900287987904,
+          "throughput_max": 274.56092808670303,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.06475808721337946,
+          "joules_per_token_std": 0.0013066950215184926,
+          "joules_per_token_min": 0.06384274344501029,
+          "joules_per_token_max": 0.06625453781247016,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 2.1519203186035156,
+          "batch_size": 8,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 7.448320068584533e-05,
+              "throughput": 274.56092808670303,
+              "ttft_ms": null,
+              "joules_per_token": 0.06384274344501029,
+              "energy_raw_kwh": 0.00024282925408045979,
+              "energy_idle_kwh": 0.00016834605339461446,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 19.207080841064453,
+              "memory_allocated_gb": 2.1519203186035156
+            },
+            "run_2": {
+              "energy_kwh": 7.72969607812152e-05,
+              "throughput": 269.4170536856256,
+              "ttft_ms": null,
+              "joules_per_token": 0.06625453781247016,
+              "energy_raw_kwh": 0.0002487160712140613,
+              "energy_idle_kwh": 0.0001714191104328461,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 19.557694673538208,
+              "memory_allocated_gb": 2.1519203186035156
+            },
+            "run_3": {
+              "energy_kwh": 7.487314377976759e-05,
+              "throughput": 268.6900287987904,
+              "ttft_ms": null,
+              "joules_per_token": 0.06417698038265793,
+              "energy_raw_kwh": 0.0002443124660727717,
+              "energy_idle_kwh": 0.0001694393222930041,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 19.331815004348755,
+              "memory_allocated_gb": 2.1519203186035156
+            }
+          }
+        },
+        "ifeval_throughput_b8": {
+          "energy_kwh_mean": 6.275350261021946e-05,
+          "energy_kwh_std": 4.170777379897436e-07,
+          "energy_kwh_min": 6.229794340405296e-05,
+          "energy_kwh_max": 6.311657152102638e-05,
+          "throughput_mean": 277.4392418850351,
+          "throughput_std": 3.0314886325990478,
+          "throughput_min": 274.1157293241874,
+          "throughput_max": 280.05263965414724,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.06845836648387578,
+          "joules_per_token_std": 0.00045499389598880875,
+          "joules_per_token_min": 0.06796139280442141,
+          "joules_per_token_max": 0.0688544416593015,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 2.1519203186035156,
+          "batch_size": 8,
+          "num_prompts": 30,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 6.311657152102638e-05,
+              "throughput": 274.1157293241874,
+              "ttft_ms": null,
+              "joules_per_token": 0.0688544416593015,
+              "energy_raw_kwh": 0.00021181862822013464,
+              "energy_idle_kwh": 0.00014870205669910826,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 16.96584129333496,
+              "memory_allocated_gb": 2.1519203186035156
+            },
+            "run_2": {
+              "energy_kwh": 6.229794340405296e-05,
+              "throughput": 280.05263965414724,
+              "ttft_ms": null,
+              "joules_per_token": 0.06796139280442141,
+              "energy_raw_kwh": 0.00020857426186791895,
+              "energy_idle_kwh": 0.000146276318463866,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 16.68908190727234,
+              "memory_allocated_gb": 2.1519203186035156
+            },
+            "run_3": {
+              "energy_kwh": 6.284599290557906e-05,
+              "throughput": 278.14935667677065,
+              "ttft_ms": null,
+              "joules_per_token": 0.06855926498790443,
+              "energy_raw_kwh": 0.00021186957334395527,
+              "energy_idle_kwh": 0.0001490235804383762,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 17.002524852752686,
+              "memory_allocated_gb": 2.1519203186035156
+            }
+          }
+        }
+      }
+    },
+    "20pct": {
+      "name": "Llama-3.2-1B-pruned-20%",
+      "pruning_pct": 20,
+      "is_star": false,
+      "hf_repo": "oopere/Llama-3.2-1B-pruned-20pct",
+      "results": {
+        "hellaswag_latency_b1": {
+          "energy_kwh_mean": 0.00010331541218552136,
+          "energy_kwh_std": 3.5516191829401104e-06,
+          "energy_kwh_min": 9.933961688955289e-05,
+          "energy_kwh_max": 0.00010617439401086414,
+          "throughput_mean": 50.74057726000413,
+          "throughput_std": 0.3181035485477346,
+          "throughput_min": 50.37878704350748,
+          "throughput_max": 50.97643369132732,
+          "ttft_mean": 294.1387276900442,
+          "ttft_std": 7.957921421212063,
+          "ttft_min": 285.2077609614322,
+          "ttft_max": 300.47687982258043,
+          "joules_per_token_mean": 0.2622875035683651,
+          "joules_per_token_std": 0.0008472083190245809,
+          "joules_per_token_min": 0.2616256175101805,
+          "joules_per_token_max": 0.26324229920048964,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 2.0019569396972656,
+          "batch_size": 1,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.00010617439401086414,
+              "throughput": 50.866511045177596,
+              "ttft_ms": 300.47687982258043,
+              "joules_per_token": 0.26324229920048964,
+              "energy_raw_kwh": 0.00037650594400808363,
+              "energy_idle_kwh": 0.0002703315499972195,
+              "total_new_tokens": 1452,
+              "inference_duration_sec": 30.842896699905396,
+              "memory_allocated_gb": 2.0019569396972656
+            },
+            "run_2": {
+              "energy_kwh": 0.00010443222565614704,
+              "throughput": 50.97643369132732,
+              "ttft_ms": 296.73154228612,
+              "joules_per_token": 0.2616256175101805,
+              "energy_raw_kwh": 0.0003684169636595047,
+              "energy_idle_kwh": 0.0002639847380033577,
+              "total_new_tokens": 1437,
+              "inference_duration_sec": 30.118770837783813,
+              "memory_allocated_gb": 2.0019569396972656
+            },
+            "run_3": {
+              "energy_kwh": 9.933961688955289e-05,
+              "throughput": 50.37878704350748,
+              "ttft_ms": 285.2077609614322,
+              "joules_per_token": 0.2619945939944252,
+              "energy_raw_kwh": 0.00035339678545347913,
+              "energy_idle_kwh": 0.00025405716856392624,
+              "total_new_tokens": 1365,
+              "inference_duration_sec": 28.986106157302856,
+              "memory_allocated_gb": 2.0019569396972656
+            }
+          }
+        },
+        "mmlu_latency_b1": {
+          "energy_kwh_mean": 0.0002664379729231708,
+          "energy_kwh_std": 9.621505935666912e-06,
+          "energy_kwh_min": 0.0002565197905268587,
+          "energy_kwh_max": 0.00027573245567632935,
+          "throughput_mean": 50.91398296963089,
+          "throughput_std": 1.0485669960553656,
+          "throughput_min": 49.80253351684496,
+          "throughput_max": 51.885643785637356,
+          "ttft_mean": 769.436834569563,
+          "ttft_std": 16.76950042505177,
+          "ttft_min": 755.827115711413,
+          "ttft_max": 788.1705585278963,
+          "joules_per_token_mean": 0.257699833182839,
+          "joules_per_token_std": 0.001980409658594479,
+          "joules_per_token_min": 0.25550497823289203,
+          "joules_per_token_max": 0.2593531214563712,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 2.0019569396972656,
+          "batch_size": 1,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.00027573245567632935,
+              "throughput": 51.885643785637356,
+              "ttft_ms": 788.1705585278963,
+              "joules_per_token": 0.25550497823289203,
+              "energy_raw_kwh": 0.0009748988580155027,
+              "energy_idle_kwh": 0.0006991664023391734,
+              "total_new_tokens": 3885,
+              "inference_duration_sec": 79.76988673210144,
+              "memory_allocated_gb": 2.0019569396972656
+            },
+            "run_2": {
+              "energy_kwh": 0.0002565197905268587,
+              "throughput": 49.80253351684496,
+              "ttft_ms": 755.827115711413,
+              "joules_per_token": 0.2582413998592537,
+              "energy_raw_kwh": 0.0009291505855193147,
+              "energy_idle_kwh": 0.000672630794992456,
+              "total_new_tokens": 3576,
+              "inference_duration_sec": 76.74236369132996,
+              "memory_allocated_gb": 2.0019569396972656
+            },
+            "run_3": {
+              "energy_kwh": 0.00026706167256632443,
+              "throughput": 51.05377160641032,
+              "ttft_ms": 764.3128294693796,
+              "joules_per_token": 0.2593531214563712,
+              "energy_raw_kwh": 0.0009526594291455699,
+              "energy_idle_kwh": 0.0006855977565792455,
+              "total_new_tokens": 3707,
+              "inference_duration_sec": 78.22180128097534,
+              "memory_allocated_gb": 2.0019569396972656
+            }
+          }
+        },
+        "ifeval_latency_b1": {
+          "energy_kwh_mean": 0.00024258377578597376,
+          "energy_kwh_std": 0.0,
+          "energy_kwh_min": 0.00024258377578597376,
+          "energy_kwh_max": 0.00024258377578597376,
+          "throughput_mean": 51.79213636119819,
+          "throughput_std": 0.0,
+          "throughput_min": 51.79213636119819,
+          "throughput_max": 51.79213636119819,
+          "ttft_mean": 2306.141595840454,
+          "ttft_std": null,
+          "ttft_min": 2306.141595840454,
+          "ttft_max": 2306.141595840454,
+          "joules_per_token_mean": 0.29246536933339096,
+          "joules_per_token_std": 0.0,
+          "joules_per_token_min": 0.29246536933339096,
+          "joules_per_token_max": 0.29246536933339096,
+          "num_runs_aggregated": 1,
+          "seeds_used": [
+            42
+          ],
+          "model_size_gb": 2.0019569396972656,
+          "batch_size": 1,
+          "num_prompts": 30,
+          "outliers_excluded": [
+            {
+              "run_key": "run_2",
+              "joules_per_token": 0.2593531214563712,
+              "energy_kwh": 0.00025129448774217087,
+              "reason": ">0.3000 J/token"
+            },
+            {
+              "run_key": "run_3",
+              "joules_per_token": 0.2593531214563712,
+              "energy_kwh": 0.00020951851308727352,
+              "reason": ">0.3000 J/token"
+            }
+          ],
+          "outliers_count": 2,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.00024258377578597376,
+              "throughput": 51.79213636119819,
+              "ttft_ms": 2306.141595840454,
+              "joules_per_token": 0.29246536933339096,
+              "energy_raw_kwh": 0.0008582204371309295,
+              "energy_idle_kwh": 0.0006156366613449557,
+              "total_new_tokens": 2986,
+              "inference_duration_sec": 70.23974061012268,
+              "memory_allocated_gb": 2.0019569396972656
+            },
+            "run_2": {
+              "energy_kwh": 0.00025129448774217087,
+              "throughput": 51.52804098524924,
+              "ttft_ms": 2314.8561000823975,
+              "joules_per_token": 0.3033736270529226,
+              "energy_raw_kwh": 0.0008956464400504824,
+              "energy_idle_kwh": 0.0006443519523083116,
+              "total_new_tokens": 2982,
+              "inference_duration_sec": 73.51594996452332,
+              "memory_allocated_gb": 2.0019569396972656
+            },
+            "run_3": {
+              "energy_kwh": 0.00020951851308727352,
+              "throughput": 51.88840111769816,
+              "ttft_ms": 1812.3510837554932,
+              "joules_per_token": 0.32082800813023593,
+              "energy_raw_kwh": 0.0007426881489925487,
+              "energy_idle_kwh": 0.0005331696359052752,
+              "total_new_tokens": 2351,
+              "inference_duration_sec": 60.83084273338318,
+              "memory_allocated_gb": 2.0019569396972656
+            }
+          }
+        },
+        "hellaswag_throughput_b8": {
+          "energy_kwh_mean": 2.800182463218104e-05,
+          "energy_kwh_std": 1.4783333096943707e-07,
+          "energy_kwh_min": 2.7849597984021157e-05,
+          "energy_kwh_max": 2.8144833243374682e-05,
+          "throughput_mean": 253.32018081194315,
+          "throughput_std": 0.5331810513293483,
+          "throughput_min": 252.92554149175453,
+          "throughput_max": 253.9267398747316,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.060003909926102224,
+          "joules_per_token_std": 0.0003167857092202204,
+          "joules_per_token_min": 0.05967770996575963,
+          "joules_per_token_max": 0.06031035695008861,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 2.0019569396972656,
+          "batch_size": 8,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 2.8011042669147282e-05,
+              "throughput": 252.92554149175453,
+              "ttft_ms": null,
+              "joules_per_token": 0.06002366286245846,
+              "energy_raw_kwh": 0.00010597191484639838,
+              "energy_idle_kwh": 7.79608721772511e-05,
+              "total_new_tokens": 1680,
+              "inference_duration_sec": 8.89477801322937,
+              "memory_allocated_gb": 2.0019569396972656
+            },
+            "run_2": {
+              "energy_kwh": 2.7849597984021157e-05,
+              "throughput": 253.10826106934326,
+              "ttft_ms": null,
+              "joules_per_token": 0.05967770996575963,
+              "energy_raw_kwh": 0.00010381617957930342,
+              "energy_idle_kwh": 7.596658159528227e-05,
+              "total_new_tokens": 1680,
+              "inference_duration_sec": 8.667243719100952,
+              "memory_allocated_gb": 2.0019569396972656
+            },
+            "run_3": {
+              "energy_kwh": 2.8144833243374682e-05,
+              "throughput": 253.9267398747316,
+              "ttft_ms": null,
+              "joules_per_token": 0.06031035695008861,
+              "energy_raw_kwh": 0.00010415363073719391,
+              "energy_idle_kwh": 7.600879749381923e-05,
+              "total_new_tokens": 1680,
+              "inference_duration_sec": 8.672060251235962,
+              "memory_allocated_gb": 2.0019569396972656
+            }
+          }
+        },
+        "mmlu_throughput_b8": {
+          "energy_kwh_mean": 6.209056792580026e-05,
+          "energy_kwh_std": 2.479862642656592e-06,
+          "energy_kwh_min": 5.977665652266768e-05,
+          "energy_kwh_max": 6.470837243552005e-05,
+          "throughput_mean": 275.4059361946913,
+          "throughput_std": 4.698359481696614,
+          "throughput_min": 270.7391584816302,
+          "throughput_max": 280.13525308684933,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.05322048679354308,
+          "joules_per_token_std": 0.0021255965508485083,
+          "joules_per_token_min": 0.051237134162286584,
+          "joules_per_token_max": 0.05546431923044576,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 2.0019569396972656,
+          "batch_size": 8,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 5.977665652266768e-05,
+              "throughput": 280.13525308684933,
+              "ttft_ms": null,
+              "joules_per_token": 0.051237134162286584,
+              "energy_raw_kwh": 0.00022351646890728685,
+              "energy_idle_kwh": 0.00016373981238461917,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 18.681541681289673,
+              "memory_allocated_gb": 2.0019569396972656
+            },
+            "run_2": {
+              "energy_kwh": 6.470837243552005e-05,
+              "throughput": 270.7391584816302,
+              "ttft_ms": null,
+              "joules_per_token": 0.05546431923044576,
+              "energy_raw_kwh": 0.00023435922350435834,
+              "energy_idle_kwh": 0.0001696508510688383,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 19.35594892501831,
+              "memory_allocated_gb": 2.0019569396972656
+            },
+            "run_3": {
+              "energy_kwh": 6.178667481921305e-05,
+              "throughput": 275.34339701559446,
+              "ttft_ms": null,
+              "joules_per_token": 0.0529600069878969,
+              "energy_raw_kwh": 0.00022806128213211704,
+              "energy_idle_kwh": 0.000166274607312904,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 18.970743656158447,
+              "memory_allocated_gb": 2.0019569396972656
+            }
+          }
+        },
+        "ifeval_throughput_b8": {
+          "energy_kwh_mean": 5.148956364776503e-05,
+          "energy_kwh_std": 5.717580850294288e-07,
+          "energy_kwh_min": 5.0978416530280616e-05,
+          "energy_kwh_max": 5.210701256628191e-05,
+          "throughput_mean": 273.6808472782759,
+          "throughput_std": 2.3755450454602194,
+          "throughput_min": 270.9639059293534,
+          "throughput_max": 275.3662530271739,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.05617043307028913,
+          "joules_per_token_std": 0.0006237360927593744,
+          "joules_per_token_min": 0.055612818033033404,
+          "joules_per_token_max": 0.056844013708671176,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 2.0019569396972656,
+          "batch_size": 8,
+          "num_prompts": 30,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 5.210701256628191e-05,
+              "throughput": 275.3662530271739,
+              "ttft_ms": null,
+              "joules_per_token": 0.056844013708671176,
+              "energy_raw_kwh": 0.00020003111146067146,
+              "energy_idle_kwh": 0.00014792409889438955,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 16.877081871032715,
+              "memory_allocated_gb": 2.0019569396972656
+            },
+            "run_2": {
+              "energy_kwh": 5.0978416530280616e-05,
+              "throughput": 274.71238287830045,
+              "ttft_ms": null,
+              "joules_per_token": 0.055612818033033404,
+              "energy_raw_kwh": 0.00020094198299458428,
+              "energy_idle_kwh": 0.00014996356646430366,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 17.10977053642273,
+              "memory_allocated_gb": 2.0019569396972656
+            },
+            "run_3": {
+              "energy_kwh": 5.138326184673256e-05,
+              "throughput": 270.9639059293534,
+              "ttft_ms": null,
+              "joules_per_token": 0.056054467469162796,
+              "energy_raw_kwh": 0.00020066695215237878,
+              "energy_idle_kwh": 0.00014928369030564622,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 17.032201528549194,
+              "memory_allocated_gb": 2.0019569396972656
+            }
+          }
+        }
+      }
+    },
+    "30pct": {
+      "name": "Llama-3.2-1B-pruned-30%",
+      "pruning_pct": 30,
+      "is_star": false,
+      "hf_repo": "oopere/Llama-3.2-1B-pruned-30pct",
+      "results": {
+        "hellaswag_latency_b1": {
+          "energy_kwh_mean": 0.00012984908103383296,
+          "energy_kwh_std": 4.663171863388069e-06,
+          "energy_kwh_min": 0.00012462737895174697,
+          "energy_kwh_max": 0.00013359815101337077,
+          "throughput_mean": 50.6037194477712,
+          "throughput_std": 0.25885031713805123,
+          "throughput_min": 50.423849284970714,
+          "throughput_max": 50.900387521417635,
+          "ttft_mean": 392.4747709642377,
+          "ttft_std": 6.060516470298868,
+          "ttft_min": 385.47943516781453,
+          "ttft_max": 396.14219665527344,
+          "joules_per_token_mean": 0.24779774294122317,
+          "joules_per_token_std": 0.009670989406303942,
+          "joules_per_token_min": 0.23663426383243097,
+          "joules_per_token_max": 0.2536256262290623,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.8519935607910156,
+          "batch_size": 1,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.00013132171313638116,
+              "throughput": 50.900387521417635,
+              "ttft_ms": 385.47943516781453,
+              "joules_per_token": 0.2536256262290623,
+              "energy_raw_kwh": 0.0004776943463235092,
+              "energy_idle_kwh": 0.000346372633187128,
+              "total_new_tokens": 1864,
+              "inference_duration_sec": 39.51864051818848,
+              "memory_allocated_gb": 1.8519935607910156
+            },
+            "run_2": {
+              "energy_kwh": 0.00013359815101337077,
+              "throughput": 50.486921536925244,
+              "ttft_ms": 396.14219665527344,
+              "joules_per_token": 0.2531333387621762,
+              "energy_raw_kwh": 0.0004891113516609284,
+              "energy_idle_kwh": 0.00035551320064755766,
+              "total_new_tokens": 1900,
+              "inference_duration_sec": 40.561513900756836,
+              "memory_allocated_gb": 1.8519935607910156
+            },
+            "run_3": {
+              "energy_kwh": 0.00012462737895174697,
+              "throughput": 50.423849284970714,
+              "ttft_ms": 395.80268106962507,
+              "joules_per_token": 0.23663426383243097,
+              "energy_raw_kwh": 0.0004808741691257471,
+              "energy_idle_kwh": 0.00035624679017400013,
+              "total_new_tokens": 1896,
+              "inference_duration_sec": 40.6452112197876,
+              "memory_allocated_gb": 1.8519935607910156
+            }
+          }
+        },
+        "mmlu_latency_b1": {
+          "energy_kwh_mean": 0.00029321536371601904,
+          "energy_kwh_std": 1.420222799307351e-05,
+          "energy_kwh_min": 0.00027746444656975985,
+          "energy_kwh_max": 0.00030504490078558737,
+          "throughput_mean": 50.89028646667245,
+          "throughput_std": 0.3220991610940306,
+          "throughput_min": 50.575235759130635,
+          "throughput_max": 51.218999315125444,
+          "ttft_mean": 907.1071131187573,
+          "ttft_std": 16.049481331942456,
+          "ttft_min": 891.5272060193514,
+          "ttft_max": 923.5881956000077,
+          "joules_per_token_mean": 0.240674196739217,
+          "joules_per_token_std": 0.009942465920351478,
+          "joules_per_token_min": 0.2294147927540504,
+          "joules_per_token_max": 0.24824606118676162,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.8519935607910156,
+          "batch_size": 1,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.00029713674379270997,
+              "throughput": 50.87662432576126,
+              "ttft_ms": 891.5272060193514,
+              "joules_per_token": 0.24824606118676162,
+              "energy_raw_kwh": 0.0010923311293654131,
+              "energy_idle_kwh": 0.0007951943855727031,
+              "total_new_tokens": 4309,
+              "inference_duration_sec": 90.72599291801453,
+              "memory_allocated_gb": 1.8519935607910156
+            },
+            "run_2": {
+              "energy_kwh": 0.00030504490078558737,
+              "throughput": 51.218999315125444,
+              "ttft_ms": 923.5881956000077,
+              "joules_per_token": 0.24436173627683902,
+              "energy_raw_kwh": 0.0011180592498885836,
+              "energy_idle_kwh": 0.0008130143491029962,
+              "total_new_tokens": 4494,
+              "inference_duration_sec": 92.7591233253479,
+              "memory_allocated_gb": 1.8519935607910156
+            },
+            "run_3": {
+              "energy_kwh": 0.00027746444656975985,
+              "throughput": 50.575235759130635,
+              "ttft_ms": 906.2059377369128,
+              "joules_per_token": 0.2294147927540504,
+              "energy_raw_kwh": 0.0010836262810143046,
+              "energy_idle_kwh": 0.0008061618344445447,
+              "total_new_tokens": 4354,
+              "inference_duration_sec": 91.97730040550232,
+              "memory_allocated_gb": 1.8519935607910156
+            }
+          }
+        },
+        "ifeval_latency_b1": {
+          "energy_kwh_mean": 0.0002547445759390036,
+          "energy_kwh_std": 3.0499306800787602e-05,
+          "energy_kwh_min": 0.0002196282508495084,
+          "energy_kwh_max": 0.00027461369055708346,
+          "throughput_mean": 51.399718725994525,
+          "throughput_std": 0.1856200837604189,
+          "throughput_min": 51.2851842008497,
+          "throughput_max": 51.613881486933245,
+          "ttft_mean": 2637.4780718485513,
+          "ttft_std": 271.48812275701545,
+          "ttft_min": 2329.82045173645,
+          "ttft_max": 2843.421106338501,
+          "joules_per_token_mean": 0.2702728511803194,
+          "joules_per_token_std": 0.0061140499870223205,
+          "joules_per_token_min": 0.2646123504210945,
+          "joules_per_token_max": 0.2767569564571491,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.8519935607910156,
+          "batch_size": 1,
+          "num_prompts": 30,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.00027461369055708346,
+              "throughput": 51.613881486933245,
+              "ttft_ms": 2843.421106338501,
+              "joules_per_token": 0.26944924666271475,
+              "energy_raw_kwh": 0.0010087121858481545,
+              "energy_idle_kwh": 0.000734098495291071,
+              "total_new_tokens": 3669,
+              "inference_duration_sec": 83.75538873672485,
+              "memory_allocated_gb": 1.8519935607910156
+            },
+            "run_2": {
+              "energy_kwh": 0.0002699917864104188,
+              "throughput": 51.2851842008497,
+              "ttft_ms": 2739.192657470703,
+              "joules_per_token": 0.2767569564571491,
+              "energy_raw_kwh": 0.000991863070044513,
+              "energy_idle_kwh": 0.0007218712836340943,
+              "total_new_tokens": 3512,
+              "inference_duration_sec": 82.36035132408142,
+              "memory_allocated_gb": 1.8519935607910156
+            },
+            "run_3": {
+              "energy_kwh": 0.0002196282508495084,
+              "throughput": 51.30009049020063,
+              "ttft_ms": 2329.82045173645,
+              "joules_per_token": 0.2646123504210945,
+              "energy_raw_kwh": 0.0008672098197009712,
+              "energy_idle_kwh": 0.0006475815688514628,
+              "total_new_tokens": 2988,
+              "inference_duration_sec": 73.88442611694336,
+              "memory_allocated_gb": 1.8519935607910156
+            }
+          }
+        },
+        "hellaswag_throughput_b8": {
+          "energy_kwh_mean": 3.110101035257629e-05,
+          "energy_kwh_std": 1.1929931247442333e-06,
+          "energy_kwh_min": 3.0058038419913114e-05,
+          "energy_kwh_max": 3.240184845783138e-05,
+          "throughput_mean": 248.01683981574993,
+          "throughput_std": 2.5992468986755273,
+          "throughput_min": 245.37084006761876,
+          "throughput_max": 250.566664224923,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.06664502218409206,
+          "joules_per_token_std": 0.002556413838737644,
+          "joules_per_token_min": 0.06441008232838524,
+          "joules_per_token_max": 0.06943253240963868,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.8519935607910156,
+          "batch_size": 8,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 3.240184845783138e-05,
+              "throughput": 248.11301515470817,
+              "ttft_ms": null,
+              "joules_per_token": 0.06943253240963868,
+              "energy_raw_kwh": 0.00011001678514813071,
+              "energy_idle_kwh": 7.761493669029933e-05,
+              "total_new_tokens": 1680,
+              "inference_duration_sec": 8.855309247970581,
+              "memory_allocated_gb": 1.8519935607910156
+            },
+            "run_2": {
+              "energy_kwh": 3.0843144179984374e-05,
+              "throughput": 250.566664224923,
+              "ttft_ms": null,
+              "joules_per_token": 0.06609245181425223,
+              "energy_raw_kwh": 0.00010765288396857316,
+              "energy_idle_kwh": 7.680973978858879e-05,
+              "total_new_tokens": 1680,
+              "inference_duration_sec": 8.763442039489746,
+              "memory_allocated_gb": 1.8519935607910156
+            },
+            "run_3": {
+              "energy_kwh": 3.0058038419913114e-05,
+              "throughput": 245.37084006761876,
+              "ttft_ms": null,
+              "joules_per_token": 0.06441008232838524,
+              "energy_raw_kwh": 0.00010837134710680426,
+              "energy_idle_kwh": 7.831330868689115e-05,
+              "total_new_tokens": 1680,
+              "inference_duration_sec": 8.934988498687744,
+              "memory_allocated_gb": 1.8519935607910156
+            }
+          }
+        },
+        "mmlu_throughput_b8": {
+          "energy_kwh_mean": 6.831432426520802e-05,
+          "energy_kwh_std": 2.5656322848246995e-06,
+          "energy_kwh_min": 6.56581887872669e-05,
+          "energy_kwh_max": 7.077869181631077e-05,
+          "throughput_mean": 273.3419023137958,
+          "throughput_std": 3.285809171042748,
+          "throughput_min": 271.1461364637646,
+          "throughput_max": 277.1194309537122,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.05855513508446403,
+          "joules_per_token_std": 0.0021991133869925968,
+          "joules_per_token_min": 0.056278447531943054,
+          "joules_per_token_max": 0.060667450128266374,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.8519935607910156,
+          "batch_size": 8,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 6.850609219204642e-05,
+              "throughput": 277.1194309537122,
+              "ttft_ms": null,
+              "joules_per_token": 0.058719507593182646,
+              "energy_raw_kwh": 0.00023413166924661494,
+              "energy_idle_kwh": 0.00016562557705456852,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 18.89669394493103,
+              "memory_allocated_gb": 1.8519935607910156
+            },
+            "run_2": {
+              "energy_kwh": 7.077869181631077e-05,
+              "throughput": 271.7601395239106,
+              "ttft_ms": null,
+              "joules_per_token": 0.060667450128266374,
+              "energy_raw_kwh": 0.00024050208644111926,
+              "energy_idle_kwh": 0.00016972339462480849,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 19.36422562599182,
+              "memory_allocated_gb": 1.8519935607910156
+            },
+            "run_3": {
+              "energy_kwh": 6.56581887872669e-05,
+              "throughput": 271.1461364637646,
+              "ttft_ms": null,
+              "joules_per_token": 0.056278447531943054,
+              "energy_raw_kwh": 0.00023384040428994036,
+              "energy_idle_kwh": 0.00016818221550267347,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 19.188388109207153,
+              "memory_allocated_gb": 1.8519935607910156
+            }
+          }
+        },
+        "ifeval_throughput_b8": {
+          "energy_kwh_mean": 5.5284240144023815e-05,
+          "energy_kwh_std": 2.675638417880511e-06,
+          "energy_kwh_min": 5.257456723829814e-05,
+          "energy_kwh_max": 5.792449306683725e-05,
+          "throughput_mean": 275.1026820356122,
+          "throughput_std": 0.932596428435778,
+          "throughput_min": 274.2190216846588,
+          "throughput_max": 276.077517264016,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.06031008015711689,
+          "joules_per_token_std": 0.0029188782740514636,
+          "joules_per_token_min": 0.0573540733508707,
+          "joules_per_token_max": 0.06319035607291336,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.8519935607910156,
+          "batch_size": 8,
+          "num_prompts": 30,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 5.792449306683725e-05,
+              "throughput": 274.2190216846588,
+              "ttft_ms": null,
+              "joules_per_token": 0.06319035607291336,
+              "energy_raw_kwh": 0.00020760718860298756,
+              "energy_idle_kwh": 0.00014968269553615032,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 17.077725172042847,
+              "memory_allocated_gb": 1.8519935607910156
+            },
+            "run_2": {
+              "energy_kwh": 5.535366012693606e-05,
+              "throughput": 276.077517264016,
+              "ttft_ms": null,
+              "joules_per_token": 0.060385811047566615,
+              "energy_raw_kwh": 0.0002032536732651363,
+              "energy_idle_kwh": 0.00014790001313820023,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 16.87433385848999,
+              "memory_allocated_gb": 1.8519935607910156
+            },
+            "run_3": {
+              "energy_kwh": 5.257456723829814e-05,
+              "throughput": 275.0115071581617,
+              "ttft_ms": null,
+              "joules_per_token": 0.0573540733508707,
+              "energy_raw_kwh": 0.00020135160616051808,
+              "energy_idle_kwh": 0.00014877703892221994,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 16.974396228790283,
+              "memory_allocated_gb": 1.8519935607910156
+            }
+          }
+        }
+      }
+    },
+    "40pct": {
+      "name": "Llama-3.2-1B-pruned-40%",
+      "pruning_pct": 40,
+      "is_star": true,
+      "hf_repo": "oopere/Llama-3.2-1B-I-pruned-40pct",
+      "results": {
+        "hellaswag_latency_b1": {
+          "energy_kwh_mean": 0.0001210459959433544,
+          "energy_kwh_std": 9.030465096330894e-06,
+          "energy_kwh_min": 0.0001122078209518039,
+          "energy_kwh_max": 0.00013025719121860404,
+          "throughput_mean": 50.26333075670045,
+          "throughput_std": 0.3601578236816902,
+          "throughput_min": 50.05242075043205,
+          "throughput_max": 50.679190954541546,
+          "ttft_mean": 397.63754710816494,
+          "ttft_std": 2.62671349449928,
+          "ttft_min": 394.6392912613718,
+          "ttft_max": 399.53350016945285,
+          "joules_per_token_mean": 0.22952386865112404,
+          "joules_per_token_std": 0.017376477295162566,
+          "joules_per_token_min": 0.2126042923297337,
+          "joules_per_token_max": 0.24732378079481782,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.7020301818847656,
+          "batch_size": 1,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.0001122078209518039,
+              "throughput": 50.679190954541546,
+              "ttft_ms": 394.6392912613718,
+              "joules_per_token": 0.2126042923297337,
+              "energy_raw_kwh": 0.00046768206352608047,
+              "energy_idle_kwh": 0.0003554742425742766,
+              "total_new_tokens": 1900,
+              "inference_duration_sec": 40.557069063186646,
+              "memory_allocated_gb": 1.7020301818847656
+            },
+            "run_2": {
+              "energy_kwh": 0.00013025719121860404,
+              "throughput": 50.05242075043205,
+              "ttft_ms": 398.73984989367034,
+              "joules_per_token": 0.24732378079481782,
+              "energy_raw_kwh": 0.0004892976887963234,
+              "energy_idle_kwh": 0.0003590404975777194,
+              "total_new_tokens": 1896,
+              "inference_duration_sec": 40.963953256607056,
+              "memory_allocated_gb": 1.7020301818847656
+            },
+            "run_3": {
+              "energy_kwh": 0.00012067297565965528,
+              "throughput": 50.05838056512774,
+              "ttft_ms": 399.53350016945285,
+              "joules_per_token": 0.22864353282882052,
+              "energy_raw_kwh": 0.0004791997106420525,
+              "energy_idle_kwh": 0.0003585267349823972,
+              "total_new_tokens": 1900,
+              "inference_duration_sec": 40.90533661842346,
+              "memory_allocated_gb": 1.7020301818847656
+            }
+          }
+        },
+        "mmlu_latency_b1": {
+          "energy_kwh_mean": 0.0002760427494866073,
+          "energy_kwh_std": 6.915989550882801e-06,
+          "energy_kwh_min": 0.00026884963379868296,
+          "energy_kwh_max": 0.00028264350880401006,
+          "throughput_mean": 50.74925902495115,
+          "throughput_std": 0.35665722619821444,
+          "throughput_min": 50.51222458562497,
+          "throughput_max": 51.159435948600574,
+          "ttft_mean": 929.4337632363303,
+          "ttft_std": 18.82320955759099,
+          "ttft_min": 909.6286848971719,
+          "ttft_max": 947.0908089687949,
+          "joules_per_token_mean": 0.22195656744482037,
+          "joules_per_token_std": 0.011430064528395964,
+          "joules_per_token_min": 0.21026693062682134,
+          "joules_per_token_max": 0.23310804849815264,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.7020301818847656,
+          "batch_size": 1,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.00026884963379868296,
+              "throughput": 51.159435948600574,
+              "ttft_ms": 947.0908089687949,
+              "joules_per_token": 0.21026693062682134,
+              "energy_raw_kwh": 0.0011089448110229373,
+              "energy_idle_kwh": 0.0008400951772242544,
+              "total_new_tokens": 4603,
+              "inference_duration_sec": 95.84885215759277,
+              "memory_allocated_gb": 1.7020301818847656
+            },
+            "run_2": {
+              "energy_kwh": 0.00028264350880401006,
+              "throughput": 50.51222458562497,
+              "ttft_ms": 909.6286848971719,
+              "joules_per_token": 0.23310804849815264,
+              "energy_raw_kwh": 0.0010927101257912058,
+              "energy_idle_kwh": 0.0008100666169871957,
+              "total_new_tokens": 4365,
+              "inference_duration_sec": 92.4228081703186,
+              "memory_allocated_gb": 1.7020301818847656
+            },
+            "run_3": {
+              "energy_kwh": 0.00027663510585712895,
+              "throughput": 50.5761165406279,
+              "ttft_ms": 931.581795843024,
+              "joules_per_token": 0.2224947232094871,
+              "energy_raw_kwh": 0.0011043351920738095,
+              "energy_idle_kwh": 0.0008277000862166805,
+              "total_new_tokens": 4476,
+              "inference_duration_sec": 94.43466091156006,
+              "memory_allocated_gb": 1.7020301818847656
+            }
+          }
+        },
+        "ifeval_latency_b1": {
+          "energy_kwh_mean": 0.00024375307322129866,
+          "energy_kwh_std": 2.8185717526381334e-05,
+          "energy_kwh_min": 0.00021902761974947386,
+          "energy_kwh_max": 0.00027444401960442257,
+          "throughput_mean": 51.40016447337991,
+          "throughput_std": 0.46555047838781766,
+          "throughput_min": 50.93065682359202,
+          "throughput_max": 51.861654208575054,
+          "ttft_mean": 2635.6099478403726,
+          "ttft_std": 245.78830060065923,
+          "ttft_min": 2468.4543228149414,
+          "ttft_max": 2917.8234481811523,
+          "joules_per_token_mean": 0.25876191365172896,
+          "joules_per_token_std": 0.006872695993377815,
+          "joules_per_token_min": 0.250874779223069,
+          "joules_per_token_max": 0.26346625882024566,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.7020301818847656,
+          "batch_size": 1,
+          "num_prompts": 30,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.00023778758030999954,
+              "throughput": 51.861654208575054,
+              "ttft_ms": 2520.5520725250244,
+              "joules_per_token": 0.2619447029118722,
+              "energy_raw_kwh": 0.0009012334604606405,
+              "energy_idle_kwh": 0.000663445880150641,
+              "total_new_tokens": 3268,
+              "inference_duration_sec": 75.6944305896759,
+              "memory_allocated_gb": 1.7020301818847656
+            },
+            "run_2": {
+              "energy_kwh": 0.00027444401960442257,
+              "throughput": 51.40818238797267,
+              "ttft_ms": 2917.8234481811523,
+              "joules_per_token": 0.26346625882024566,
+              "energy_raw_kwh": 0.0010509372803681489,
+              "energy_idle_kwh": 0.0007764932607637263,
+              "total_new_tokens": 3750,
+              "inference_duration_sec": 88.59232831001282,
+              "memory_allocated_gb": 1.7020301818847656
+            },
+            "run_3": {
+              "energy_kwh": 0.00021902761974947386,
+              "throughput": 50.93065682359202,
+              "ttft_ms": 2468.4543228149414,
+              "joules_per_token": 0.250874779223069,
+              "energy_raw_kwh": 0.0008820335660195391,
+              "energy_idle_kwh": 0.0006630059462700653,
+              "total_new_tokens": 3143,
+              "inference_duration_sec": 75.64423727989197,
+              "memory_allocated_gb": 1.7020301818847656
+            }
+          }
+        },
+        "hellaswag_throughput_b8": {
+          "energy_kwh_mean": 2.500553216891231e-05,
+          "energy_kwh_std": 3.294818113595832e-07,
+          "energy_kwh_min": 2.4802112072226998e-05,
+          "energy_kwh_max": 2.538567257159011e-05,
+          "throughput_mean": 257.98597998805366,
+          "throughput_std": 0.6946002064233348,
+          "throughput_min": 257.584910000121,
+          "throughput_max": 258.78803521887664,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.053583283219097805,
+          "joules_per_token_std": 0.000706032452913394,
+          "joules_per_token_min": 0.053147383011914996,
+          "joules_per_token_max": 0.05439786979626453,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.7020301818847656,
+          "batch_size": 8,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 2.4828811862919814e-05,
+              "throughput": 258.78803521887664,
+              "ttft_ms": null,
+              "joules_per_token": 0.05320459684911389,
+              "energy_raw_kwh": 9.910389046332409e-05,
+              "energy_idle_kwh": 7.427507860040428e-05,
+              "total_new_tokens": 1680,
+              "inference_duration_sec": 8.474255323410034,
+              "memory_allocated_gb": 1.7020301818847656
+            },
+            "run_2": {
+              "energy_kwh": 2.538567257159011e-05,
+              "throughput": 257.58499474516327,
+              "ttft_ms": null,
+              "joules_per_token": 0.05439786979626453,
+              "energy_raw_kwh": 0.00010011213027959142,
+              "energy_idle_kwh": 7.47264577080013e-05,
+              "total_new_tokens": 1680,
+              "inference_duration_sec": 8.525754451751709,
+              "memory_allocated_gb": 1.7020301818847656
+            },
+            "run_3": {
+              "energy_kwh": 2.4802112072226998e-05,
+              "throughput": 257.584910000121,
+              "ttft_ms": null,
+              "joules_per_token": 0.053147383011914996,
+              "energy_raw_kwh": 9.97923010786519e-05,
+              "energy_idle_kwh": 7.49901890064249e-05,
+              "total_new_tokens": 1680,
+              "inference_duration_sec": 8.5558443069458,
+              "memory_allocated_gb": 1.7020301818847656
+            }
+          }
+        },
+        "mmlu_throughput_b8": {
+          "energy_kwh_mean": 5.612984480485479e-05,
+          "energy_kwh_std": 2.4317231554824515e-06,
+          "energy_kwh_min": 5.4097131729059675e-05,
+          "energy_kwh_max": 5.8823799527219715e-05,
+          "throughput_mean": 274.4829532648484,
+          "throughput_std": 2.5491681625833933,
+          "throughput_min": 272.03300702177506,
+          "throughput_max": 277.1209305886672,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.048111295547018394,
+          "joules_per_token_std": 0.0020843341332706703,
+          "joules_per_token_min": 0.04636897005347972,
+          "joules_per_token_max": 0.05042039959475975,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.7020301818847656,
+          "batch_size": 8,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 5.4097131729059675e-05,
+              "throughput": 277.1209305886672,
+              "ttft_ms": null,
+              "joules_per_token": 0.04636897005347972,
+              "energy_raw_kwh": 0.00021908655936870333,
+              "energy_idle_kwh": 0.00016498942763964366,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 18.824113845825195,
+              "memory_allocated_gb": 1.7020301818847656
+            },
+            "run_2": {
+              "energy_kwh": 5.8823799527219715e-05,
+              "throughput": 272.03300702177506,
+              "ttft_ms": null,
+              "joules_per_token": 0.05042039959475975,
+              "energy_raw_kwh": 0.00022796457003287235,
+              "energy_idle_kwh": 0.00016914077050565263,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 19.297752380371094,
+              "memory_allocated_gb": 1.7020301818847656
+            },
+            "run_3": {
+              "energy_kwh": 5.546860315828499e-05,
+              "throughput": 274.29492218410303,
+              "ttft_ms": null,
+              "joules_per_token": 0.04754451699281571,
+              "energy_raw_kwh": 0.00022196986023711388,
+              "energy_idle_kwh": 0.0001665012570788289,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 18.996602773666382,
+              "memory_allocated_gb": 1.7020301818847656
+            }
+          }
+        },
+        "ifeval_throughput_b8": {
+          "energy_kwh_mean": 4.613257639221328e-05,
+          "energy_kwh_std": 1.1279423710457477e-06,
+          "energy_kwh_min": 4.497130043605081e-05,
+          "energy_kwh_max": 4.7223932108022025e-05,
+          "throughput_mean": 273.22449211484223,
+          "throughput_std": 3.4900970628322083,
+          "throughput_min": 270.3013254081,
+          "throughput_max": 277.08859493981714,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.05032644697332358,
+          "joules_per_token_std": 0.0012304825865953588,
+          "joules_per_token_min": 0.04905960047569179,
+          "joules_per_token_max": 0.051517016845114935,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.7020301818847656,
+          "batch_size": 8,
+          "num_prompts": 30,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 4.7223932108022025e-05,
+              "throughput": 272.28355599660955,
+              "ttft_ms": null,
+              "joules_per_token": 0.051517016845114935,
+              "energy_raw_kwh": 0.00020071950566164504,
+              "energy_idle_kwh": 0.00015349557355362302,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 17.512747287750244,
+              "memory_allocated_gb": 1.7020301818847656
+            },
+            "run_2": {
+              "energy_kwh": 4.497130043605081e-05,
+              "throughput": 270.3013254081,
+              "ttft_ms": null,
+              "joules_per_token": 0.04905960047569179,
+              "energy_raw_kwh": 0.00019550989917912893,
+              "energy_idle_kwh": 0.00015053859874307812,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 17.17537760734558,
+              "memory_allocated_gb": 1.7020301818847656
+            },
+            "run_3": {
+              "energy_kwh": 4.620249663256701e-05,
+              "throughput": 277.08859493981714,
+              "ttft_ms": null,
+              "joules_per_token": 0.050402723599164014,
+              "energy_raw_kwh": 0.00019372698846600108,
+              "energy_idle_kwh": 0.00014752449183343407,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 16.83148956298828,
+              "memory_allocated_gb": 1.7020301818847656
+            }
+          }
+        }
+      }
+    },
+    "50pct": {
+      "name": "Llama-3.2-1B-pruned-50%",
+      "pruning_pct": 50,
+      "is_star": false,
+      "hf_repo": "oopere/Llama-3.2-1B-pruned-50pct",
+      "results": {
+        "hellaswag_latency_b1": {
+          "energy_kwh_mean": 0.00012065909705554985,
+          "energy_kwh_std": 1.5626790257178447e-06,
+          "energy_kwh_min": 0.0001191710408002776,
+          "energy_kwh_max": 0.00012228699857529443,
+          "throughput_mean": 51.12041935581029,
+          "throughput_std": 0.14023556171962273,
+          "throughput_min": 51.02760839441735,
+          "throughput_max": 51.28174048755049,
+          "ttft_mean": 391.2350570946409,
+          "ttft_std": 1.0716117175050586,
+          "ttft_min": 390.00236360650314,
+          "ttft_max": 391.9446869900352,
+          "joules_per_token_mean": 0.22861723652630497,
+          "joules_per_token_std": 0.0029608655224127615,
+          "joules_per_token_min": 0.22579776151631545,
+          "joules_per_token_max": 0.2317016815110842,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.5518836975097656,
+          "batch_size": 1,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.00012228699857529443,
+              "throughput": 51.051909185463,
+              "ttft_ms": 391.75812068738435,
+              "joules_per_token": 0.2317016815110842,
+              "energy_raw_kwh": 0.0004739092148971121,
+              "energy_idle_kwh": 0.00035162221632181767,
+              "total_new_tokens": 1900,
+              "inference_duration_sec": 40.11758041381836,
+              "memory_allocated_gb": 1.5518836975097656
+            },
+            "run_2": {
+              "energy_kwh": 0.00012051925179107749,
+              "throughput": 51.02760839441735,
+              "ttft_ms": 391.9446869900352,
+              "joules_per_token": 0.22835226655151525,
+              "energy_raw_kwh": 0.00047197078022019167,
+              "energy_idle_kwh": 0.0003514515284291142,
+              "total_new_tokens": 1900,
+              "inference_duration_sec": 40.098106145858765,
+              "memory_allocated_gb": 1.5518836975097656
+            },
+            "run_3": {
+              "energy_kwh": 0.0001191710408002776,
+              "throughput": 51.28174048755049,
+              "ttft_ms": 390.00236360650314,
+              "joules_per_token": 0.22579776151631545,
+              "energy_raw_kwh": 0.00046911245124555263,
+              "energy_idle_kwh": 0.00034994141044527503,
+              "total_new_tokens": 1900,
+              "inference_duration_sec": 39.92581248283386,
+              "memory_allocated_gb": 1.5518836975097656
+            }
+          }
+        },
+        "mmlu_latency_b1": {
+          "energy_kwh_mean": 0.0002850503546185026,
+          "energy_kwh_std": 9.671363786138823e-07,
+          "energy_kwh_min": 0.0002842130433984956,
+          "energy_kwh_max": 0.0002861089596135954,
+          "throughput_mean": 51.464375317581265,
+          "throughput_std": 0.11273077714687323,
+          "throughput_min": 51.35132821109292,
+          "throughput_max": 51.576787079797434,
+          "ttft_mean": 961.5266582422088,
+          "ttft_std": 2.1062320091647706,
+          "ttft_min": 959.4279389632376,
+          "ttft_max": 963.6403234381424,
+          "joules_per_token_mean": 0.218289997155203,
+          "joules_per_token_std": 0.0007406277309104528,
+          "joules_per_token_min": 0.21764878881824803,
+          "joules_per_token_max": 0.21910067105061548,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.5518836975097656,
+          "batch_size": 1,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.0002848290608434168,
+              "throughput": 51.576787079797434,
+              "ttft_ms": 959.4279389632376,
+              "joules_per_token": 0.21812053159674544,
+              "energy_raw_kwh": 0.0011347644919391159,
+              "energy_idle_kwh": 0.0008499354310956991,
+              "total_new_tokens": 4701,
+              "inference_duration_sec": 96.97155475616455,
+              "memory_allocated_gb": 1.5518836975097656
+            },
+            "run_2": {
+              "energy_kwh": 0.0002842130433984956,
+              "throughput": 51.46501066185345,
+              "ttft_ms": 961.5117123252467,
+              "joules_per_token": 0.21764878881824803,
+              "energy_raw_kwh": 0.001136503261516536,
+              "energy_idle_kwh": 0.0008522902181180404,
+              "total_new_tokens": 4701,
+              "inference_duration_sec": 97.24021911621094,
+              "memory_allocated_gb": 1.5518836975097656
+            },
+            "run_3": {
+              "energy_kwh": 0.0002861089596135954,
+              "throughput": 51.35132821109292,
+              "ttft_ms": 963.6403234381424,
+              "joules_per_token": 0.21910067105061548,
+              "energy_raw_kwh": 0.001139895507947009,
+              "energy_idle_kwh": 0.0008537865483334137,
+              "total_new_tokens": 4701,
+              "inference_duration_sec": 97.41093969345093,
+              "memory_allocated_gb": 1.5518836975097656
+            }
+          }
+        },
+        "ifeval_latency_b1": {
+          "energy_kwh_mean": 0.0002534747726626012,
+          "energy_kwh_std": 4.084888277419089e-06,
+          "energy_kwh_min": 0.0002507746951299918,
+          "energy_kwh_max": 0.0002581742140961616,
+          "throughput_mean": 51.86671856268449,
+          "throughput_std": 0.27441311898312354,
+          "throughput_min": 51.55100368893193,
+          "throughput_max": 52.04793512494249,
+          "ttft_mean": 2849.9577617645264,
+          "ttft_std": 48.81018633063335,
+          "ttft_min": 2794.1260051727295,
+          "ttft_max": 2884.547882080078,
+          "joules_per_token_mean": 0.2469750968350597,
+          "joules_per_token_std": 0.0055543959069495425,
+          "joules_per_token_min": 0.24074370732479214,
+          "joules_per_token_max": 0.251405573880017,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.5518836975097656,
+          "batch_size": 1,
+          "num_prompts": 30,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.0002507746951299918,
+              "throughput": 52.00121687417905,
+              "ttft_ms": 2884.547882080078,
+              "joules_per_token": 0.24074370732479214,
+              "energy_raw_kwh": 0.0009931476089290678,
+              "energy_idle_kwh": 0.0007423729137990759,
+              "total_new_tokens": 3750,
+              "inference_duration_sec": 84.69944071769714,
+              "memory_allocated_gb": 1.5518836975097656
+            },
+            "run_2": {
+              "energy_kwh": 0.0002581742140961616,
+              "throughput": 52.04793512494249,
+              "ttft_ms": 2871.1993980407715,
+              "joules_per_token": 0.24877600930036986,
+              "energy_raw_kwh": 0.0010224505862669036,
+              "energy_idle_kwh": 0.000764276372170742,
+              "total_new_tokens": 3736,
+              "inference_duration_sec": 87.19846868515015,
+              "memory_allocated_gb": 1.5518836975097656
+            },
+            "run_3": {
+              "energy_kwh": 0.0002514754087616503,
+              "throughput": 51.55100368893193,
+              "ttft_ms": 2794.1260051727295,
+              "joules_per_token": 0.251405573880017,
+              "energy_raw_kwh": 0.0009990428737338295,
+              "energy_idle_kwh": 0.0007475674649721792,
+              "total_new_tokens": 3601,
+              "inference_duration_sec": 85.29210186004639,
+              "memory_allocated_gb": 1.5518836975097656
+            }
+          }
+        },
+        "hellaswag_throughput_b8": {
+          "energy_kwh_mean": 2.334402614248813e-05,
+          "energy_kwh_std": 4.6906472856529545e-08,
+          "energy_kwh_min": 2.3290392893255963e-05,
+          "energy_kwh_max": 2.3377386705401645e-05,
+          "throughput_mean": 267.8247306203031,
+          "throughput_std": 4.330477145877543,
+          "throughput_min": 264.3933500319459,
+          "throughput_max": 272.69038166889624,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.05002291316247456,
+          "joules_per_token_std": 0.00010051387040684708,
+          "joules_per_token_min": 0.04990798477126278,
+          "joules_per_token_max": 0.05009440008300352,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.5518836975097656,
+          "batch_size": 8,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 2.336429882880678e-05,
+              "throughput": 264.3933500319459,
+              "ttft_ms": null,
+              "joules_per_token": 0.05006635463315739,
+              "energy_raw_kwh": 9.780367296305778e-05,
+              "energy_idle_kwh": 7.4439374134251e-05,
+              "total_new_tokens": 1680,
+              "inference_duration_sec": 8.493000268936157,
+              "memory_allocated_gb": 1.5518836975097656
+            },
+            "run_2": {
+              "energy_kwh": 2.3290392893255963e-05,
+              "throughput": 272.69038166889624,
+              "ttft_ms": null,
+              "joules_per_token": 0.04990798477126278,
+              "energy_raw_kwh": 9.484697199947192e-05,
+              "energy_idle_kwh": 7.155657910621596e-05,
+              "total_new_tokens": 1680,
+              "inference_duration_sec": 8.164093971252441,
+              "memory_allocated_gb": 1.5518836975097656
+            },
+            "run_3": {
+              "energy_kwh": 2.3377386705401645e-05,
+              "throughput": 266.3904601600672,
+              "ttft_ms": null,
+              "joules_per_token": 0.05009440008300352,
+              "energy_raw_kwh": 9.624210071928188e-05,
+              "energy_idle_kwh": 7.286471401388023e-05,
+              "total_new_tokens": 1680,
+              "inference_duration_sec": 8.313342809677124,
+              "memory_allocated_gb": 1.5518836975097656
+            }
+          }
+        },
+        "mmlu_throughput_b8": {
+          "energy_kwh_mean": 5.2548598711380656e-05,
+          "energy_kwh_std": 1.938653384626637e-06,
+          "energy_kwh_min": 5.077791165250574e-05,
+          "energy_kwh_max": 5.4620060890184187e-05,
+          "throughput_mean": 280.88524626891177,
+          "throughput_std": 2.04961168139726,
+          "throughput_min": 278.78086191652903,
+          "throughput_max": 282.8752992650573,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.04504165603832627,
+          "joules_per_token_std": 0.0016617029011085453,
+          "joules_per_token_min": 0.043523924273576355,
+          "joules_per_token_max": 0.046817195048729304,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.5518836975097656,
+          "batch_size": 8,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 5.077791165250574e-05,
+              "throughput": 280.99957762514885,
+              "ttft_ms": null,
+              "joules_per_token": 0.043523924273576355,
+              "energy_raw_kwh": 0.0002157104830320072,
+              "energy_idle_kwh": 0.00016493257137950145,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 18.817626953125,
+              "memory_allocated_gb": 1.5518836975097656
+            },
+            "run_2": {
+              "energy_kwh": 5.4620060890184187e-05,
+              "throughput": 282.8752992650573,
+              "ttft_ms": null,
+              "joules_per_token": 0.046817195048729304,
+              "energy_raw_kwh": 0.00021728268871316444,
+              "energy_idle_kwh": 0.00016266262782298026,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 18.558642625808716,
+              "memory_allocated_gb": 1.5518836975097656
+            },
+            "run_3": {
+              "energy_kwh": 5.224782359145204e-05,
+              "throughput": 278.78086191652903,
+              "ttft_ms": null,
+              "joules_per_token": 0.04478384879267318,
+              "energy_raw_kwh": 0.0002159378073402622,
+              "energy_idle_kwh": 0.00016368998374881015,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 18.675856590270996,
+              "memory_allocated_gb": 1.5518836975097656
+            }
+          }
+        },
+        "ifeval_throughput_b8": {
+          "energy_kwh_mean": 4.3017424821784885e-05,
+          "energy_kwh_std": 6.014185172858224e-07,
+          "energy_kwh_min": 4.260516816006045e-05,
+          "energy_kwh_max": 4.370753410948543e-05,
+          "throughput_mean": 276.41794706673585,
+          "throughput_std": 1.0796784229592142,
+          "throughput_min": 275.6051396368254,
+          "throughput_max": 277.64301650004955,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.04692809980558351,
+          "joules_per_token_std": 0.000656092927948173,
+          "joules_per_token_min": 0.04647836526552049,
+          "joules_per_token_max": 0.04768094630125684,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.5518836975097656,
+          "batch_size": 8,
+          "num_prompts": 30,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 4.370753410948543e-05,
+              "throughput": 276.0056850633324,
+              "ttft_ms": null,
+              "joules_per_token": 0.04768094630125684,
+              "energy_raw_kwh": 0.00019164227996967272,
+              "energy_idle_kwh": 0.0001479347458601873,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 16.878296613693237,
+              "memory_allocated_gb": 1.5518836975097656
+            },
+            "run_2": {
+              "energy_kwh": 4.273957219580877e-05,
+              "throughput": 277.64301650004955,
+              "ttft_ms": null,
+              "joules_per_token": 0.04662498784997321,
+              "energy_raw_kwh": 0.00018965397094729776,
+              "energy_idle_kwh": 0.000146914398751489,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 16.761882305145264,
+              "memory_allocated_gb": 1.5518836975097656
+            },
+            "run_3": {
+              "energy_kwh": 4.260516816006045e-05,
+              "throughput": 275.6051396368254,
+              "ttft_ms": null,
+              "joules_per_token": 0.04647836526552049,
+              "energy_raw_kwh": 0.00019028538989185453,
+              "energy_idle_kwh": 0.00014768022173179408,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 16.849257230758667,
+              "memory_allocated_gb": 1.5518836975097656
+            }
+          }
+        }
+      }
+    },
+    "60pct": {
+      "name": "Llama-3.2-1B-pruned-60%",
+      "pruning_pct": 60,
+      "is_star": false,
+      "hf_repo": "oopere/Llama-3.2-1B-pruned-60pct",
+      "results": {
+        "hellaswag_latency_b1": {
+          "energy_kwh_mean": 0.00011230804133000625,
+          "energy_kwh_std": 7.841227966150707e-07,
+          "energy_kwh_min": 0.0001114299123625075,
+          "energy_kwh_max": 0.00011293819662332302,
+          "throughput_mean": 50.85570068269931,
+          "throughput_std": 0.417815870620987,
+          "throughput_min": 50.57140017130613,
+          "throughput_max": 51.33541577092286,
+          "ttft_mean": 389.20644709938455,
+          "ttft_std": 2.692749409827595,
+          "ttft_min": 387.3390373430754,
+          "ttft_max": 392.29316962392704,
+          "joules_per_token_mean": 0.21502058682114691,
+          "joules_per_token_std": 0.0003475822075043176,
+          "joules_per_token_min": 0.2146195201351047,
+          "joules_per_token_max": 0.21523425507885804,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.4019203186035156,
+          "batch_size": 1,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.00011293819662332302,
+              "throughput": 51.33541577092286,
+              "ttft_ms": 387.3390373430754,
+              "joules_per_token": 0.21523425507885804,
+              "energy_raw_kwh": 0.00046066648006812684,
+              "energy_idle_kwh": 0.0003477282834448038,
+              "total_new_tokens": 1889,
+              "inference_duration_sec": 39.67331051826477,
+              "memory_allocated_gb": 1.4019203186035156
+            },
+            "run_2": {
+              "energy_kwh": 0.0001114299123625075,
+              "throughput": 50.57140017130613,
+              "ttft_ms": 387.9871343311511,
+              "joules_per_token": 0.215207985249478,
+              "energy_raw_kwh": 0.0004600576084303087,
+              "energy_idle_kwh": 0.00034862769606780117,
+              "total_new_tokens": 1864,
+              "inference_duration_sec": 39.77592706680298,
+              "memory_allocated_gb": 1.4019203186035156
+            },
+            "run_3": {
+              "energy_kwh": 0.00011255601500418825,
+              "throughput": 50.66028610586893,
+              "ttft_ms": 392.29316962392704,
+              "joules_per_token": 0.2146195201351047,
+              "energy_raw_kwh": 0.0004650708879842488,
+              "energy_idle_kwh": 0.00035251487298006053,
+              "total_new_tokens": 1888,
+              "inference_duration_sec": 40.21942615509033,
+              "memory_allocated_gb": 1.4019203186035156
+            }
+          }
+        },
+        "mmlu_latency_b1": {
+          "energy_kwh_mean": 0.00027106899340578413,
+          "energy_kwh_std": 6.340408980119585e-07,
+          "energy_kwh_min": 0.00027037582814640985,
+          "energy_kwh_max": 0.00027161965764353345,
+          "throughput_mean": 51.36938678305899,
+          "throughput_std": 0.023248103431457168,
+          "throughput_min": 51.3501576537617,
+          "throughput_max": 51.395223392985926,
+          "ttft_mean": 970.4726168983861,
+          "ttft_std": 4.665353541013836,
+          "ttft_min": 965.0972265946237,
+          "ttft_max": 973.4675708569979,
+          "joules_per_token_mean": 0.20605111555580793,
+          "joules_per_token_std": 0.0006200665229252409,
+          "joules_per_token_min": 0.20554976419761534,
+          "joules_per_token_max": 0.20674447351892003,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.4019203186035156,
+          "batch_size": 1,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.0002712114944274091,
+              "throughput": 51.395223392985926,
+              "ttft_ms": 972.8530532435367,
+              "joules_per_token": 0.20554976419761534,
+              "energy_raw_kwh": 0.001132507085481983,
+              "energy_idle_kwh": 0.000861295591054574,
+              "total_new_tokens": 4750,
+              "inference_duration_sec": 98.26766777038574,
+              "memory_allocated_gb": 1.4019203186035156
+            },
+            "run_2": {
+              "energy_kwh": 0.00027161965764353345,
+              "throughput": 51.36277930242937,
+              "ttft_ms": 973.4675708569979,
+              "joules_per_token": 0.20585910895088852,
+              "energy_raw_kwh": 0.0011337874284931802,
+              "energy_idle_kwh": 0.0008621677708496468,
+              "total_new_tokens": 4750,
+              "inference_duration_sec": 98.3671772480011,
+              "memory_allocated_gb": 1.4019203186035156
+            },
+            "run_3": {
+              "energy_kwh": 0.00027037582814640985,
+              "throughput": 51.3501576537617,
+              "ttft_ms": 965.0972265946237,
+              "joules_per_token": 0.20674447351892003,
+              "energy_raw_kwh": 0.0011252669756723359,
+              "energy_idle_kwh": 0.000854891147525926,
+              "total_new_tokens": 4708,
+              "inference_duration_sec": 97.53696656227112,
+              "memory_allocated_gb": 1.4019203186035156
+            }
+          }
+        },
+        "ifeval_latency_b1": {
+          "energy_kwh_mean": 0.00023662753174913983,
+          "energy_kwh_std": 7.219121159235563e-06,
+          "energy_kwh_min": 0.00023000106310666504,
+          "energy_kwh_max": 0.00024432062283852004,
+          "throughput_mean": 51.75484083532745,
+          "throughput_std": 0.2715111864321226,
+          "throughput_min": 51.45285392931563,
+          "throughput_max": 51.97878122662301,
+          "ttft_mean": 2830.6795851389566,
+          "ttft_std": 121.89999871723981,
+          "ttft_min": 2690.955629348755,
+          "ttft_max": 2915.290184020996,
+          "joules_per_token_mean": 0.23271358891652927,
+          "joules_per_token_std": 0.00587676236947308,
+          "joules_per_token_min": 0.22613847293014505,
+          "joules_per_token_max": 0.2374544958944635,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.4019203186035156,
+          "batch_size": 1,
+          "num_prompts": 30,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 0.00023556090930223442,
+              "throughput": 51.97878122662301,
+              "ttft_ms": 2885.792942047119,
+              "joules_per_token": 0.22613847293014505,
+              "energy_raw_kwh": 0.0009778059487582172,
+              "energy_idle_kwh": 0.0007422450394559827,
+              "total_new_tokens": 3750,
+              "inference_duration_sec": 84.68485116958618,
+              "memory_allocated_gb": 1.4019203186035156
+            },
+            "run_2": {
+              "energy_kwh": 0.00024432062283852004,
+              "throughput": 51.45285392931563,
+              "ttft_ms": 2915.290184020996,
+              "joules_per_token": 0.23454779792497923,
+              "energy_raw_kwh": 0.0010183629876003232,
+              "energy_idle_kwh": 0.0007740423647618032,
+              "total_new_tokens": 3750,
+              "inference_duration_sec": 88.31269860267639,
+              "memory_allocated_gb": 1.4019203186035156
+            },
+            "run_3": {
+              "energy_kwh": 0.00023000106310666504,
+              "throughput": 51.83288735004371,
+              "ttft_ms": 2690.955629348755,
+              "joules_per_token": 0.2374544958944635,
+              "energy_raw_kwh": 0.0009569855149731378,
+              "energy_idle_kwh": 0.0007269844518664728,
+              "total_new_tokens": 3487,
+              "inference_duration_sec": 82.94372725486755,
+              "memory_allocated_gb": 1.4019203186035156
+            }
+          }
+        },
+        "hellaswag_throughput_b8": {
+          "energy_kwh_mean": 2.5891829171908072e-05,
+          "energy_kwh_std": 4.961233640910522e-07,
+          "energy_kwh_min": 2.5328405381474088e-05,
+          "energy_kwh_max": 2.6263283012038097e-05,
+          "throughput_mean": 264.01335890587103,
+          "throughput_std": 0.5948610372398261,
+          "throughput_min": 263.340032036126,
+          "throughput_max": 264.46763547132673,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.05548249108266016,
+          "joules_per_token_std": 0.001063121494480826,
+          "joules_per_token_min": 0.05427515438887305,
+          "joules_per_token_max": 0.0562784635972245,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.4019203186035156,
+          "batch_size": 8,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 2.6263283012038097e-05,
+              "throughput": 264.46763547132673,
+              "ttft_ms": null,
+              "joules_per_token": 0.0562784635972245,
+              "energy_raw_kwh": 0.00010006501360368115,
+              "energy_idle_kwh": 7.380173059164306e-05,
+              "total_new_tokens": 1680,
+              "inference_duration_sec": 8.420249700546265,
+              "memory_allocated_gb": 1.4019203186035156
+            },
+            "run_2": {
+              "energy_kwh": 2.5328405381474088e-05,
+              "throughput": 264.23240921016026,
+              "ttft_ms": null,
+              "joules_per_token": 0.05427515438887305,
+              "energy_raw_kwh": 9.856574021169508e-05,
+              "energy_idle_kwh": 7.3237334830221e-05,
+              "total_new_tokens": 1680,
+              "inference_duration_sec": 8.35585618019104,
+              "memory_allocated_gb": 1.4019203186035156
+            },
+            "run_3": {
+              "energy_kwh": 2.6083799122212034e-05,
+              "throughput": 263.340032036126,
+              "ttft_ms": null,
+              "joules_per_token": 0.05589385526188293,
+              "energy_raw_kwh": 9.960707237657448e-05,
+              "energy_idle_kwh": 7.352327325436245e-05,
+              "total_new_tokens": 1680,
+              "inference_duration_sec": 8.388479709625244,
+              "memory_allocated_gb": 1.4019203186035156
+            }
+          }
+        },
+        "mmlu_throughput_b8": {
+          "energy_kwh_mean": 5.862578443281512e-05,
+          "energy_kwh_std": 2.4369853082872723e-06,
+          "energy_kwh_min": 5.617060893325397e-05,
+          "energy_kwh_max": 6.104416282018654e-05,
+          "throughput_mean": 279.76240284482424,
+          "throughput_std": 3.670707193771179,
+          "throughput_min": 276.4055689893509,
+          "throughput_max": 283.6819893673182,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.050250672370984385,
+          "joules_per_token_std": 0.0020888445499605223,
+          "joules_per_token_min": 0.0481462362285034,
+          "joules_per_token_max": 0.05232356813158846,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.4019203186035156,
+          "batch_size": 8,
+          "num_prompts": 100,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 5.617060893325397e-05,
+              "throughput": 283.6819893673182,
+              "ttft_ms": null,
+              "joules_per_token": 0.0481462362285034,
+              "energy_raw_kwh": 0.00021739323410966912,
+              "energy_idle_kwh": 0.00016122262517641515,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 18.394348621368408,
+              "memory_allocated_gb": 1.4019203186035156
+            },
+            "run_2": {
+              "energy_kwh": 6.104416282018654e-05,
+              "throughput": 276.4055689893509,
+              "ttft_ms": null,
+              "joules_per_token": 0.05232356813158846,
+              "energy_raw_kwh": 0.000227306482761375,
+              "energy_idle_kwh": 0.00016626231994118845,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 18.96934175491333,
+              "memory_allocated_gb": 1.4019203186035156
+            },
+            "run_3": {
+              "energy_kwh": 5.866258154500485e-05,
+              "throughput": 279.19965017780356,
+              "ttft_ms": null,
+              "joules_per_token": 0.0502822127528613,
+              "energy_raw_kwh": 0.00022226889205387255,
+              "energy_idle_kwh": 0.0001636063105088677,
+              "total_new_tokens": 4200,
+              "inference_duration_sec": 18.66631007194519,
+              "memory_allocated_gb": 1.4019203186035156
+            }
+          }
+        },
+        "ifeval_throughput_b8": {
+          "energy_kwh_mean": 4.7403681755843084e-05,
+          "energy_kwh_std": 3.2169504098469315e-07,
+          "energy_kwh_min": 4.711944071924737e-05,
+          "energy_kwh_max": 4.77529084648509e-05,
+          "throughput_mean": 276.51764421585614,
+          "throughput_std": 2.6748737011660624,
+          "throughput_min": 273.5973066133177,
+          "throughput_max": 278.84882997022663,
+          "ttft_mean": null,
+          "ttft_std": null,
+          "ttft_min": null,
+          "ttft_max": null,
+          "joules_per_token_mean": 0.05171310737001064,
+          "joules_per_token_std": 0.0003509400447105754,
+          "joules_per_token_min": 0.05140302623917896,
+          "joules_per_token_max": 0.05209408196165553,
+          "num_runs_aggregated": 3,
+          "seeds_used": [
+            42,
+            123,
+            456
+          ],
+          "model_size_gb": 1.4019203186035156,
+          "batch_size": 8,
+          "num_prompts": 30,
+          "outliers_excluded": null,
+          "outliers_count": 0,
+          "raw_runs_data": {
+            "run_1": {
+              "energy_kwh": 4.77529084648509e-05,
+              "throughput": 273.5973066133177,
+              "ttft_ms": null,
+              "joules_per_token": 0.05209408196165553,
+              "energy_raw_kwh": 0.00019589636828969874,
+              "energy_idle_kwh": 0.00014814345982484784,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 16.902109384536743,
+              "memory_allocated_gb": 1.4019203186035156
+            },
+            "run_2": {
+              "energy_kwh": 4.711944071924737e-05,
+              "throughput": 278.84882997022663,
+              "ttft_ms": null,
+              "joules_per_token": 0.05140302623917896,
+              "energy_raw_kwh": 0.0001930587236818991,
+              "energy_idle_kwh": 0.00014593928296265172,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 16.650628566741943,
+              "memory_allocated_gb": 1.4019203186035156
+            },
+            "run_3": {
+              "energy_kwh": 4.733869608343098e-05,
+              "throughput": 277.10679606402414,
+              "ttft_ms": null,
+              "joules_per_token": 0.05164221390919743,
+              "energy_raw_kwh": 0.0001950695656091484,
+              "energy_idle_kwh": 0.00014773086952571743,
+              "total_new_tokens": 3300,
+              "inference_duration_sec": 16.85503578186035,
+              "memory_allocated_gb": 1.4019203186035156
+            }
+          }
+        }
+      }
+    }
+  },
+  "summary_statistics": {
+    "baseline": {
+      "model": "Llama-3.2-1B",
+      "pruning_pct": 0,
+      "is_star": false,
+      "total_energy_kwh": 0.0006510886653321798,
+      "avg_throughput_tok_s": 157.65274381995485,
+      "avg_joules_per_token": 0.1681801134041303,
+      "avg_ttft_ms": 877.2973773911682,
+      "model_size_gb": 2.3018836975097656
+    },
+    "pruned_models": [
+      {
+        "model": "Llama-3.2-1B-pruned-10%",
+        "pruning_pct": 10,
+        "is_star": false,
+        "total_energy_kwh": 0.0007326894382149286,
+        "avg_throughput_tok_s": 156.87934156004056,
+        "avg_joules_per_token": 0.17295744205128527,
+        "avg_ttft_ms": 1006.6757245091667,
+        "model_size_gb": 2.1519203186035156
+      },
+      {
+        "model": "Llama-3.2-1B-pruned-20%",
+        "pruning_pct": 20,
+        "is_star": false,
+        "total_energy_kwh": 0.0007539191171004123,
+        "avg_throughput_tok_s": 159.3089434792906,
+        "avg_joules_per_token": 0.16364125597908827,
+        "avg_ttft_ms": 1123.2390527000205,
+        "model_size_gb": 2.0019569396972656
+      },
+      {
+        "model": "Llama-3.2-1B-pruned-30%",
+        "pruning_pct": 30,
+        "is_star": false,
+        "total_energy_kwh": 0.0008325085954506637,
+        "avg_throughput_tok_s": 158.22585813426602,
+        "avg_joules_per_token": 0.15737583804773878,
+        "avg_ttft_ms": 1312.3533186438488,
+        "model_size_gb": 1.8519935607910156
+      },
+      {
+        "model": "Llama-3.2-1B-pruned-40%",
+        "pruning_pct": 40,
+        "is_star": true,
+        "total_energy_kwh": 0.0007681097720172407,
+        "avg_throughput_tok_s": 159.68436327046263,
+        "avg_joules_per_token": 0.1437105625811855,
+        "avg_ttft_ms": 1320.8937527282894,
+        "model_size_gb": 1.7020301818847656
+      },
+      {
+        "model": "Llama-3.2-1B-pruned-50%",
+        "pruning_pct": 50,
+        "is_star": false,
+        "total_energy_kwh": 0.0007780942740123073,
+        "avg_throughput_tok_s": 163.26323953200446,
+        "avg_joules_per_token": 0.13931249992049202,
+        "avg_ttft_ms": 1400.9064923671256,
+        "model_size_gb": 1.5518836975097656
+      },
+      {
+        "model": "Llama-3.2-1B-pruned-60%",
+        "pruning_pct": 60,
+        "is_star": false,
+        "total_energy_kwh": 0.0007519258618454965,
+        "avg_throughput_tok_s": 162.3788890446062,
+        "avg_joules_per_token": 0.13520526035285654,
+        "avg_ttft_ms": 1396.7862163789093,
+        "model_size_gb": 1.4019203186035156
+      }
+    ]
+  },
+  "citation": {
+    "paper": "Exploring GLU Expansion Ratios: Structured Pruning in Llama-3.2 Models",
+    "author": "Pere Martra",
+    "doi": "https://doi.org/10.31219/osf.io/qgxea",
+    "github": "https://github.com/peremartra/llama-glu-expansion-pruning",
+    "note": "Results are freely available for research purposes. Please cite the paper if you use this data."
+  }
+}
