@@ -211,3 +211,9 @@ __marimo__/
 .claude_*
 claude_memory.md
 .claude_history
+.claude.md
+
+# Gemini configuration files
+.gemini/
+.gemini.lock
+.GEMINI.md
