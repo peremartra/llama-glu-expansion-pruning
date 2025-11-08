@@ -20,7 +20,7 @@ Our pruning strategy targets the Gated Linear Unit (GLU) MLP layers, which are c
 
 The selection of which neurons to prune was based on an empirical comparison of three importance metrics:
 
-1.  **Maximum Absolute Weight (MAW):** The importance of a neuron is determined by the maximum absolute value of its weights in the `up_proj` matrix.
+1.  **Maximum Absolute Weight (MAW):** The importance of a neuron is determined by the sum of maximum absolute values of its weights in both `gate_proj` and `up_proj` matrices.
 2.  **Vector-based Output Weighting (VOW):** Measures the L2 norm of the output weight vector associated with each neuron.
 3.  **Product of Norms (PON):** Computes the product of the L2 norms of a neuron's input and output weight vectors.
 
@@ -35,24 +35,34 @@ Models were pruned at incremental ratios from **10% to 60%** of the neurons in t
 To measure the impact of pruning on model capabilities, we used the `lm-evaluation-harness`, a standardized framework for LLM evaluation. We curated two distinct sets of benchmarks:
 
 -   **Base Model Benchmarks (`BENCHMARKS_BASE`):** A comprehensive suite of 13 tasks designed to test a broad range of capabilities, including:
-    -   **Reasoning and Commonsense:** `hellaswag`, `winogrande`, `piqa`, `copa`, `openbookqa`.
-    -   **Knowledge-Intensive:** `mmlu` (5-shot), `gsm8k` (5-shot), `arc_challenge` (25-shot).
-    -   **Language Understanding:** `glue` (mrpc, sst2), `squad_v2`.
-    -   **Safety:** `truthfulqa_mc2`.
+    -   **Language Modeling:** `wikitext` (perplexity), `lambada_openai`.
+    -   **Reading Comprehension:** `boolq`.
+    -   **Reasoning and Commonsense:** `hellaswag`, `winogrande`, `piqa`.
+    -   **Knowledge-Intensive:** `mmlu` (5-shot), `gsm8k` (5-shot), `arc_challenge` (0-shot).
+    -   **Safety and Truthfulness:** `truthfulqa_mc1`, `truthfulqa_mc2`.
+    -   **Instruction Following:** `ifeval`.
+    -   **Multi-step Reasoning:** `leaderboard_musr`.
 -   **Instruction-Following Benchmarks (`BENCHMARKS_INSTRUCT`):** A focused set of 7 tasks to evaluate the instruction-following and reasoning abilities of the `1B-Instruct` model:
     -   **Instruction Following:** `ifeval`.
-    -   **Multi-step Reasoning:** `musr`.
-    -   **Commonsense and Reasoning:** `hellaswag`, `winogrande`, `piqa`.
+    -   **Multi-step Reasoning:** `leaderboard_musr`.
+    -   **Safety and Truthfulness:** `truthfulqa_mc1`, `truthfulqa_mc2`.
+    -   **Language Understanding:** `lambada_openai`.
     -   **Knowledge:** `mmlu` (5-shot), `gsm8k` (5-shot).
 
-The evaluation process, executed via the `run_robust_evaluation` function in `utils.py`, involved three runs for each model-pruning configuration using fixed seeds (`42`, `123`, `456`) to ensure result robustness and calculate confidence intervals.
+The evaluation process, executed via the `run_robust_evaluation` function in `utils.py`, involved a single run for each model-pruning configuration using the EleutherAI LM Evaluation Harness with `batch_size="auto"` and appropriate few-shot configurations as specified above.
 
 ### 2.2. Performance and Energy Profiling
 
 To quantify the computational benefits of pruning, we conducted a separate evaluation focused on performance and energy efficiency. This was orchestrated by the `run_carbon_profiling` function and measured the following metrics:
 
--   **Time to First Token (TTFT):** Latency before the model generates the first token.
--   **Throughput:** The rate of token generation (tokens/second) after the first token.
--   **Energy Consumption:** Measured in Joules per token, using the `codecarbon` library. The `CodeCarbonTracker` was configured to measure emissions from a single GPU (`gpu_ids=[0]`) with a 10-second interval check.
+-   **Time to First Token (TTFT):** Latency before the model generates the first token, measured in milliseconds.
+-   **Throughput:** The rate of token generation (tokens/second) during inference.
+-   **Energy Consumption:** Total energy in kWh and efficiency in Joules per token, using the `codecarbon` library with 1-second measurement intervals and idle power correction.
+-   **Memory Usage:** Model size and GPU memory allocation in GB.
 
-This profiling was performed on a specific set of generation tasks defined in `BENCHMARKS_CARBON`, including prompts from `ifeval` and `musr`, to simulate real-world generative workloads. Similar to the capability evaluation, experiments were run three times with fixed seeds to ensure the reliability of performance metrics. The results were aggregated to provide a stable estimate of the performance gains and energy savings achieved through pruning.
+This profiling was performed on a specific set of 6 generation workloads defined in `BENCHMARKS_CARBON`:
+
+-   **Latency Measurement (batch=1):** `hellaswag` (100 prompts, 20 tokens), `mmlu` (100 prompts, 50 tokens), `ifeval` (30 prompts, 150 tokens)
+-   **Throughput Measurement (batch=8):** Same tasks with increased batch size for throughput optimization
+
+Each carbon profiling experiment was run three times with fixed seeds (`42`, `123`, `456`) to ensure statistical reliability. An idle power calibration was performed before experiments to enable net energy calculation. The results were aggregated using mean ± standard deviation, with outlier detection (>1.0 J/token) to ensure data quality.
