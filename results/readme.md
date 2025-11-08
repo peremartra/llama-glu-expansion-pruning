@@ -211,6 +211,26 @@ Despite different absolute magnitudes, the **exponential degradation pattern is 
 
 ---
 
+## Environmental and Performance Metrics (CARBON BENCHMARK)
+
+Our investigation extended beyond traditional performance metrics to measure the **environmental efficiency** of structured GLU pruning. These results, evaluated on an **NVIDIA L4 GPU** on Google Colab, confirm reductions in energy consumption per generated token.
+
+The core metric analyzed is **Joules per Token (J/tok)**, representing energy efficiency.
+
+| Model | Pruning (%) | Model Size (GB) | Avg Joules/Token (J/tok) | % Reduction from Baseline |
+| :--- | :--- | :--- | :--- | :--- |
+| Llama-3.2-3B (Baseline) | 0% | 5.98 | 0.3616 | - |
+| Llama-3.2-3B (Best Eff.) | 60% | 3.62 | **0.2903** | **~19.6%** |
+| Llama-3.2-1B (Baseline) | 0% | 2.30 | 0.1682 | - |
+| Llama-3.2-1B (Best Eff.) | 60% | 1.40 | **0.1352** | **~19.6%** |
+
+**Key Findings:**
+* **Peak Efficiency:** Both Llama-3.2-3B and Llama-3.2-1B achieved their maximum energy efficiency at **60% structured pruning**, showing a consistent $\mathbf{\sim 19.6\%}$ reduction in Joules/Token.
+* **Performance Trade-off:** While throughput largely remained stable or increased, a noticeable penalty was observed in **Time-to-First-Token (TTFT)**, increasing significantly at higher pruning levels.
+* **Star Models for Efficiency:** The optimized balance points were found at **10% pruning for Llama-3.2-3B** and **40% pruning for Llama-3.2-1B**, which retain high task performance while offering substantial size and efficiency benefits.
+
+A detailed breakdown of all benchmarks and raw data can be found in the `results/` directory, and the analysis notebook is available in `notebooks/03_Carbon_Metrics_Analysis.ipynb`.
+
 ## Files in this Directory
 
 - **`llama_3.2_1b_base_results.csv` & `llama_3.2_3b_base_results.csv`**: Complete results table with all benchmarks and metrics across different expansion ratios
