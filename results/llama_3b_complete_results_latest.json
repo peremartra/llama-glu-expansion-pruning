@@ -67,7 +67,7 @@
     "baseline": {
       "name": "Llama-3.2-3B",
       "pruning_pct": 0,
-      "expansion_rate": 300,
+      "expansion_rate": 2.67,
       "is_star": false,
       "hf_repo": "meta-llama/Llama-3.2-3B",
       "results": {
