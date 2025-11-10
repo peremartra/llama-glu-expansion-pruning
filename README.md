@@ -62,33 +62,52 @@ Evaluation of structured width pruning in GLU-MLP layers using expansion ratio m
 Before conducting the main pruning experiments, we empirically validated three neuron importance metrics for GLU architectures:
 
 - **MAW (Maximum Absolute Weight)** - Selected method ✅
-- **VOW (Variance of Weights)** - Rejected due to catastrophic performance
-- **PON (Product of Norms)** - Rejected due to catastrophic performance
+- **L2 Norm** - Rejected due to high degradation
+- **Random** - Rejected due to catastrophic degradation
 
-**Key Finding:** At just 10% pruning on Llama-3.2-1B, VOW and PON caused perplexity increases of 9,000%+ on Lambada, while MAW showed acceptable 50% degradation. This validates our architectural understanding that GLU's gating mechanism requires magnitude-aware importance metrics.
+**Key Finding:** At just 10% pruning on Llama-3.2-1B, the `L2` and `Random` methods caused perplexity increases of over 500% on Lambada, while `MAW` showed acceptable degradation. This validates our architectural understanding that GLU's gating mechanism requires magnitude-aware importance metrics.
 
 See [Notebook 00 Neuron Selection Method](notebooks/00_Neuron_Selection_Method_Comparison.ipynb) for full experimental details.
 
 ---
-## Results Highlights - Llama-3.2-1B
+## Notebooks
 
-### Key Findings
+The `/notebooks` directory contains all the Jupyter notebooks used to run the experiments and generate the analyses for this project. For a detailed breakdown of each notebook's purpose, methodology, and runtime, please see the dedicated readme file.
 
-**1. Instruction Following Improves (+75%)**
-- IFEval performance peaks at 30% pruning with +75% improvement over baseline
-- Remains elevated (+46%) even at optimal 140% Expansion (40% pruning) configuration
-- Mechanism unclear; may relate to reduced capacity for elaboration
+- 📓 **[View Notebook Descriptions →](notebooks/README.md)**
 
-**2. Validates 140% Expansion (40% Pruning) as Effective configuration**
-- Maintains 87% of MMLU performance (-13.6%)
-- Improves instruction following by +46.5% (IFEval)
-- Improves multi-step reasoning by +26.1% (MUSR)
-- Improves truthfulness metrics by +13.9% (see caveats in detailed [results](results/))
+---
+## Key Findings
 
-**3. Clear Performance Dichotomy**
-- **Improves:** IFEval (+75%), MUSR (+26%), TruthfulQA (+24%)
-- **Degrades:** GSM8K (-69%), Perplexity (+2,691%), HellaSwag (-41%)
-- Reveals trade-off: pruning sacrifices computational fluency but improves performance on literal instruction-following tasks
+This research reveals two core trade-offs introduced by structured width pruning of GLU-MLP layers.
+
+### 1. Capability Trade-offs (Accuracy & Reasoning)
+
+Pruning creates a clear dichotomy between two classes of model capabilities:
+
+- **"Fragile" Capabilities (Degrade):** These are tasks that rely heavily on distributed knowledge stored in the MLP layers.
+  - **Degradation:** Performance on benchmarks like **MMLU** (knowledge), **GSM8K** (math reasoning), and perplexity metrics (**WikiText**, **Lambada**) consistently degrades as pruning intensity increases.
+  - **Most Fragile Task:** `gsm8k` is catastrophically affected, with performance collapsing even at moderate pruning levels.
+
+- **"Robust" Capabilities (Improve):** These are tasks that appear to rely more on core algorithmic reasoning pathways that are refined, not eroded, by pruning.
+  - **Improvement:** Performance on benchmarks like **IFEval** (instruction following), **MUSR** (multi-step reasoning), and **TruthfulQA** (truthfulness) is either stable or *improves significantly* with pruning.
+  - **Peak Improvement:** `IFEval` performance on the 1B model peaks at a **+75% improvement** over baseline at 30% pruning.
+
+This trade-off suggests that pruning acts as a form of regularization, sacrificing rote knowledge for enhanced performance on tasks requiring literal instruction adherence.
+
+### 2. The Deployment Dilemma (Performance & Energy)
+
+Pruning introduces a second trade-off related to inference performance, creating a dilemma for deployment:
+
+- **The Win (Batch Throughput & Efficiency):** For offline or batch processing, pruning is highly beneficial.
+  - **Throughput:** Batch throughput (tokens/sec) **improves** with more aggressive pruning, as the smaller model size allows for faster processing.
+  - **Energy:** Energy efficiency (Joules/token) **improves significantly**, with up to a **~20% reduction** in energy consumption at high pruning levels.
+
+- **The Cost (Interactive Latency):** For interactive, user-facing applications, pruning has a severe negative impact.
+  - **Latency:** Time To First Token (TTFT) **worsens dramatically** with pruning, increasing by **+50-90%** at higher pruning levels.
+  - **The Bottleneck:** This latency cost is isolated to the **prefill phase**. The token generation speed *after* the first token remains almost completely unaffected.
+
+This dilemma means that the optimal pruning level depends entirely on the deployment scenario. Models intended for batch processing can be aggressively pruned to save costs, while models for interactive chatbots must remain largely unpruned to ensure a responsive user experience.
 
 📊 **[View complete results and analysis →](results/)**
 ---
@@ -129,5 +148,9 @@ Unexpected gains: IFEval improves substantially, MUSR shows consistent gains (+2
 - [x] **Llama-3.2-3B (Base)** - Completed ✅
    - 7 pruning levels (0-60%)
    - 13 benchmarks evaluated
-- [ ] Llama-3.2-1B-Instruct
-- [ ] Llama-3.2-3B-Instruct
+- [x] **Llama-3.2-1B-Instruct** - Completed ✅
+  - 4 pruning levels (0-60%)
+  - 7 benchmarks evaluated
+- [x] **Llama-3.2-3B-Instruct** - Completed ✅
+   - 4 pruning levels (0-60%)
+   - 7 benchmarks evaluated
