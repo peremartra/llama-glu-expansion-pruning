@@ -23,11 +23,11 @@ These notebooks establish the baseline architectural details and validate the ch
 **File:** `00_Neuron_Selection_Method_Comparison.ipynb`
 **Purpose:** To validate the choice of "Maximum Absolute Weight" (MAW) as the optimal neuron selection method for pruning GLU layers in Llama-style models.
 **What it does:**
-- Compares three different neuron selection methods: `MAW`, `L2`, and `Random`.
-- Applies each method to prune the Llama-3.2-1B model at a fixed 40% pruning level.
-- Evaluates the resulting models on a small, representative set of benchmarks (`wikitext`, `mmlu`, `gsm8k`).
+- Compares three different neuron selection methods: `MAW`, `VOW` (Variance of Weights), and `PON` (Product of Norms).
+- Applies each method to prune the Llama-3.2-1B model at a fixed 10% pruning level.
+- Evaluates the resulting models on a small, representative set of benchmarks (`wikitext`, `boolq`, `lambada_openai`).
 - Measures the performance degradation of each method relative to the baseline model.
-**Conclusion:** The results from this notebook confirm that the MAW method consistently outperforms L2 and Random selection, leading to the least performance degradation. This provides the empirical justification for using MAW in all subsequent experiments.
+**Conclusion:** The results from this notebook confirm that the MAW method consistently outperforms VOW and PON selection, leading to the least performance degradation. This provides the empirical justification for using MAW in all subsequent experiments.
 **Runtime:** ~30 minutes on a Google Colab T4 GPU.
 
 ---
@@ -40,8 +40,8 @@ These notebooks run comprehensive benchmark suites to evaluate the impact of pru
 **File:** `02_Evaluate_1B.ipynb`
 **Purpose:** To perform a comprehensive capability evaluation of the base Llama-3.2-1B model across multiple pruning levels.
 **What it does:**
-- Evaluates the baseline Llama-3.2-1B model and all its pruned versions (10% to 60%).
-- Runs a broad suite of 13 general-purpose benchmarks (`BENCHMARKS_BASE`), including tasks for reasoning, knowledge, and language perplexity like `arc_challenge`, `mmlu`, `gsm8k`, and `wikitext`.
+- Evaluates the baseline Llama-3.2-1B model and all its pruned versions (10%, 20%, 30%, 40%, 50%, 60%).
+- Runs a broad suite of 13 general-purpose benchmarks (`BENCHMARKS_BASE`), including tasks for reasoning, knowledge, and language perplexity like `arc_challenge`, `mmlu`, `gsm8k`, `wikitext`, `ifeval`, and `musr`.
 - Uses the same robust evaluation process as the other "02" notebooks, saving results to `results/llama_1b_results_latest.csv` and a complete JSON file.
 - Analyzes the trade-offs between performance degradation and pruning intensity to identify the optimal configuration (the "star model").
 **Conclusion:** This is the core evaluation notebook for the base 1B model, providing the primary data on how pruning affects its general knowledge and reasoning abilities, as opposed to specific instruction-following skills.
@@ -51,8 +51,8 @@ These notebooks run comprehensive benchmark suites to evaluate the impact of pru
 **File:** `02_Evaluate_1B_Instruct.ipynb`
 **Purpose:** To evaluate the impact of GLU pruning on the instruction-following and reasoning capabilities of the Llama-3.2-1B-Instruct model.
 **What it does:**
-- Evaluates the baseline Llama-3.2-1B-Instruct model and several pruned versions (e.g., 10%, 40%, 60%).
-- Runs a curated suite of 7 benchmarks (`BENCHMARKS_INSTRUCT`) tailored for instruction-following, including `ifeval`, `musr`, `mmlu`, and `gsm8k`.
+- Evaluates the baseline Llama-3.2-1B-Instruct model and pruned versions (10%, 40%, 60%).
+- Runs a curated suite of 7 benchmarks (`BENCHMARKS_INSTRUCT`) tailored for instruction-following, including `ifeval`, `musr`, `mmlu`, `gsm8k`, `lambada_openai`, `truthfulqa_mc1`, and `truthfulqa_mc2`.
 - Uses the `run_robust_evaluation` utility, which leverages `lm-evaluation-harness` with multiple runs for statistical significance.
 - Saves detailed evaluation results to `results/llama_1b_I_results_latest.csv` and `results/llama_1b_I_complete_results_latest.json`.
 - Includes a decision matrix to determine which pruned models are candidates for uploading to Hugging Face Hub based on performance trade-offs.
