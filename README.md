@@ -15,9 +15,8 @@ Evaluation of structured width pruning in GLU-MLP layers using expansion ratio m
 
 ### Instruct Models
 - `Llama-3.2-1B-Instruct`
-- `Llama-3.2-3B-Instruct`
 
-**Total:** 4 models
+**Total:** 3 model families
 
 ---
 
@@ -62,10 +61,10 @@ Evaluation of structured width pruning in GLU-MLP layers using expansion ratio m
 Before conducting the main pruning experiments, we empirically validated three neuron importance metrics for GLU architectures:
 
 - **MAW (Maximum Absolute Weight)** - Selected method ✅
-- **L2 Norm** - Rejected due to high degradation
-- **Random** - Rejected due to catastrophic degradation
+- **VOW (Variance of Weights)** - Rejected due to high degradation
+- **PON (Product of Norms)** - Rejected due to catastrophic degradation
 
-**Key Finding:** At just 10% pruning on Llama-3.2-1B, the `L2` and `Random` methods caused perplexity increases of over 500% on Lambada, while `MAW` showed acceptable degradation. This validates our architectural understanding that GLU's gating mechanism requires magnitude-aware importance metrics.
+**Key Finding:** At just 10% pruning on Llama-3.2-1B, the `VOW` and `PON` methods caused perplexity increases of over 500% on Lambada, while `MAW` showed acceptable degradation. This validates our architectural understanding that GLU's gating mechanism requires magnitude-aware importance metrics.
 
 See [Notebook 00 Neuron Selection Method](notebooks/00_Neuron_Selection_Method_Comparison.ipynb) for full experimental details.
 
@@ -119,10 +118,10 @@ This dilemma means that the optimal pruning level depends entirely on the deploy
 
 ### Estimated Time (Colab)
 - **Per model:** ~4.5-5 hours
-- **Total (4 models):** ~18-20 hours
+- **Total (3 models):** ~13-15 hours
 
 ### Resource Requirements
-- GPU: T4/V100 level (Colab)
+- GPU: L4/T4 level (Colab)
 - RAM: ~15GB
 
 ---
@@ -142,15 +141,12 @@ Unexpected gains: IFEval improves substantially, MUSR shows consistent gains (+2
 ## Progress Tracker
 
 - [x] **Llama-3.2-1B (Base)** - Completed ✅ 
-  - 7 pruning levels (0-60%)
+  - 7 pruning levels (0%, 10%, 20%, 30%, 40%, 50%, 60%)
   - 13 benchmarks evaluated
   - [See detailed results](results/)
 - [x] **Llama-3.2-3B (Base)** - Completed ✅
-   - 7 pruning levels (0-60%)
+   - 7 pruning levels (0%, 10%, 20%, 30%, 40%, 50%, 60%)
    - 13 benchmarks evaluated
 - [x] **Llama-3.2-1B-Instruct** - Completed ✅
-  - 4 pruning levels (0-60%)
+  - 4 pruning levels (0%, 10%, 40%, 60%)
   - 7 benchmarks evaluated
-- [x] **Llama-3.2-3B-Instruct** - Completed ✅
-   - 4 pruning levels (0-60%)
-   - 7 benchmarks evaluated
