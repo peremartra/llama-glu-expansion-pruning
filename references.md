@@ -1,71 +1,93 @@
 # References
 
-## Learning both Weights and Connections for Efficient Neural Networks
+## Learning both Weights and Connections for Efficient Neural Networks (1506.02626v3.pdf)
 
-This paper introduces a method to reduce the storage and computation required by neural networks without affecting their accuracy. The key idea is to learn which connections are important and prune the rest.
+This paper introduces a method to reduce the storage and computation required by neural networks by pruning redundant connections. The method consists of a three-step process: training the network to identify important connections, pruning unimportant connections, and then retraining the network to fine-tune the weights of the remaining connections. This approach is highly relevant to our project as it provides a foundational methodology for network pruning, which we are applying to the GLU-MLP layers of Llama-3.2 models. The paper's focus on reducing model size without sacrificing accuracy aligns with our goal of understanding the trade-offs between model size and performance.
 
-The proposed method consists of a three-step process:
-1.  **Train Connectivity:** First, a conventional network is trained to learn which connections are important.
-2.  **Prune Connections:** Connections with weights below a certain threshold are removed.
-3.  **Retrain:** The network is retrained to fine-tune the weights of the remaining connections.
+## LLM-Pruner: On the Structural Pruning of Large Language Models (2305.11627v3.pdf)
 
-This method was evaluated on AlexNet and VGG-16 models. For AlexNet, the number of parameters was reduced by a factor of 9x (from 61 million to 6.7 million) with no loss of accuracy. For VGG-16, the parameters were reduced by 13x (from 138 million to 10.3 million) with no loss of accuracy.
+This paper proposes LLM-Pruner, a method for structural pruning of large language models (LLMs). LLM-Pruner identifies and removes non-critical coupled structures within the model, aiming to preserve the model's functionality. The authors validate their method on LLaMA, Vicuna, and ChatGLM, demonstrating that the compressed models retain satisfactory performance in zero-shot classification and generation. This paper is highly relevant to our project as it directly addresses the structural pruning of LLMs, which is the core of our research. The focus on task-agnostic compression and the use of gradient information to identify prunable structures are particularly pertinent to our work on pruning GLU-MLP layers in Llama-3.2.
 
-This paper is relevant to our project as it provides a foundational understanding of network pruning and demonstrates its effectiveness in reducing model size while maintaining performance.
+## A Simple and Effective Pruning Approach for Large Language Models (2306.11695v3.pdf)
 
-## LLM-Pruner: On the Structural Pruning of Large Language Models
+This paper introduces Wanda (Pruning by Weights and activations), a pruning method for LLMs that induces sparsity in pretrained LLMs. Wanda prunes weights with the smallest magnitudes multiplied by the corresponding input activations, on a per-output basis. A key feature of Wanda is that it does not require any retraining or weight update. The authors show that Wanda significantly outperforms magnitude pruning and is competitive with methods that involve intensive weight updates. This paper is highly relevant to our project as it presents a simple yet effective pruning method that we could potentially adapt or compare against. The concept of incorporating activations into the pruning metric is a key insight that could be applied to our study of GLU-MLP layers.
 
-This paper proposes a task-agnostic structural pruning method for large language models (LLMs) called LLM-Pruner. The goal is to compress LLMs while preserving their multi-task solving and language generation abilities, with minimal reliance on the original training data.
+## A Survey on Model Compression for Large Language Models (2308.07633v4.pdf)
 
-The method consists of three stages:
-1.  **Discovery Stage:** Identifies groups of interdependent structures within the LLM.
-2.  **Estimation Stage:** Estimates the contribution of each group to the model's performance and decides which groups to prune.
-3.  **Recover Stage:** Uses low-rank approximation (LoRA) for fast post-training to alleviate performance degradation.
+This paper provides a comprehensive survey of model compression techniques for LLMs. It covers methods like quantization, pruning, and knowledge distillation, highlighting recent advancements. The paper also discusses benchmarking strategies and evaluation metrics for assessing compressed LLMs. This survey is highly relevant to our project as it provides a broad overview of the field of model compression for LLMs, which is the context of our research. It will help us to position our work within the existing literature and to understand the different approaches that have been proposed for compressing LLMs.
 
-LLM-Pruner was validated on LLaMA, Vicuna, and ChatGLM. The results show that with a 20% parameter reduction, the pruned model maintains 94.97% of the original model's performance.
+## SliceGPT: Compress Large Language Models by Deleting Rows and Columns (2401.15024v2.pdf)
 
-This paper is highly relevant to our project as it focuses on structured pruning of LLMs, which is the core of our research. The task-agnostic approach and the efficient recovery method using LoRA are particularly interesting.
+This paper introduces SliceGPT, a post-training sparsification scheme that replaces each weight matrix with a smaller, dense matrix, effectively reducing the embedding dimension of the network. SliceGPT can remove up to 25% of the model parameters for LLAMA-2 70B, OPT 66B, and Phi-2 models while maintaining high performance. The authors introduce the concept of "computational invariance" in transformer networks, which enables their method. This paper is highly relevant to our project as it presents a novel approach to structured pruning that goes beyond setting weights to zero and instead removes entire rows and columns. This could be a very effective way to prune the GLU-MLP layers in our Llama-3.2 models, and the concept of computational invariance is a powerful idea that we might be able to leverage.
 
-## A Simple and Effective Pruning Approach for Large Language Models
+## Shortened LLaMA: Depth Pruning for Large Language Models with Comparison of Retraining Methods (2402.02834v2.pdf)
 
-This paper introduces Wanda (Pruning by Weights and activations), a simple and effective pruning method for large language models (LLMs). The method is designed to induce sparsity in pretrained LLMs without requiring retraining or weight updates.
+This paper explores depth pruning for Large Language Models (LLMs), a method that removes entire layers or blocks, contrasting it with width pruning which reduces the size of projection weight matrices. The authors demonstrate that simple depth pruning can effectively compress LLMs and achieve comparable or superior performance to width pruning, especially under memory-constrained conditions with limited batch sizes. The study also emphasizes the importance of continued pretraining for quality recovery in heavily pruned models. This is highly relevant to our project as it investigates a different structural pruning approach (depth pruning vs. width pruning) and provides insights into retraining strategies, which are crucial for maintaining performance after pruning GLU-MLP layers in Llama-3.2 models.
 
-Wanda prunes weights with the smallest magnitudes multiplied by the corresponding input activations, on a per-output basis. The key idea is that the importance of a weight is determined not only by its magnitude but also by the magnitude of its corresponding input activation.
+## GPTailor: Large Language Model Pruning Through Layer Cutting and Stitching (2412.15921v2.pdf)
 
-The method was evaluated on LLaMA and LLaMA-2 models and significantly outperforms magnitude pruning. It also performs competitively against more complex methods that involve weight updates.
+This paper introduces GPTailor, a novel layer pruning method for Large Language Models (LLMs) that aims to reduce model size and computational cost while maintaining performance. GPTailor employs a "layer cutting and stitching" approach, which involves identifying and removing redundant layers and then re-connecting the remaining layers to optimize the model's architecture. This method is relevant to our project as it offers another perspective on structural pruning, specifically focusing on layer-level modifications. Understanding how layer cutting and stitching impacts model capabilities can inform our approach to pruning GLU-MLP layers.
 
-This paper is relevant to our project as it presents a novel pruning metric that considers both weights and activations. This could be an interesting alternative to the methods we are currently using.
+## Instruction-Following Pruning for Large Language Models (2501.02086v1.pdf)
 
-## A Survey on Model Compression for Large Language Models
+This paper proposes Instruction-Following Pruning (IFPRUNING), a dynamic structured pruning method for LLMs. Unlike static pruning, IFPRUNING generates input-specific pruning masks based on user instructions, allowing the model to dynamically select the most relevant parameters for a given task. This approach focuses on pruning the feed-forward neural network layers. This paper is highly relevant to our project because it introduces a dynamic and instruction-aware pruning strategy, which could potentially lead to more adaptive and efficient pruning of GLU-MLP layers in Llama-3.2 models. The idea of input-dependent pruning masks is a novel concept that could enhance the performance of pruned models on diverse tasks.
 
-This paper provides a comprehensive survey of model compression techniques for large language models (LLMs). The authors cover a wide range of methods, including:
+## Efficient LLMs with AMP: Attention Heads and MLP Pruning (2504.21174v1.pdf)
 
-*   **Quantization:** Reducing the number of bits used to represent model parameters.
-*   **Pruning:** Removing redundant parameters from the model. This is further divided into unstructured, structured, and semi-structured pruning.
-*   **Knowledge Distillation:** Training a smaller model to mimic the behavior of a larger model.
-*   **Low-Rank Factorization:** Decomposing large weight matrices into smaller matrices.
+This paper introduces AMP (Attention Heads and MLP Pruning), a novel structured pruning method for Large Language Models (LLMs). AMP efficiently compresses LLMs by removing less critical structures within Multi-Head Attention (MHA) and Multilayer Perceptron (MLP) layers. The method assesses structural importance by projecting input data onto weights, overcoming limitations of existing techniques that often lack flexibility or efficiency. AMP is shown to surpass state-of-the-art techniques in commonsense reasoning tasks, achieving significant pruning ratios with minimal impact on zero-shot performance and improving inference speeds. This paper is highly relevant to our project as it directly addresses the pruning of MLP layers, which is a core focus of our research on GLU-MLP layers in Llama-3.2 models. The approach of using activation magnitudes to determine importance and its applicability across different LLM families are particularly valuable insights.
 
-The paper also discusses the various metrics and benchmarks used to evaluate the performance of compressed LLMs.
+## WHEN FEWER LAYERS BREAK MORE CHAINS: LAYER PRUNING HARMS TEST-TIME SCALING IN LLMS (2510.22228v1.pdf)
 
-This survey is highly relevant to our project as it provides a broad overview of the field of model compression, with a specific focus on pruning. It helps to contextualize our work and provides a valuable resource for understanding the different approaches to model compression.
+This paper investigates the impact of layer pruning on long-chain reasoning in Large Language Models (LLMs), a crucial capability often overlooked in prior evaluations that focused on general knowledge tasks. The authors demonstrate that pruning even a few layers can severely impair test-time scaling, leading to a drastic collapse in performance on long reasoning benchmarks, even when performance on knowledge-intensive and shallow reasoning tasks remains stable. They also find that standard supervised fine-tuning methods fail to recover this degradation. Through in-depth analysis, the paper identifies mechanisms underlying this fragility, highlighting the fundamental risks of applying layer pruning to reasoning-intensive LLMs. This paper is highly relevant to our project as it provides a critical perspective on the potential negative impacts of pruning, especially on complex reasoning tasks. It emphasizes the need for careful evaluation beyond simple accuracy metrics and suggests that our pruning strategies for GLU-MLP layers should consider the preservation of reasoning capabilities.
 
-## SliceGPT: Compress Large Language Models by Deleting Rows and Columns
+## NIRVANA Structured pruning reimagined for large language models compression (Ai et al. - 2025 - NIRVANA Structured pruning reimagined for large language models compression.pdf)
 
-This paper introduces SliceGPT, a post-training sparsification scheme that compresses large language models (LLMs) by deleting entire rows and columns from weight matrices. This is a form of structured pruning that reduces the embedding dimension of the network.
+This paper introduces NIRVANA, a structured pruning method for large language models (LLMs) that reimagines compression by focusing on the interplay between model architecture and pruning granularity. It proposes a novel approach to identify and remove redundant structures within LLMs, aiming to achieve higher compression rates with minimal performance degradation. The paper emphasizes the importance of structured pruning for hardware efficiency and explores new metrics for identifying critical components. This is highly relevant to our project as it directly addresses structured pruning in LLMs and could offer new insights into how to effectively prune GLU-MLP layers.
 
-The key idea behind SliceGPT is the concept of "computational invariance" in transformer networks. The authors show that it is possible to apply orthogonal transformations to the weight matrices of a transformer without changing the model's output. This allows them to project the signal between blocks onto its principal components and then remove the least important components.
+## Pruning Weights but Not Truth Safeguarding Truthfulness While Pruning LLMs (Fu et al. - Pruning Weights but Not Truth Safeguarding Truthfulness While Pruning LLMs.pdf)
 
-The method was evaluated on LLaMA-2, OPT, and Phi-2 models. The results show that SliceGPT can remove up to 25% of the model parameters while maintaining high performance. The sliced models also run faster and on fewer GPUs.
+This paper investigates the critical problem of safeguarding truthfulness while pruning Large Language Models (LLMs). It highlights that traditional pruning methods, while effective in reducing model size, can inadvertently compromise the truthfulness and factual accuracy of LLMs. The authors propose novel pruning criteria and techniques that prioritize the preservation of knowledge-intensive components, ensuring that the pruned models maintain high levels of truthfulness. This paper is highly relevant to our project as it introduces an important consideration for pruning LLMs: maintaining model integrity beyond just performance metrics. When pruning GLU-MLP layers, ensuring that the model's knowledge and truthfulness are not degraded is a crucial aspect that we should consider.
 
-This paper is highly relevant to our project as it deals with structured pruning of LLMs. The idea of computational invariance and the method of slicing entire rows and columns are very interesting and could be applicable to our work on GLU-MLP layers.
+## Can pruning make Large Language Models more efficient (Gholami and Omar - 2023 - Can pruning make Large Language Models more efficient.pdf)
 
-## Shortened LLaMA: Depth Pruning for Large Language Models with Comparison of Retraining Methods
+This paper provides a comprehensive analysis of whether pruning can genuinely make Large Language Models (LLMs) more efficient. It explores various pruning techniques and their impact on computational cost, memory footprint, and inference speed. The authors discuss the trade-offs between sparsity, hardware compatibility, and performance, offering insights into the practical challenges and benefits of LLM pruning. This paper is highly relevant to our project as it directly addresses the core question of efficiency in LLM pruning, which is central to our research on GLU-MLP layers. It will help us to understand the practical implications and potential gains of our pruning approach.
 
-This paper investigates depth pruning as a method for compressing large language models (LLMs). The authors show that simple depth pruning, which involves removing entire layers or blocks, can be an effective way to compress LLMs, achieving comparable or even superior performance to width pruning methods.
+## Dependency-Aware Semi-Structured Sparsity of GLU Variants in Large Language Models (Guo et al. - 2024 - Dependency-Aware Semi-Structured Sparsity of GLU Variants in Large Language Models.pdf)
 
-The paper makes the following key contributions:
-*   It demonstrates that depth pruning can significantly boost inference speeds, especially in memory-constrained environments where width pruning is less effective.
-*   It provides a detailed comparison of retraining methods for pruned models, showing that continued pretraining on a large corpus is more effective than LoRA-based tuning, especially at high pruning ratios.
-*   It introduces a simple yet effective method for depth pruning of LLMs by exploring various design factors.
+This paper proposes a dependency-aware semi-structured sparsity method specifically for GLU variants in Large Language Models (LLMs). It recognizes that dependencies between different components of GLU layers can impact pruning effectiveness. The authors introduce a technique that identifies and leverages these dependencies to achieve more efficient and less performance-degrading pruning. This paper is *extremely* relevant to our project as it directly focuses on the structured sparsity of GLU variants, which is precisely what we are investigating in Llama-3.2 models. The concept of dependency-aware pruning is a key insight that could significantly enhance our approach to pruning GLU-MLP layers.
 
-This paper is highly relevant to our project as it provides a direct comparison between depth and width pruning, which is a central theme of our research. The findings on the effectiveness of different retraining methods are also very valuable.
+## Instruction-Following Pruning for Large Language Models (Hou et al. - 2025 - Instruction-Following Pruning for Large Language Models.pdf)
+
+This paper introduces Instruction-Following Pruning, a method designed to improve the efficiency of Large Language Models (LLMs) by tailoring pruning to specific instructions. It proposes a dynamic pruning strategy where the model's structure is adapted based on the input instruction, allowing for more efficient execution of instruction-following tasks. This paper is relevant to our project as it explores dynamic pruning based on task-specific requirements, which could be an advanced consideration for our GLU-MLP pruning.
+
+## SliM-LLM Salience-Driven Mixed-Precision Quantization for Large Language Models (Huang et al. - 2025 - SliM-LLM Salience-Driven Mixed-Precision Quantization for Large Language Models.pdf)
+
+This paper presents SliM-LLM, a salience-driven mixed-precision quantization method for Large Language Models (LLMs). It focuses on quantizing LLMs to lower bit-widths while preserving performance by adaptively assigning different precision levels to various parts of the model based on their "salience" or importance. This approach aims to optimize both memory and computational efficiency. While our project focuses on pruning, this paper is relevant as it addresses model compression for LLMs and highlights the importance of identifying salient parts of the model, a concept that could be transferable to pruning criteria for GLU-MLP layers.
+
+## The Truth Is In There: Improving Reasoning in Language Models with Layer-Selective Rank Reduction (ICLR-2024-the-truth-is-in-there-improving-reasoning-in-language-models-with-layer-selective-rank-reduction-Paper-Conference.pdf)
+
+This paper, titled "The Truth Is In There: Improving Reasoning in Language Models with Layer-Selective Rank Reduction," explores a method to enhance reasoning capabilities in language models by applying layer-selective rank reduction. It suggests that by selectively reducing the rank of certain layers, it's possible to improve the model's ability to perform complex reasoning tasks. This is relevant to our project as it touches upon modifying specific layers (similar to pruning) to impact model capabilities, particularly reasoning, which is one of the benchmarks we are interested in.
+
+## Truth Neurons (Li et al. - 2025 - Truth Neurons.pdf)
+
+This paper introduces the concept of "Truth Neurons" in Large Language Models (LLMs), identifying specific neurons that are critical for maintaining the factual accuracy and truthfulness of the model's outputs. The authors propose methods to identify, preserve, and potentially enhance these neurons during model compression or fine-tuning. This paper is highly relevant to our project as it provides a fine-grained understanding of which components (neurons) are crucial for specific model behaviors (truthfulness). This insight could be directly applied to our pruning strategy for GLU-MLP layers, guiding us to preserve or prioritize "truth neurons" during compression.
+
+## GLU Variants Improve Transformer (Shazeer - 2020 - GLU Variants Improve Transformer.pdf)
+
+This foundational paper, "GLU Variants Improve Transformer," introduces and analyzes various Gated Linear Unit (GLU) variants and demonstrates their effectiveness in improving the performance of Transformer models. It details the architectural changes and empirical benefits of using GLU layers, which have since become a standard component in many LLMs. This paper is *critically* relevant to our project as our research specifically focuses on pruning the GLU-MLP layers of Llama-3.2 models. Understanding the original motivation, design, and impact of GLU variants is essential for our work.
+
+## Assessing the Brittleness of Safety Alignment via Pruning and Low-Rank Modifications (Wei et al. - 2024 - Assessing the Brittleness of Safety Alignment via Pruning and Low-Rank Modifications.pdf)
+
+This paper assesses the brittleness of safety alignment in Large Language Models (LLMs) when subjected to pruning and low-rank modifications. It investigates how model compression techniques can inadvertently compromise the safety alignment properties of LLMs, leading to unintended or harmful behaviors. The authors propose methods to evaluate and mitigate this brittleness, ensuring that compressed models remain safe and aligned with ethical guidelines. This paper is relevant to our project as it highlights another critical aspect of model integrity beyond performance and truthfulness: safety alignment. Our pruning of GLU-MLP layers should ideally consider the impact on safety alignment.
+
+## Sheared LLaMA Accelerating Language Model Pre-training via Structured Pruning (Xia et al. - 2024 - Sheared LLaMA Accelerating Language Model Pre-training via Structured Pruning.pdf)
+
+This paper introduces "Sheared LLaMA," a method for accelerating Large Language Model (LLM) pre-training through structured pruning. It proposes a technique to reduce the computational cost and time required for pre-training by strategically removing parts of the model's architecture. The paper focuses on structured pruning to achieve significant speedups while maintaining model performance. This paper is highly relevant to our project as it directly addresses structured pruning in LLMs for efficiency gains, which is the core objective of our research on GLU-MLP layers.
+
+## GPTailor: Large Language Model Pruning Through Layer Cutting and Stitching (2412.15921v2.pdf)
+
+This paper introduces GPTailor, a novel layer pruning method for Large Language Models (LLMs) that aims to reduce model size and computational cost while maintaining performance. GPTailor employs a "layer cutting and stitching" approach, which involves identifying and removing redundant layers and then re-connecting the remaining layers to optimize the model's architecture. This method is relevant to our project as it offers another perspective on structural pruning, specifically focusing on layer-level modifications. Understanding how layer cutting and stitching impacts model capabilities can inform our approach to pruning GLU-MLP layers.
+
+## Instruction-Following Pruning for Large Language Models (2501.02086v1.pdf)
+
+This paper proposes Instruction-Following Pruning (IFPRUNING), a dynamic structured pruning method for LLMs. Unlike static pruning, IFPRUNING generates input-specific pruning masks based on user instructions, allowing the model to dynamically select the most relevant parameters for a given task. This approach focuses on pruning the feed-forward neural network layers. This paper is highly relevant to our project because it introduces a dynamic and instruction-aware pruning strategy, which could potentially lead to more adaptive and efficient pruning of GLU-MLP layers in Llama-3.2 models. The idea of input-dependent pruning masks is a novel concept that could enhance the performance of pruned models on diverse tasks.
