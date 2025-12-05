@@ -305,7 +305,7 @@ BENCHMARKS_CARBON = [
         "max_new_tokens": 20,
         "dataset": "hellaswag",
         "subset": "validation",  # ← Importante
-        "description": "Short responses (Latency, TTFT, bsz=1)",
+        "description": "Short responses (Latency, ttlt, bsz=1)",
         "batch_size": 1
     },
     {
@@ -314,7 +314,7 @@ BENCHMARKS_CARBON = [
         "max_new_tokens": 50,
         "dataset": "mmlu",
         "subset": "test",
-        "description": "Knowledge QA (Latency, TTFT, bsz=1)",
+        "description": "Knowledge QA (Latency, ttlt, bsz=1)",
         "batch_size": 1
     },
     {
@@ -323,7 +323,7 @@ BENCHMARKS_CARBON = [
         "max_new_tokens": 150, 
         "dataset": "IFEval",
         "subset": "train", 
-        "description": "Instruction (Latency, TTFT, bsz=1)", 
+        "description": "Instruction (Latency, ttlt, bsz=1)", 
         "batch_size": 1
     },
     {
@@ -712,8 +712,8 @@ def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, ba
     Measure inference performance with warm-up period.
     
     Handles two modes:
-    1. batch_size = 1: Measures TTFT (Time To First Token) and latency.
-    2. batch_size > 1: Measures batched throughput. TTFT metrics will be None.
+    1. batch_size = 1: Measures TTLT (Time To First Token) and latency.
+    2. batch_size > 1: Measures batched throughput. TTLT metrics will be None.
     
     The first 5 prompts/batches are used for GPU warm-up and excluded from metrics.
     """
@@ -730,7 +730,7 @@ def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, ba
     WARMUP_STEPS = min(5, max(1, int(total_iterations * 0.2)))
     print(f"   Using {WARMUP_STEPS} warmup iterations (out of {total_iterations} total)")
     
-    ttft_times_ms = []
+    ttlt_times_ms = []
     total_new_tokens = 0
     total_inference_time_sec = 0
     
@@ -739,9 +739,9 @@ def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, ba
         for i in range(0, len(data), size):
             yield data[i:i + size]
 
-    # --- LÓGICA PARA BATCH SIZE = 1 (LATENCIA / TTFT) ---
+    # --- LÓGICA PARA BATCH SIZE = 1 (LATENCIA / TTLT) ---
     if batch_size == 1:
-        print(f"   Running in LATENCY mode (bsz=1). Measuring TTFT...")
+        print(f"   Running in LATENCY mode (bsz=1). Measuring TTLT...")
         loop_start_time = time.time()
         
         for i, prompt in enumerate(prompts):
@@ -759,17 +759,17 @@ def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, ba
             
             # Solo contar métricas después del calentamiento
             if i >= WARMUP_STEPS:
-                ttft_times_ms.append(gen_time_sec * 1000) # TTFT es el tiempo total de generación para bsz=1
+                ttlt_times_ms.append(gen_time_sec * 1000) # TTLT es el tiempo total de generación para bsz=1
                 total_new_tokens += (outputs.shape[1] - inputs.input_ids.shape[1])
                 total_inference_time_sec += gen_time_sec
         
         total_time_sec = time.time() - loop_start_time # Tiempo total del bucle
-        num_measured_prompts = len(ttft_times_ms)
+        num_measured_prompts = len(ttlt_times_ms)
         
         return {
             "mode": "latency",
-            "avg_ttft_ms": float(np.mean(ttft_times_ms)) if num_measured_prompts > 0 else None,
-            "std_ttft_ms": float(np.std(ttft_times_ms)) if num_measured_prompts > 0 else None,
+            "avg_ttlt_ms": float(np.mean(ttlt_times_ms)) if num_measured_prompts > 0 else None,
+            "std_ttlt_ms": float(np.std(ttlt_times_ms)) if num_measured_prompts > 0 else None,
             "throughput_tokens_per_sec": float(total_new_tokens / total_inference_time_sec) if total_inference_time_sec > 0 else 0.0,
             "total_loop_time_sec": float(total_time_sec),
             "total_new_tokens": int(total_new_tokens),
@@ -780,7 +780,7 @@ def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, ba
 
     # --- LÓGICA PARA BATCH SIZE > 1 (THROUGHPUT) ---
     else:
-        print(f"   Running in THROUGHPUT mode (bsz={batch_size}). TTFT will not be measured.")
+        print(f"   Running in THROUGHPUT mode (bsz={batch_size}). TTLT will not be measured.")
         # El tokenizer necesita padding para los lotes
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
@@ -817,17 +817,17 @@ def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, ba
                 num_new_tokens_in_batch = (outputs.shape[1] - input_length) * len(batch_prompts)
                 total_new_tokens += num_new_tokens_in_batch
                 
-                ttft_times_ms.append(gen_time_sec * 1000)
+                ttlt_times_ms.append(gen_time_sec * 1000)
                     
                 total_time_sec = time.time() - loop_start_time
-                num_measured_batches = len(ttft_times_ms)
+                num_measured_batches = len(ttlt_times_ms)
                 num_measured_prompts = num_measured_batches * batch_size
 
         return {
             "mode": "throughput",
-            "avg_ttft_ms": None, 
-            "std_ttft_ms": None,
-            "avg_batch_time_ms": float(np.mean(ttft_times_ms)) if num_measured_batches > 0 else None,
+            "avg_ttlt_ms": None, 
+            "std_ttlt_ms": None,
+            "avg_batch_time_ms": float(np.mean(ttlt_times_ms)) if num_measured_batches > 0 else None,
             "throughput_tokens_per_sec": float(total_new_tokens / total_inference_time_sec) if total_inference_time_sec > 0 else 0.0,
             "total_loop_time_sec": float(total_time_sec),
             "total_new_tokens": int(total_new_tokens),
@@ -1579,8 +1579,8 @@ def run_carbon_profiling(
             print(f"✅ {workload_name} completed")
             print(f"   Energy: {result['energy_kwh']:.6f} kWh")
             print(f"   Throughput: {result['throughput_tokens_per_sec']:.2f} tok/s")
-            if result.get("avg_ttft_ms"):
-                print(f"   Avg TTFT: {result['avg_ttft_ms']:.2f} ms")
+            if result.get("avg_ttlt_ms"):
+                print(f"   Avg TTLT: {result['avg_ttlt_ms']:.2f} ms")
             if result.get("avg_batch_time_ms"):
                 print(f"   Avg Batch Time: {result['avg_batch_time_ms']:.2f} ms")
             print(f"   Memory: {result['model_size_gb']:.2f} GB\n")
