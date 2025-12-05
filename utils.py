@@ -305,7 +305,7 @@ BENCHMARKS_CARBON = [
         "max_new_tokens": 20,
         "dataset": "hellaswag",
         "subset": "validation",  # ← Importante
-        "description": "Short responses (Latency, ttlt, bsz=1)",
+        "description": "Short responses (Latency, TTLT, bsz=1)",
         "batch_size": 1
     },
     {
@@ -314,7 +314,7 @@ BENCHMARKS_CARBON = [
         "max_new_tokens": 50,
         "dataset": "mmlu",
         "subset": "test",
-        "description": "Knowledge QA (Latency, ttlt, bsz=1)",
+        "description": "Knowledge QA (Latency, TTLT, bsz=1)",
         "batch_size": 1
     },
     {
@@ -323,7 +323,7 @@ BENCHMARKS_CARBON = [
         "max_new_tokens": 150, 
         "dataset": "IFEval",
         "subset": "train", 
-        "description": "Instruction (Latency, ttlt, bsz=1)", 
+        "description": "Instruction (Latency, TTLT, bsz=1)", 
         "batch_size": 1
     },
     {
@@ -712,7 +712,7 @@ def _measure_inference_performance(model, tokenizer, prompts, max_new_tokens, ba
     Measure inference performance with warm-up period.
     
     Handles two modes:
-    1. batch_size = 1: Measures TTLT (Time To First Token) and latency.
+    1. batch_size = 1: Measures TTLT (Time To Last Token) and latency.
     2. batch_size > 1: Measures batched throughput. TTLT metrics will be None.
     
     The first 5 prompts/batches are used for GPU warm-up and excluded from metrics.
