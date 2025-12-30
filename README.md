@@ -4,8 +4,7 @@
 Evaluation of structured width pruning in GLU-MLP layers using expansion ratio modification.
 
 **Focus:** Impact of reducing MLP expansion ratio on model capabilities.
-
----
+**Preprint:** [Fragile Knowledge, Robust Instruction-Following: The Width Pruning Dichotomy in Llama-3.2](https://arxiv.org/abs/2512.22671)
 
 ## Models
 
@@ -138,15 +137,14 @@ Unexpected gains: IFEval improves substantially, MUSR shows consistent gains (+2
 
 ---
 
-## Progress Tracker
-
-- [x] **Llama-3.2-1B (Base)** - Completed ✅ 
-  - 7 pruning levels (0%, 10%, 20%, 30%, 40%, 50%, 60%)
-  - 13 benchmarks evaluated
-  - [See detailed results](results/)
-- [x] **Llama-3.2-3B (Base)** - Completed ✅
-   - 7 pruning levels (0%, 10%, 20%, 30%, 40%, 50%, 60%)
-   - 13 benchmarks evaluated
-- [x] **Llama-3.2-1B-Instruct** - Completed ✅
-  - 4 pruning levels (0%, 10%, 40%, 60%)
-  - 7 benchmarks evaluated
+```
+@misc{martra2025fragileknowledgerobustinstructionfollowing,
+      title={Fragile Knowledge, Robust Instruction-Following: The Width Pruning Dichotomy in Llama-3.2}, 
+      author={Pere Martra},
+      year={2025},
+      eprint={2512.22671},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2512.22671}, 
+}
+```
