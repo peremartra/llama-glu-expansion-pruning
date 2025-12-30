@@ -15,8 +15,40 @@ Evaluation of structured width pruning in GLU-MLP layers using expansion ratio m
 ### Instruct Models
 - `Llama-3.2-1B-Instruct`
 
-**Total:** 3 model families
+---
+## Key Findings
 
+This research reveals two core trade-offs introduced by structured width pruning of GLU-MLP layers.
+
+### 1. Capability Trade-offs (Accuracy & Reasoning)
+
+Pruning creates a clear dichotomy between two classes of model capabilities:
+
+- **"Fragile" Capabilities (Degrade):** These are tasks that rely heavily on distributed knowledge stored in the MLP layers.
+  - **Degradation:** Performance on benchmarks like **MMLU** (knowledge), **GSM8K** (math reasoning), and perplexity metrics (**WikiText**, **Lambada**) consistently degrades as pruning intensity increases.
+  - **Most Fragile Task:** `gsm8k` is catastrophically affected, with performance collapsing even at moderate pruning levels.
+
+- **"Robust" Capabilities (Improve):** These are tasks that appear to rely more on core algorithmic reasoning pathways that are refined, not eroded, by pruning.
+  - **Improvement:** Performance on benchmarks like **IFEval** (instruction following), **MUSR** (multi-step reasoning), and **TruthfulQA** (truthfulness) is either stable or *improves significantly* with pruning.
+  - **Peak Improvement:** `IFEval` performance on the 1B model peaks at a **+75% improvement** over baseline at 30% pruning.
+
+This trade-off suggests that pruning acts as a form of regularization, sacrificing rote knowledge for enhanced performance on tasks requiring literal instruction adherence.
+
+### 2. The Deployment Dilemma (Performance & Energy)
+
+Pruning introduces a second trade-off related to inference performance, creating a dilemma for deployment:
+
+- **The Win (Batch Throughput & Efficiency):** For offline or batch processing, pruning is highly beneficial.
+  - **Throughput:** Batch throughput (tokens/sec) **improves** with more aggressive pruning, as the smaller model size allows for faster processing.
+  - **Energy:** Energy efficiency (Joules/token) **improves significantly**, with up to a **~20% reduction** in energy consumption at high pruning levels.
+
+- **The Cost (Interactive Latency):** For interactive, user-facing applications, pruning has a severe negative impact.
+  - **Latency:** Time To First Token (TTFT) **worsens dramatically** with pruning, increasing by **+50-90%** at higher pruning levels.
+  - **The Bottleneck:** This latency cost is isolated to the **prefill phase**. The token generation speed *after* the first token remains almost completely unaffected.
+
+This dilemma means that the optimal pruning level depends entirely on the deployment scenario. Models intended for batch processing can be aggressively pruned to save costs, while models for interactive chatbots must remain largely unpruned to ensure a responsive user experience.
+
+📊 **[View complete results and analysis →](results/)**
 ---
 
 ## Benchmarks
@@ -74,40 +106,6 @@ The `/notebooks` directory contains all the Jupyter notebooks used to run the ex
 
 - 📓 **[View Notebook Descriptions →](notebooks/README.md)**
 
----
-## Key Findings
-
-This research reveals two core trade-offs introduced by structured width pruning of GLU-MLP layers.
-
-### 1. Capability Trade-offs (Accuracy & Reasoning)
-
-Pruning creates a clear dichotomy between two classes of model capabilities:
-
-- **"Fragile" Capabilities (Degrade):** These are tasks that rely heavily on distributed knowledge stored in the MLP layers.
-  - **Degradation:** Performance on benchmarks like **MMLU** (knowledge), **GSM8K** (math reasoning), and perplexity metrics (**WikiText**, **Lambada**) consistently degrades as pruning intensity increases.
-  - **Most Fragile Task:** `gsm8k` is catastrophically affected, with performance collapsing even at moderate pruning levels.
-
-- **"Robust" Capabilities (Improve):** These are tasks that appear to rely more on core algorithmic reasoning pathways that are refined, not eroded, by pruning.
-  - **Improvement:** Performance on benchmarks like **IFEval** (instruction following), **MUSR** (multi-step reasoning), and **TruthfulQA** (truthfulness) is either stable or *improves significantly* with pruning.
-  - **Peak Improvement:** `IFEval` performance on the 1B model peaks at a **+75% improvement** over baseline at 30% pruning.
-
-This trade-off suggests that pruning acts as a form of regularization, sacrificing rote knowledge for enhanced performance on tasks requiring literal instruction adherence.
-
-### 2. The Deployment Dilemma (Performance & Energy)
-
-Pruning introduces a second trade-off related to inference performance, creating a dilemma for deployment:
-
-- **The Win (Batch Throughput & Efficiency):** For offline or batch processing, pruning is highly beneficial.
-  - **Throughput:** Batch throughput (tokens/sec) **improves** with more aggressive pruning, as the smaller model size allows for faster processing.
-  - **Energy:** Energy efficiency (Joules/token) **improves significantly**, with up to a **~20% reduction** in energy consumption at high pruning levels.
-
-- **The Cost (Interactive Latency):** For interactive, user-facing applications, pruning has a severe negative impact.
-  - **Latency:** Time To First Token (TTFT) **worsens dramatically** with pruning, increasing by **+50-90%** at higher pruning levels.
-  - **The Bottleneck:** This latency cost is isolated to the **prefill phase**. The token generation speed *after* the first token remains almost completely unaffected.
-
-This dilemma means that the optimal pruning level depends entirely on the deployment scenario. Models intended for batch processing can be aggressively pruned to save costs, while models for interactive chatbots must remain largely unpruned to ensure a responsive user experience.
-
-📊 **[View complete results and analysis →](results/)**
 ---
 
 ## Execution Details
