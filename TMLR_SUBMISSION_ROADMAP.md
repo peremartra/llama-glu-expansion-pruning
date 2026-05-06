@@ -18,15 +18,15 @@ These should be completed first, as the results will directly inform several tex
 
 ## Phase 2 — Editorial / Administrative Changes
 
-- [ ] Update author affiliation to **Independent Researcher**
-- [ ] Rename **MAW → PPM (Peak-to-Peak Magnitude)** throughout the entire manuscript (no reference to the previous name needed)
+- [X] Update author affiliation to **Independent Researcher**
+- [X] Rename **MAW → PPM (Peak-to-Peak Magnitude)** throughout the entire manuscript (no reference to the previous name needed)
 
 ---
 
 ## Phase 3 — Claim Adjustments *(after Phase 1 data is available)*
 
-- [ ] Soften language around the Llama-1B correlation (p=0.096 is not statistically significant — remove "robust" or equivalent wording)
-- [ ] Revise or remove the combined two-model correlation, which may violate statistical independence assumptions
+- [X] Soften language around the Llama-1B correlation (p=0.096 is not statistically significant — remove "robust" or equivalent wording)
+- [-] Revise or remove the combined two-model correlation, which may violate statistical independence assumptions
 - [ ] Update IFEval claims with variance data from Phase 1
 - [ ] Be more explicit about the modest **absolute** magnitude of IFEval gains (alongside the relative gains already reported)
 
